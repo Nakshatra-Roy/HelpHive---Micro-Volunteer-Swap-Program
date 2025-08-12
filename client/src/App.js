@@ -13,12 +13,9 @@ import ProfilePage from "./pages/ProfilePage";
 // import Profile from "./pages/Profile";
 
 function AppContent() {
-  const location = useLocation();
-  const hideNavbar = ["/login", "/signup"].includes(location.pathname);
-
   return (
     <>
-      {!hideNavbar && <Navbar />}
+      <Navbar />
       <div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}>
         <Routes>
           {/* Define your routes here */}

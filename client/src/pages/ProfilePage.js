@@ -1,120 +1,269 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import ProfileHeader from '../components/ProfileHeader'
-import ProfileDetails from '../components/ProfileDetails'
-import SkillsSection from '../components/SkillSection'
-import StatsSummary from '../components/StatsSummary'
-import VolunteerHistory from '../components/VolunteerHistory'
-import './ProfilePage.css' // Import the new stylesheet
-// Mock data for the user profile
-const mockUserData = {
-  id: "1234",
-  name: "Sarah Johnson",
-  profilePicture: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-  location: "Portland, OR",
-  memberSince: "January 2023",
-  bio: "I'm a retired teacher who loves gardening and community service. I believe in the power of helping others and building strong communities. I have experience in education, gardening, and basic home repairs.",
-  contact: {
-    email: "sarah.johnson@example.com",
-    phone: "(555) 123-4567"
-  },
-  skillsToOffer: ["Gardening", "Tutoring", "Basic Home Repairs", "Pet Sitting", "Cooking"],
-  skillsToReceive: ["Computer Help", "Heavy Lifting", "Home Organization", "Transportation"],
-  stats: {
-    creditsEarned: 120,
-    creditsSpent: 85,
-    rating: 4.8
-  },
-  volunteerHistory: [
-    { id: "task1", description: "Helped with garden cleanup at community center", date: "2023-06-15", credits: 15, type: "earned" },
-    { id: "task2", description: "Received computer setup assistance", date: "2023-05-22", credits: 10, type: "spent" },
-    { id: "task3", description: "Tutored high school student in math", date: "2023-04-10", credits: 20, type: "earned" },
-    { id: "task4", description: "Pet sitting for neighbor's cat", date: "2023-03-05", credits: 25, type: "earned" },
-    { id: "task5", description: "Received help with furniture moving", date: "2023-02-18", credits: 30, type: "spent" }
-  ]
-}
-const ProfilePage = () => {
-  const { user, loading, updateProfile } = useAuth()
-  const [userData, setUserData] = useState(user || mockUserData)
-  const [isEditing, setIsEditing] = useState(false)
-  const [profilePicture, setProfilePicture] = useState(null)
-  const navigate = useNavigate()
-  
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import './ProfilePage.css';
+import ProfileHeader from '../components/ProfileHeader';
+import ProfileDetails from '../components/ProfileDetails';
+import ProfileStats from '../components/ProfileStats';
+
+function ProfilePage() {
+  const { user, loading, updateProfile } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState({
+    firstName: '',
+    lastName: '',
+    bio: '',
+    location: '',
+    skills: '',
+    following: {
+      offer: [],
+      receive: []
+    },
+    availability: '',
+    contactInfo: {
+      phone: '',
+      publicEmail: ''
+    },
+    socialLinks: {
+      github: '',
+      linkedin: '',
+      twitter: ''
+    }
+  });
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+
   useEffect(() => {
-    if (!loading && !user && !localStorage.getItem('token')) {
-      navigate('/login')
-    }
     if (user) {
-      setUserData(user)
+      setProfileData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        bio: user.bio || '',
+        location: user.location || '',
+        skills: Array.isArray(user.skills) ? user.skills.join(', ') : user.skills || '',
+        following: Array.isArray(user.following) ? user.following.join(', ') : user.following || '',
+        availability: user.availability || '',
+        contactInfo: {
+          phone: user.contactInfo?.phone || '',
+          publicEmail: user.contactInfo?.publicEmail || ''
+        },
+        socialLinks: {
+          github: user.socialLinks?.github || '',
+          linkedin: user.socialLinks?.linkedin || '',
+          twitter: user.socialLinks?.twitter || ''
+        }
+      });
+      setPreviewUrl(user.profilePicture || '');
     }
-  }, [user, loading, navigate])
-  const handleEditToggle = async () => {
-    if (isEditing) {
-      // Save changes to the backend
-      const success = await updateProfile(userData, profilePicture)
-      if (success) {
-        setProfilePicture(null)
-      }
+  }, [user]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Handle nested objects (contactInfo and socialLinks)
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setProfileData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value
+        }
+      }));
+    } else {
+      // Handle regular fields
+      setProfileData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
-    setIsEditing(!isEditing)
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfilePicture(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Convert comma-separated strings to arrays and format nested objects
+    const formattedData = {
+      ...profileData,
+      skills: profileData.skills.split(',').map(skill => skill.trim()).filter(Boolean),
+      following: profileData.following.split(',').map(item => item.trim()).filter(Boolean),
+      contactInfo: profileData.contactInfo,
+      socialLinks: profileData.socialLinks
+    };
+    
+    const success = await updateProfile(formattedData, profilePicture);
+    if (success) {
+      setIsEditing(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="profile-loading">Loading profile...</div>;
   }
-  const handleDataChange = (field, value) => {
-    setUserData(prevData => ({
-      ...prevData,
-      [field]: value
-    }))
+
+  if (!user) {
+    return <div className="profile-error">Please log in to view your profile</div>;
   }
-  
-  const handleProfilePictureChange = (file) => {
-    setProfilePicture(file)
-  }
-  const handleContactChange = (field, value) => {
-    setUserData(prevData => ({
-      ...prevData,
-      contact: {
-        ...prevData.contact,
-        [field]: value
-      }
-    }))
-  }
-  const handleSkillsChange = (type, skills) => {
-    setUserData(prevData => ({
-      ...prevData,
-      [type]: skills
-    }))
-  }
+
   return (
-    <div className="profile-page-container">
+    <div className="profile-container">
       <ProfileHeader 
-        user={userData} 
+        user={user} 
         isEditing={isEditing} 
-        onEditToggle={handleEditToggle} 
-        onDataChange={handleDataChange}
-        onProfilePictureChange={handleProfilePictureChange}
+        setIsEditing={setIsEditing} 
+        previewUrl={previewUrl} 
+        handleFileChange={handleFileChange} 
       />
-      <div className="grid-layout">
-        <div className="main-column">
-          <ProfileDetails 
-            user={userData} 
-            isEditing={isEditing} 
-            onDataChange={handleDataChange}
-            onContactChange={handleContactChange}
-          />
-          <SkillsSection 
-            skillsToOffer={userData.skillsToOffer}
-            skillsToReceive={userData.skillsToReceive}
-            isEditing={isEditing}
-            onSkillsChange={handleSkillsChange}
-          />
-          <VolunteerHistory history={userData.volunteerHistory} />
-        </div>
-        <div className="side-column">
-          <StatsSummary stats={userData.stats} />
-        </div>
-      </div>
+      
+      {isEditing ? (
+        <form className="profile-edit-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>First Name</label>
+            <input 
+              type="text" 
+              name="firstName" 
+              value={profileData.firstName} 
+              onChange={handleInputChange} 
+              required 
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Last Name</label>
+            <input 
+              type="text" 
+              name="lastName" 
+              value={profileData.lastName} 
+              onChange={handleInputChange} 
+              required 
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Bio</label>
+            <textarea 
+              name="bio" 
+              value={profileData.bio} 
+              onChange={handleInputChange} 
+              rows={4} 
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Location</label>
+            <input 
+              type="text" 
+              name="location" 
+              value={profileData.location} 
+              onChange={handleInputChange} 
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Skills (comma separated)</label>
+            <input 
+              type="text" 
+              name="skills" 
+              value={profileData.skills} 
+              onChange={handleInputChange} 
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Following (comma separated)</label>
+            <input 
+              type="text" 
+              name="following" 
+              value={profileData.following} 
+              onChange={handleInputChange} 
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Availability</label>
+            <input 
+              type="text" 
+              name="availability" 
+              value={profileData.availability} 
+              onChange={handleInputChange} 
+            />
+          </div>
+
+          <h3>Contact Information</h3>
+          <div className="form-group">
+            <label>Phone</label>
+            <input 
+              type="text" 
+              name="contactInfo.phone" 
+              value={profileData.contactInfo.phone} 
+              onChange={handleInputChange} 
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Public Email</label>
+            <input 
+              type="email" 
+              name="contactInfo.publicEmail" 
+              value={profileData.contactInfo.publicEmail} 
+              onChange={handleInputChange} 
+            />
+          </div>
+
+          <h3>Social Links</h3>
+          <div className="form-group">
+            <label>GitHub</label>
+            <input 
+              type="url" 
+              name="socialLinks.github" 
+              value={profileData.socialLinks.github} 
+              onChange={handleInputChange} 
+              placeholder="https://github.com/username"
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>LinkedIn</label>
+            <input 
+              type="url" 
+              name="socialLinks.linkedin" 
+              value={profileData.socialLinks.linkedin} 
+              onChange={handleInputChange} 
+              placeholder="https://linkedin.com/in/username"
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Twitter</label>
+            <input 
+              type="url" 
+              name="socialLinks.twitter" 
+              value={profileData.socialLinks.twitter} 
+              onChange={handleInputChange} 
+              placeholder="https://twitter.com/username"
+            />
+          </div>
+          
+          <div className="form-actions">
+            <button type="submit" className="btn primary">Save Changes</button>
+            <button type="button" className="btn secondary" onClick={() => setIsEditing(false)}>Cancel</button>
+          </div>
+        </form>
+      ) : (
+        <>
+          <ProfileDetails user={user} />
+          <ProfileStats user={user} />
+        </>
+      )}
     </div>
-  )
+  );
 }
 
-export default ProfilePage
+export default ProfilePage;

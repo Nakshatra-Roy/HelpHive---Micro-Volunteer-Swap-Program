@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Navbar = () => {
   const { pathname } = useLocation();
@@ -7,15 +8,16 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const loggedInFlag = localStorage.getItem("isLoggedIn");
-    setIsLoggedIn(!!loggedInFlag);
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
   }, [pathname]);
 
   const isActive = (to) => pathname === to || pathname.startsWith(to + "/");
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    navigate("/login");
+    localStorage.removeItem("token");
+    delete axios.defaults.headers.common['Authorization'];
+    navigate("/");
   };
 
   return (
@@ -98,22 +100,6 @@ const Navbar = () => {
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {isLoggedIn ? (
             <>
-              <Link
-                to="/problems"
-                className="btn glossy ghost"
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "9999px",
-                  border: "1px solid #a7f3d0",
-                  background: "transparent",
-                  color: "#047857",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  transition: "all 0.3s",
-                }}
-              >
-                Explore
-              </Link>
               <Link
                 to="/profile"
                 className="btn glossy primary"

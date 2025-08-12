@@ -12,9 +12,14 @@ function Signup() {
   const [bio, setBio] = useState("");
   const [location, setLocation] = useState("");
   const [skills, setSkills] = useState("");
-  const [interests, setInterests] = useState("");
+  const [following, setFollowing] = useState("");
   const [availability, setAvailability] = useState("");
-  const [socialLinks, setSocialLinks] = useState("");
+  const [socialLinks, setSocialLinks] = useState({
+    github: "",
+    linkedin: "",
+    twitter: "",
+    website: ""
+  });
 
   const navigate = useNavigate();
 
@@ -31,8 +36,8 @@ function Signup() {
         password,
         bio,
         location,
-        skills,
-        interests,
+        skills: skills.split(',').map(item => item.trim()).filter(Boolean),
+        following: following.split(',').map(item => item.trim()).filter(Boolean),
         availability,
         socialLinks,
       },
@@ -55,53 +60,6 @@ function Signup() {
 
   return (
     <div className="signup-container">
-      <div
-        style={{
-          height: "60px",
-          display: "flex",
-          alignItems: "center",
-          paddingLeft: "24px",
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6))",
-          borderBottom: "1px solid rgba(0,0,0,0.08)",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-        }}
-      >
-        <a
-          href="/"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            fontWeight: 800,
-            letterSpacing: ".3px",
-            color: "#059669",
-            textDecoration: "none",
-            fontSize: "1.5rem",
-            textTransform: "uppercase",
-          }}
-          aria-label="HelpHive Home"
-        >
-          <span
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: "10px",
-              background: "linear-gradient(135deg, #bbf7d0, #34d399)",
-              boxShadow: "0 6px 16px rgba(16,185,129,0.25)",
-              display: "grid",
-              placeItems: "center",
-              color: "#064e3b",
-              fontWeight: 900,
-            }}
-          >
-            💡
-          </span>
-          HELP HIVE
-        </a>
-      </div>
       <div className="signup-form-wrapper">
         <form className="signup-form" onSubmit={handleSubmit}>
           <h2>Sign Up</h2>
@@ -184,9 +142,9 @@ function Signup() {
           />
           <input
             type="text"
-            placeholder="Interests (comma separated)"
-            value={interests}
-            onChange={(e) => setInterests(e.target.value)}
+            placeholder="Following (comma separated)"
+            value={following}
+            onChange={(e) => setFollowing(e.target.value)}
           />
           <input
             type="text"
@@ -194,12 +152,33 @@ function Signup() {
             value={availability}
             onChange={(e) => setAvailability(e.target.value)}
           />
-          <input
-            type="text"
-            placeholder="Social Links (comma separated URLs)"
-            value={socialLinks}
-            onChange={(e) => setSocialLinks(e.target.value)}
-          />
+          <div className="social-links-container">
+            <h4>Social Links</h4>
+            <input
+              type="text"
+              placeholder="GitHub"
+              value={socialLinks.github}
+              onChange={(e) => setSocialLinks({...socialLinks, github: e.target.value})}
+            />
+            <input
+              type="text"
+              placeholder="LinkedIn"
+              value={socialLinks.linkedin}
+              onChange={(e) => setSocialLinks({...socialLinks, linkedin: e.target.value})}
+            />
+            <input
+              type="text"
+              placeholder="Twitter"
+              value={socialLinks.twitter}
+              onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
+            />
+            <input
+              type="text"
+              placeholder="Website"
+              value={socialLinks.website}
+              onChange={(e) => setSocialLinks({...socialLinks, website: e.target.value})}
+            />
+          </div>
 
           <button type="submit">Sign Up</button>
           <p>

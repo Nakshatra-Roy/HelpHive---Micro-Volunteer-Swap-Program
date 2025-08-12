@@ -1,26 +1,39 @@
 const User = require('../models/userModel.js');
 const express = require('express');
-
-
 const jwt = require('jsonwebtoken');
 
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Check if email and password are provided
+    if (!email || !password) {
+      return res.status(400).json({ message: "Please provide email and password" });
+    }
+
     const user = await User.findOne({ email });
 
-    if (!user || user.password !== password) {
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    
+    if (user.password !== password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // Create JWT payload
     const payload = { user: { id: user.id } };
+    
+    // Sign JWT token
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
       { expiresIn: '2h' },
       (err, token) => {
-        if (err) throw err;
+        if (err) {
+          console.error('JWT Sign Error:', err);
+          return res.status(500).json({ message: "Error generating authentication token" });
+        }
         res.status(200).json({ token });
       }
     );
@@ -52,19 +65,25 @@ exports.getUserById = async (req, res) => {
 }
 
 exports.createUser = async (req, res) => {
-  const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, interests, availability,status, socialLinks } = req.body;
+  const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, following, availability, status, socialLinks } = req.body;
   try {
+    // Check if user with this email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User with this email already exists' });
+    }
+    
     const newUser = new User({
         firstName,
         lastName,
         email,
-        password, // In a real application, make sure to hash the password before saving
+        password,
         role,
         profilePicture,
         bio,
         location,
         skills,
-        interests,
+        following,
         availability,
         status,
         socialLinks
@@ -78,23 +97,29 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, interests, availability, socialLinks } = req.body;
+  const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, following, availability, socialLinks } = req.body;
   try {
-    const updatedUser = await User.findByIdAndUpdate(id, {
+    // Create update object
+    const updateData = {
         firstName,
         lastName,
         email,
-        password, // In a real application, make sure to hash the password before saving
         role,
         profilePicture,
         bio,
         location,
         skills,
-        interests,
+        following,
         availability,
         socialLinks
-
-    }, { new: true });
+    };
+    
+    // If password is provided, use it directly
+    if (password) {
+      updateData.password = password;
+    }
+    
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
     
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found!' });

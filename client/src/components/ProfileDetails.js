@@ -1,68 +1,98 @@
-import React from 'react'
+import React from 'react';
+import './ProfileComponents.css';
 
-const ProfileDetails = ({ user, isEditing, onDataChange, onContactChange }) => {
-  // Ensure user and contact exist with default values
-  const userWithDefaults = user || { bio: '', contact: { email: '', phone: '' } }
-  
-  const handleBioChange = (e) => {
-    onDataChange('bio', e.target.value)
-  }
-  
-  const handleContactChange = (field) => (e) => {
-    onContactChange(field, e.target.value)
-  }
-  
+function ProfileDetails({ user }) {
   return (
-    <div className="profile-section">
-      <h2 className="text-xl font-bold text-[#343a40] mb-4">About Me</h2>
+    <div className="profile-details">
+      <h2 className="section-title">About Me</h2>
+      <p className="profile-bio">{user.bio || 'No bio provided yet.'}</p>
       
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold text-[#343a40] mb-2">Bio</h3>
-        {isEditing ? (
-          <textarea
-            value={userWithDefaults.bio || ''}
-            onChange={handleBioChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#28a745] min-h-[100px]"
-            placeholder="Tell us about yourself..."
-          />
-        ) : (
-          <p className="text-[#343a40]">{userWithDefaults.bio || 'No bio available'}</p>
-        )}
-      </div>
-      
-      <div>
-        <h3 className="text-lg font-semibold text-[#343a40] mb-2">Contact Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-600 mb-1">Email</label>
-            {isEditing ? (
-              <input
-                type="email"
-                value={userWithDefaults.contact?.email || ''}
-                onChange={handleContactChange('email')}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#28a745]"
-              />
+      <div className="profile-info-grid">
+        <div className="profile-info-item">
+          <h3>Location</h3>
+          <p>{user.location || 'Not specified'}</p>
+        </div>
+        
+        <div className="profile-info-item">
+          <h3>Contact Information</h3>
+          <p>Phone: {user.contactInfo?.phone || 'Not provided'}</p>
+          <p>Public Email: {user.contactInfo?.publicEmail || 'Not provided'}</p>
+        </div>
+
+        <div className="profile-info-item">
+          <h3>Skills</h3>
+          <div className="tags-container">
+            {Array.isArray(user.skills) && user.skills.length > 0 ? (
+              user.skills.map((skill, index) => (
+                <span key={index} className="tag">{skill}</span>
+              ))
             ) : (
-              <p className="text-[#343a40]">{userWithDefaults.contact?.email || 'No email available'}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-gray-600 mb-1">Phone</label>
-            {isEditing ? (
-              <input
-                type="tel"
-                value={userWithDefaults.contact?.phone || ''}
-                onChange={handleContactChange('phone')}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#28a745]"
-              />
-            ) : (
-              <p className="text-[#343a40]">{userWithDefaults.contact?.phone || 'No phone available'}</p>
+              <p>No skills listed</p>
             )}
           </div>
         </div>
+        
+        <div className="profile-info-item">
+          <h3>Following</h3>
+          <div className="tags-container">
+            {(Array.isArray(user.following?.offer) && user.following.offer.length > 0) || 
+             (Array.isArray(user.following?.receive) && user.following.receive.length > 0) ? (
+              <>
+                {Array.isArray(user.following?.offer) && user.following.offer.map((item, index) => (
+                  <span key={`offer-${index}`} className="tag">{item}</span>
+                ))}
+                {Array.isArray(user.following?.receive) && user.following.receive.map((item, index) => (
+                  <span key={`receive-${index}`} className="tag">{item}</span>
+                ))}
+              </>
+            ) : (
+              <p>No following topics listed</p>
+            )}
+          </div>
+        </div>
+        
+        <div className="profile-info-item">
+          <h3>Availability</h3>
+          <p>{user.availability || 'Not specified'}</p>
+        </div>
+
+        <div className="profile-info-item">
+          <h3>Credits</h3>
+          <p>Earned: {user.credits?.earned || 0}</p>
+          <p>Spent: {user.credits?.spent || 0}</p>
+        </div>
+
+        <div className="profile-info-item">
+          <h3>Rating</h3>
+          <p>Average: {user.ratingSummary?.average || 0}/5</p>
+          <p>Total Ratings: {user.ratingSummary?.count || 0}</p>
+        </div>
+
+        <div className="profile-info-item">
+          <h3>Social Links</h3>
+          <div className="social-links">
+            {user.socialLinks?.github && (
+              <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer" className="social-link">GitHub</a>
+            )}
+            {user.socialLinks?.linkedin && (
+              <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="social-link">LinkedIn</a>
+            )}
+            {user.socialLinks?.twitter && (
+              <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="social-link">Twitter</a>
+            )}
+            {(!user.socialLinks?.github && !user.socialLinks?.linkedin && !user.socialLinks?.twitter) && (
+              <p>No social links provided</p>
+            )}
+          </div>
+        </div>
+
+        <div className="profile-info-item">
+          <h3>Member Since</h3>
+          <p>{new Date(user.createdAt).toLocaleDateString()}</p>
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default ProfileDetails
+export default ProfileDetails;
