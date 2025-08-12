@@ -1,0 +1,72 @@
+.signup-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+}
+
+.signup-form-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 60px;    
+  padding-bottom: 40px; 
+}
+
+.signup-form {
+  background: #fff;
+  padding: 40px 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(99,102,241,0.08);
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+}
+
+.signup-form h2 {
+  margin-bottom: 24px;
+  color: #6366f1;
+  text-align: center;
+}
+
+.signup-form input {
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.signup-form button {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.2s;
+}
+
+.signup-form button:hover {
+  background: #4f46e5;
+}
+
+.signup-link {
+  color: #6366f1;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* 🔹 Add red asterisk for required fields */
+.required-field {
+  position: relative;
+}
+
+.required-field::after {
+  content: "*";
+  color: red;
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  font-size: 1rem;
+}

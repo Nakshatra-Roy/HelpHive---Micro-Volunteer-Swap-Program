@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-
+const User=require('./models/userModel.js');
 app.use(cors());
 app.use(express.json());
 
@@ -10,7 +10,6 @@ app.use(express.json());
 // This is where we will define the routes for our application
 // For example, if we have a problem and user routes, we can import them like this
 // const problemRoutes = require('./routes/problemRoutes');
-
 
 const userRoutes = require('./routes/userRoutes');
 // FOR REACH ROUTES, WE NEED A 

@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
     skills: [String],
     interests: [String],
     availability: { type: String, default: 'full-time' },
+    status: { type: Boolean, default: true },
     socialLinks: {
         github: { type: String, default: '' },
         linkedin: { type: String, default: '' },
@@ -20,5 +21,4 @@ const userSchema = new mongoose.Schema({
         },
     createdAt: { type: Date, default: Date.now }
 });
-
 module.exports = mongoose.model('User', userSchema);

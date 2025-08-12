@@ -2,6 +2,29 @@ const User = require('../models/userModel.js');
 const express = require('express');
 
 
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "Email not found" });
+    }
+
+    if (user.password !== password) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    // Password matched
+    return res.status(200).json({ message: "Login successful" });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find().sort({ createdAt: -1 }); // Sort by creation date, newest first
@@ -25,7 +48,7 @@ exports.getUserById = async (req, res) => {
 }
 
 exports.createUser = async (req, res) => {
-  const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, interests, availability, socialLinks } = req.body;
+  const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, interests, availability,status, socialLinks } = req.body;
   try {
     const newUser = new User({
         firstName,
@@ -39,6 +62,7 @@ exports.createUser = async (req, res) => {
         skills,
         interests,
         availability,
+        status,
         socialLinks
     });
     await newUser.save();
