@@ -101,6 +101,6 @@ Mohammad Nazmul Hoque - https://github.com/NazmulHoque1010
 
 Imtiaz Mashafee Samin - https://github.com/exoxeph
 
-Ahmed Rafat - https://github.com/AhmedRafat02
+Ahmed Rafat - [https://github.com/AhmedRafat02](https://github.com/ahmedrafatcse)
 
 Nakshatra Roy – https://github.com/nakshatra-roy
