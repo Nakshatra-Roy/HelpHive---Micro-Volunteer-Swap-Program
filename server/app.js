@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const app = express();
 const User=require('./models/userModel.js');
 app.use(cors());
@@ -23,5 +24,6 @@ const userRoutes = require('./routes/userRoutes');
 // Using the routes:
 // app.use('/api/problems', problemRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/profile', require('./routes/profileRoutes'));
 
 module.exports = app;

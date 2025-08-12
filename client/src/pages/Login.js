@@ -1,35 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./Login.css";
-import axios from "axios";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-    const res = await axios.post('http://localhost:5001/api/users/login', { email, password });
-
-    window.alert(res.data.message); // "Email not found", "Invalid password", or "Login successful"
-
-    if (res.status === 200) {
-      // Save login flag
-      localStorage.setItem("isLoggedIn", "true");
+  const { login, user, loading, error } = useAuth();
+  
+  useEffect(() => {
+    // If user is already logged in, redirect to home
+    if (user) {
       navigate('/');
     }
+  }, [user, navigate]);
 
-  } catch (err) {
-    if (err.response) {
-      window.alert(err.response.data.message || "Login failed");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+    
+    const success = await login(email, password);
+    
+    if (success) {
+      navigate('/');
     } else {
-      window.alert("Login failed. Please try again.");
+      setErrorMessage(error || "Login failed. Please try again.");
     }
-  }
-};
+  };
 
 
   return (

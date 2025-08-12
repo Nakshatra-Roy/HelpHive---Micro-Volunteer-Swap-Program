@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
-import ProfileHeader from '../../components/profile/ProfileHeader'
-import ProfileDetails from '../../components/profile/ProfileDetails'
-import SkillsSection from '../../components/profile/SkillsSection'
-import StatsSummary from '../../components/profile/StatsSummary'
-import VolunteerHistory from '../../components/profile/VolunteerHistory'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import ProfileHeader from '../components/ProfileHeader'
+import ProfileDetails from '../components/ProfileDetails'
+import SkillsSection from '../components/SkillSection'
+import StatsSummary from '../components/StatsSummary'
+import VolunteerHistory from '../components/VolunteerHistory'
+import './ProfilePage.css' // Import the new stylesheet
 // Mock data for the user profile
 const mockUserData = {
   id: "1234",
@@ -32,12 +35,27 @@ const mockUserData = {
   ]
 }
 const ProfilePage = () => {
-  const [userData, setUserData] = useState(mockUserData)
+  const { user, loading, updateProfile } = useAuth()
+  const [userData, setUserData] = useState(user || mockUserData)
   const [isEditing, setIsEditing] = useState(false)
-  const handleEditToggle = () => {
+  const [profilePicture, setProfilePicture] = useState(null)
+  const navigate = useNavigate()
+  
+  useEffect(() => {
+    if (!loading && !user && !localStorage.getItem('token')) {
+      navigate('/login')
+    }
+    if (user) {
+      setUserData(user)
+    }
+  }, [user, loading, navigate])
+  const handleEditToggle = async () => {
     if (isEditing) {
-      // If we're currently editing and toggling off, we'd normally save changes to the backend
-      // For now, we just toggle the state
+      // Save changes to the backend
+      const success = await updateProfile(userData, profilePicture)
+      if (success) {
+        setProfilePicture(null)
+      }
     }
     setIsEditing(!isEditing)
   }
@@ -46,6 +64,10 @@ const ProfilePage = () => {
       ...prevData,
       [field]: value
     }))
+  }
+  
+  const handleProfilePictureChange = (file) => {
+    setProfilePicture(file)
   }
   const handleContactChange = (field, value) => {
     setUserData(prevData => ({
@@ -63,15 +85,16 @@ const ProfilePage = () => {
     }))
   }
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="profile-page-container">
       <ProfileHeader 
         user={userData} 
         isEditing={isEditing} 
         onEditToggle={handleEditToggle} 
         onDataChange={handleDataChange}
+        onProfilePictureChange={handleProfilePictureChange}
       />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <div className="md:col-span-2 space-y-6">
+      <div className="grid-layout">
+        <div className="main-column">
           <ProfileDetails 
             user={userData} 
             isEditing={isEditing} 
@@ -86,11 +109,12 @@ const ProfilePage = () => {
           />
           <VolunteerHistory history={userData.volunteerHistory} />
         </div>
-        <div className="md:col-span-1">
+        <div className="side-column">
           <StatsSummary stats={userData.stats} />
         </div>
       </div>
     </div>
   )
 }
+
 export default ProfilePage

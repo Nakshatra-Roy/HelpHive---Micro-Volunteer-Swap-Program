@@ -4,8 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./Landing.css";
 
 const API_BASE =
-  import.meta?.env?.VITE_API_BASE?.replace(/\/+$/, "") ||
-  (process.env.REACT_APP_API_BASE?.replace(/\/+$/, "") || "");
+  process.env.REACT_APP_API_BASE?.replace(/\/+$/, "") || "";
 
 function useFetch(url, initial = []) {
   const [data, setData] = useState(initial);
