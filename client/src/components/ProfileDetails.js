@@ -31,26 +31,20 @@ function ProfileDetails({ user }) {
             )}
           </div>
         </div>
-        
+
         <div className="profile-info-item">
           <h3>Following</h3>
           <div className="tags-container">
-            {(Array.isArray(user.following?.offer) && user.following.offer.length > 0) || 
-             (Array.isArray(user.following?.receive) && user.following.receive.length > 0) ? (
-              <>
-                {Array.isArray(user.following?.offer) && user.following.offer.map((item, index) => (
-                  <span key={`offer-${index}`} className="tag">{item}</span>
-                ))}
-                {Array.isArray(user.following?.receive) && user.following.receive.map((item, index) => (
-                  <span key={`receive-${index}`} className="tag">{item}</span>
-                ))}
-              </>
+            {Array.isArray(user.following) && user.following.length > 0 ? (
+              user.following.map((following, index) => (
+                <span key={index} className="tag">{following}</span>
+              ))
             ) : (
-              <p>No following topics listed</p>
+              <p>No Following skills listed</p>
             )}
           </div>
         </div>
-        
+                
         <div className="profile-info-item">
           <h3>Availability</h3>
           <p>{user.availability || 'Not specified'}</p>

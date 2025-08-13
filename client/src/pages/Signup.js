@@ -118,14 +118,7 @@ function Signup() {
             placeholder="Bio"
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            rows={2}
-            style={{
-              marginBottom: "16px",
-              borderRadius: "8px",
-              padding: "12px",
-              border: "1px solid #d1d5db",
-              fontSize: "1rem",
-            }}
+            rows={3}
           />
 
           <input
@@ -134,50 +127,56 @@ function Signup() {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
           />
+          
           <input
             type="text"
             placeholder="Skills (comma separated)"
             value={skills}
             onChange={(e) => setSkills(e.target.value)}
           />
+          
           <input
             type="text"
             placeholder="Following (comma separated)"
             value={following}
             onChange={(e) => setFollowing(e.target.value)}
           />
+          
           <input
             type="text"
             placeholder="Availability (e.g. Weekends, Evenings)"
             value={availability}
             onChange={(e) => setAvailability(e.target.value)}
           />
+          
           <div className="social-links-container">
             <h4>Social Links</h4>
-            <input
-              type="text"
-              placeholder="GitHub"
-              value={socialLinks.github}
-              onChange={(e) => setSocialLinks({...socialLinks, github: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="LinkedIn"
-              value={socialLinks.linkedin}
-              onChange={(e) => setSocialLinks({...socialLinks, linkedin: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="Twitter"
-              value={socialLinks.twitter}
-              onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="Website"
-              value={socialLinks.website}
-              onChange={(e) => setSocialLinks({...socialLinks, website: e.target.value})}
-            />
+            <div className="social-links-grid">
+              <input
+                type="text"
+                placeholder="GitHub"
+                value={socialLinks.github}
+                onChange={(e) => setSocialLinks({...socialLinks, github: e.target.value})}
+              />
+              <input
+                type="text"
+                placeholder="LinkedIn"
+                value={socialLinks.linkedin}
+                onChange={(e) => setSocialLinks({...socialLinks, linkedin: e.target.value})}
+              />
+              <input
+                type="text"
+                placeholder="Twitter"
+                value={socialLinks.twitter}
+                onChange={(e) => setSocialLinks({...socialLinks, twitter: e.target.value})}
+              />
+              <input
+                type="text"
+                placeholder="Website"
+                value={socialLinks.website}
+                onChange={(e) => setSocialLinks({...socialLinks, website: e.target.value})}
+              />
+            </div>
           </div>
 
           <button type="submit">Sign Up</button>

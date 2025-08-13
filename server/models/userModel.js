@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     // --- Basic Profile & Status Fields (from your original file, enhanced) ---
     profilePicture: { 
         type: String, 
-        default: 'default-avatar.png' // Using a more descriptive default name
+        default: 'default-avatar.svg' // Using a more descriptive default name
     },
     bio: { 
         type: String, 
