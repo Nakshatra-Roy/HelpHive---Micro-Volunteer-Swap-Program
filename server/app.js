@@ -26,7 +26,10 @@ const userRoutes = require('./routes/userRoutes');
 
 
 // Using the routes:
-// app.use('/api/problems', problemRoutes);
+const taskRoutes = require('./routes/taskRoutes');
+const offerRoutes = require('./routes/offerRoutes');
+app.use('/api/tasks', taskRoutes);
+app.use('/api/offers', offerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/profile', require('./routes/profileRoutes'));
 
