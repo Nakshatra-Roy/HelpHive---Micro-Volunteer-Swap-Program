@@ -1,9 +1,14 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+require('dotenv').config();
 const app = express();
 const User=require('./models/userModel.js');
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 // Importing routes:
@@ -21,7 +26,11 @@ const userRoutes = require('./routes/userRoutes');
 
 
 // Using the routes:
-// app.use('/api/problems', problemRoutes);
+const taskRoutes = require('./routes/taskRoutes');
+const offerRoutes = require('./routes/offerRoutes');
+app.use('/api/tasks', taskRoutes);
+app.use('/api/offers', offerRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/profile', require('./routes/profileRoutes'));
 
 module.exports = app;

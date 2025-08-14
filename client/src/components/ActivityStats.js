@@ -1,0 +1,36 @@
+// client/src/components/ActivityStats.js
+import React from 'react';
+
+const ActivityStats = ({ user }) => {
+  const tasksCompleted = user.volunteerHistory?.length || 0;
+  const tasksPosted = 0; // Placeholder as specified in requirements
+  const averageRating = user.ratingSummary?.average || 0;
+  const ratingCount = user.ratingSummary?.count || 0;
+  const creditBalance = (user.credits?.earned || 0) - (user.credits?.spent || 0);
+
+  return (
+    <div className="activity-stats-card">
+      <h2 className="card-title">Activity Stats</h2>
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">{tasksCompleted}</div>
+          <div className="stat-label">Tasks Completed</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{tasksPosted}</div>
+          <div className="stat-label">Tasks Posted</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{averageRating > 0 ? averageRating : '—'}</div>
+          <div className="stat-label">Rating ({ratingCount})</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{creditBalance}</div>
+          <div className="stat-label">Credit Balance</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ActivityStats;
