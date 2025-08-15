@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 import Task from "../models/taskModel.js";
+import User from "../models/userModel.js"; 
+import { getUserById } from "../controllers/userController.js";
+//import { sendNotifications } from "../controllers/notificationController.js";
+
 
 export const getTasks = async (req, res) => {
 	try {
@@ -12,46 +16,31 @@ export const getTasks = async (req, res) => {
 };
 
 export const createTask = async (req, res) => {
-  const taskData = req.body; 
+  const taskData = req.body;
   console.log("Received task on backend:", taskData);
 
-  const newTask = new Task(taskData);
+  // Get logged-in user's ID from auth middleware
+  const userId = req.user?._id || req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: "You have to be logged in to create a task" });
+  }
 
   try {
-    await newTask.save();
-
-    const interestedUsers = await User.find({ following: newTask.category });
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+    const newTask = new Task({
+      ...taskData,
+      postedBy: userId,  // <-- assign userId directly
     });
 
-    for (const user of interestedUsers) {
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: `New Task in ${newTask.category}!`,
-        text: `Hi ${user.name},\n\nA new task "${newTask.taskName}" has been posted in the category you follow.\n\nCheck it out on HelpHive!`,
-      };
+    await newTask.save();
 
-      try {
-        await transporter.sendMail(mailOptions);
-        console.log(`Email sent to ${user.email}`);
-      } catch (err) {
-        console.error(`Failed to send email to ${user.email}:`, err.message);
-      }
-    }
+    //const notifiedCount = await sendNotifications?.(newTask) || 0;
 
     res.status(201).json({
       success: true,
       data: newTask,
-      notifiedUsers: interestedUsers.length
+      notifiedUsers: 0,
     });
-
   } catch (error) {
     console.error("Error creating task:", error.message);
 
@@ -62,6 +51,8 @@ export const createTask = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+
 
 export const updateTask = async (req, res) => {
 	const { id } = req.params;
@@ -107,4 +98,33 @@ export const deleteTask = async (req, res) => {
 		console.log("Error in deleting task:", error.message);
 		res.status(500).json({ success: false, message: "Server Error" });
 	}
+};
+
+export const acceptTask = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'You must be logged in to accept tasks' });
+  }
+
+  try {
+    const task = await Task.findById(id);
+    if (!task) return res.status(404).json({ success: false, message: 'Task not found' });
+
+    if (!task.helpersArray) task.helpersArray = [];
+    if (!task.helpersArray.includes(userId)) task.helpersArray.push(userId);
+
+    await task.save();
+
+    const user = await User.findById(userId);
+    if (!user.myTasks.includes(task._id)) {
+      user.myTasks.push(task._id);
+      await user.save();
+    }
+    res.status(200).json(task); // return updated task
+  } catch (error) {
+    console.error('Error accepting task:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
 };

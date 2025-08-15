@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
+
+
 export const useTaskStore = create((set) => ({
   tasks: [],
   loading: false,
@@ -42,23 +44,33 @@ export const useTaskStore = create((set) => ({
   },
   
   // Accept a task
-  acceptTask: async (taskId, userId) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await axios.put(`/api/tasks/${taskId}/accept`, { userId });
-      set((state) => ({
-        tasks: state.tasks.map(task => 
-          task._id === taskId ? { ...task, acceptedBy: [...(task.acceptedBy || []), userId] } : task
-        ),
-        loading: false
-      }));
-      return { success: true, message: 'Task accepted successfully' };
-    } catch (error) {
-      set({ 
-        error: error.response?.data?.message || 'Failed to accept task', 
-        loading: false 
-      });
-      return { success: false, message: error.response?.data?.message || 'Failed to accept task' };
-    }
+ acceptTask: async (task, userId) => {
+  if (!userId) {
+    return { success: false, message: 'You have to be logged in to accept tasks' };
   }
+
+  if (userId === task.postedBy) {
+    return { success: false, message: 'You cannot accept your own tasks' };
+  }
+
+  set({ loading: true, error: null });
+  try {
+    const response = await axios.put(`/api/tasks/${task._id}/accept`, { userId });
+    set((state) => ({
+      tasks: state.tasks.map(t => 
+        t._id === task._id ? response.data : t
+      ),
+      loading: false
+    }));
+
+    return { success: true, message: 'Task accepted successfully' };
+  } catch (error) {
+    set({ 
+      error: error.response?.data?.message || 'Failed to accept task', 
+      loading: false 
+    });
+    return { success: false, message: error.response?.data?.message || 'Failed to accept task' };
+  }
+}
+
 }));

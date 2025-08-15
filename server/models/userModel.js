@@ -56,6 +56,9 @@ const userSchema = new mongoose.Schema({
         twitter: { type: String, default: '' },
         website: { type: String, default: '' }
     },
+    myTasks: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'Task'
+    }],
     
     // --- Metadata (from your original file) ---
     flag: { type: Boolean, default: false }, // Kept from your original file

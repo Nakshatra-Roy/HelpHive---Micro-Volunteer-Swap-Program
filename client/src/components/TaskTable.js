@@ -1,19 +1,18 @@
 import React, { useEffect } from "react";
 import styles from './TaskTable.module.css';
 import { useTaskStore } from "../store/taskStore";
+import { useAuth } from '../context/AuthContext'; // <-- add this
 
 const TaskTable = () => {
   const { tasks, fetchTask, acceptTask } = useTaskStore();
-
-  // Replace with actual userId from auth or context
-  const userId = "64acff1234abc567def89012";
+  const { user } = useAuth(); // <-- get logged-in user
 
   useEffect(() => {
     fetchTask();
   }, [fetchTask]);
 
-  const handleAcceptTask = async (taskId) => {
-    const { success, message } = await acceptTask(taskId, userId);
+  const handleAcceptTask = async (task) => {
+    const { success, message } = await acceptTask(task, user?._id); // <-- pass user ID
     if (!success) {
       console.error("Error accepting task:", message);
       alert(`Error: ${message}`);
@@ -58,7 +57,7 @@ const TaskTable = () => {
                 <td className={styles.td}>
                   <button
                     className={styles.button}
-                    onClick={() => handleAcceptTask(task._id)}
+                    onClick={() => handleAcceptTask(task)}
                     disabled={task.curHelpers >= task.helpersReq}
                   >
                     Accept Task
