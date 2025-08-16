@@ -2,6 +2,8 @@ import Navbar from './components/Navbar';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from './context/AuthContext';
+import { Toaster } from "react-hot-toast";
+import { SocketProvider } from "./context/socketProvider";
 
 import "./App.css";
 import Landing from "./pages/Landing";
@@ -40,12 +42,16 @@ function AppContent() {
 
 function App() {
   return (
+    <SocketProvider>
       <AuthProvider>
         <Router>
           <AppContent />
         </Router>
       </AuthProvider>
+    </SocketProvider>
   );
 }
+
+//<Toaster position="top-right" />
 
 export default App;

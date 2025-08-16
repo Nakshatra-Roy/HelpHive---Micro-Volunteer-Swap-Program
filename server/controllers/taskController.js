@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Task from "../models/taskModel.js";
 import User from "../models/userModel.js"; 
 import { getUserById } from "../controllers/userController.js";
-//import { sendNotifications } from "../controllers/notificationController.js";
+import { sendNotifications } from "../controllers/notificationController.js";
 
 
 export const getTasks = async (req, res) => {
@@ -29,17 +29,17 @@ export const createTask = async (req, res) => {
   try {
     const newTask = new Task({
       ...taskData,
-      postedBy: userId,  // <-- assign userId directly
+      postedBy: userId,
     });
 
     await newTask.save();
 
-    //const notifiedCount = await sendNotifications?.(newTask) || 0;
+    const notifiedCount = await sendNotifications?.(newTask) || 0;
 
     res.status(201).json({
       success: true,
       data: newTask,
-      notifiedUsers: 0,
+      notifiedUsers: notifiedCount,
     });
   } catch (error) {
     console.error("Error creating task:", error.message);

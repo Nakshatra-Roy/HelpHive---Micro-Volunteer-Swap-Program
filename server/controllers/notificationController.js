@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { io } from "../socket.js";
+import { getIo } from "../../client/src/socket.js";
 import User from "../models/userModel.js";
 
 export const sendNotifications = async (task) => {
@@ -24,6 +24,7 @@ export const sendNotifications = async (task) => {
         to: user.email,
         subject: `New Task in ${task.category}!`,
         text: `Hi ${user.name},\n\nA new task "${task.taskName}" has been posted in the category you follow.\n\nCheck it out on HelpHive!`,
+        //insert link to task
       };
 
       try {
@@ -39,10 +40,15 @@ export const sendNotifications = async (task) => {
       io.to(user._id.toString()).emit("newTask", {
         category: task.category,
         taskName: task.taskName,
+        taskId: task._id,
       });
       socketSentCount++;
     }
-  };
+  }
+
+
+  console.log(`Email notifications sent: ${emailSentCount}`);
+  console.log(`In-app notifications sent: ${socketSentCount}`);
 };
 
 
