@@ -43,6 +43,8 @@ const TaskTable = () => {
               <th className={styles.th}>Location</th>
               <th className={styles.th}>Helpers Required</th>
               <th className={styles.th}>Current Helpers</th>
+              <th className={styles.th}>Due Date</th>
+              <th className={styles.th}>Priority</th>
               <th className={styles.th}>Actions</th>
             </tr>
           </thead>
@@ -54,6 +56,8 @@ const TaskTable = () => {
                 <td className={styles.td}>{task.location}</td>
                 <td className={styles.td}>{task.helpersReq}</td>
                 <td className={styles.td}>{task.curHelpers || 0}</td>
+                <td className={styles.td}>{task.date}</td>
+                <td className={styles.td}>{task.priority}</td>
                 <td className={styles.td}>
                   <button
                     className={styles.button}

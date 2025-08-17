@@ -9,7 +9,9 @@ const CreateTask = () => {
         category: "",
         location: "",
         helpersReq: "",
-		taskDescription: ""
+		taskDescription: "",
+		date: "",
+		priority: "",
 	});
 
 	const { createTask } = useTaskStore();
@@ -26,7 +28,9 @@ const CreateTask = () => {
 			taskDescription: "",
             category: "",
             location: "",
-            helpersReq: 1 });
+            helpersReq: 1,
+			date: "",
+			priority: "",});
 	};
 
 	return (
@@ -92,6 +96,34 @@ const CreateTask = () => {
 			}
 			className="input glass-input"
 			/>
+
+			<label className="label">Due Date</label>
+			<input
+			placeholder="19th August"
+			name="date"
+			type="date"
+			value={newTask.date}
+			onChange={(e) =>
+				setNewTask({ ...newTask, date: Date(e.target.value) })
+			}
+			className="input glass-input"
+			/>
+
+			<label className="label">Priority</label>
+			<select
+			name="priority"
+			value={newTask.priority}
+			onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+			className="input glass-input"
+			>
+			<option value="" disabled>
+				Select Priority
+			</option>
+			<option value="Low">Low</option>
+			<option value="Medium">Medium</option>
+			<option value="High">High</option>
+			</select>
+
 
         <button className="btn glossy primary" onClick={handleAddTask}>
           Create Task

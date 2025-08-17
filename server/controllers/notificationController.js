@@ -2,8 +2,16 @@ import nodemailer from "nodemailer";
 import { getIo } from "../../client/src/socket.js";
 import User from "../models/userModel.js";
 
+
 export const sendNotifications = async (task) => {
-  const interestedUsers = await User.find({ following: task.category });
+
+  let interestedUsers = [];
+  try {
+  interestedUsers = await User.find({ following: { $in: [task.category] } });
+  console.log("Users found:", interestedUsers.length, "emails:", interestedUsers.map(u => u.email));
+  } catch (err) {
+  console.error("Error finding users:", err.message);
+}
 
   let emailSentCount = 0;
   let socketSentCount = 0;
