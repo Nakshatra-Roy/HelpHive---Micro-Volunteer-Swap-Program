@@ -17,6 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // const problemRoutes = require('./routes/problemRoutes');
 
 const userRoutes = require('./routes/userRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 // FOR REACH ROUTES, WE NEED A 
 // 1. Routes
 // 2. MODEL AND A 
@@ -32,5 +33,6 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/profile', require('./routes/profileRoutes'));
+app.use('/api/admin', adminRoutes);
 
 module.exports = app;

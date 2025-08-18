@@ -110,7 +110,7 @@ function Landing() {
                 <h3 className="card-title">{t?.title || "Loading…"}</h3>
                 <p className="card-sub">
                   {(t?.tags || ["urgent", "outdoor", "friendly"]).slice(0, 3).map((tag, j) => (
-                    <span className="tag" key={j}>#{tag}</span>
+                    <span className="tag" key={tag}>#{tag}</span>
                   ))}
                 </p>
               </Link>

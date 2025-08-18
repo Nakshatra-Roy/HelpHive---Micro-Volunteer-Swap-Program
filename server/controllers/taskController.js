@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
-import Task from "../models/taskModel.js";
-import User from "../models/userModel.js"; 
-import { getUserById } from "../controllers/userController.js";
-import { sendNotifications } from "../controllers/notificationController.js";
+const mongoose = require("mongoose");
+const Task = require("../models/taskModel.js");
+const User = require("../models/userModel.js"); 
+const { getUserById } = require("../controllers/userController.js");
+const { sendNotifications } = require("../controllers/notificationController.js");
 
 
-export const getTasks = async (req, res) => {
+const getTasks = async (req, res) => {
 	try {
 		const tasks = await Task.find({});
 		res.status(200).json({ success: true, data: tasks });
@@ -15,7 +15,7 @@ export const getTasks = async (req, res) => {
 	}
 };
 
-export const createTask = async (req, res) => {
+const createTask = async (req, res) => {
   const taskData = req.body;
   console.log("Received task on backend:", taskData);
 
@@ -54,7 +54,7 @@ export const createTask = async (req, res) => {
 
 
 
-export const updateTask = async (req, res) => {
+const updateTask = async (req, res) => {
 	const { id } = req.params;
 
 	const task = req.body;
@@ -79,7 +79,7 @@ export const updateTask = async (req, res) => {
 
 };
 
-export const deleteTask = async (req, res) => {
+const deleteTask = async (req, res) => {
 	const { id } = req.params;
 
 	if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -100,31 +100,53 @@ export const deleteTask = async (req, res) => {
 	}
 };
 
-export const acceptTask = async (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.body;
+const acceptTask = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user?._id || req.user?.id;
 
-  if (!userId) {
-    return res.status(401).json({ success: false, message: 'You must be logged in to accept tasks' });
-  }
-
-  try {
-    const task = await Task.findById(id);
-    if (!task) return res.status(404).json({ success: false, message: 'Task not found' });
-
-    if (!task.helpersArray) task.helpersArray = [];
-    if (!task.helpersArray.includes(userId)) task.helpersArray.push(userId);
-
-    await task.save();
-
-    const user = await User.findById(userId);
-    if (!user.myTasks.includes(task._id)) {
-      user.myTasks.push(task._id);
-      await user.save();
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ success: false, message: "Invalid Task Id" });
     }
-    res.status(200).json(task); // return updated task
-  } catch (error) {
-    console.error('Error accepting task:', error);
-    res.status(500).json({ success: false, message: 'Server Error' });
-  }
+
+    if (!userId) {
+        return res.status(401).json({ success: false, message: "You have to be logged in to accept a task" });
+    }
+
+    try {
+        const task = await Task.findById(id);
+
+        if (!task) {
+            return res.status(404).json({ success: false, message: "Task does not exist" });
+        }
+
+        if (task.postedBy.toString() === userId.toString()) {
+            return res.status(400).json({ success: false, message: "You cannot accept your own task" });
+        }
+
+        if (task.helpersArray.includes(userId)) {
+            return res.status(400).json({ success: false, message: "You have already accepted this task" });
+        }
+
+        if (task.curHelpers >= task.helpersReq) {
+            return res.status(400).json({ success: false, message: "This task has already been filled" });
+        }
+
+        task.curHelpers += 1;
+        task.helpersArray.push(userId);
+
+        const updatedTask = await task.save();
+
+        res.status(200).json({ success: true, data: updatedTask });
+    } catch (error) {
+        console.error("Error accepting task:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+module.exports = {
+    getTasks,
+    createTask,
+    updateTask,
+    deleteTask,
+    acceptTask
 };
