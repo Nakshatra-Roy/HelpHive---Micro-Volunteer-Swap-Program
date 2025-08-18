@@ -29,9 +29,11 @@ const adminRoutes = require('./routes/adminRoutes');
 // Using the routes:
 const taskRoutes = require('./routes/taskRoutes');
 const offerRoutes = require('./routes/offerRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 app.use('/api/tasks', taskRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/chat', chatRoutes);
 app.use('/api/profile', require('./routes/profileRoutes'));
 app.use('/api/admin', adminRoutes);
 

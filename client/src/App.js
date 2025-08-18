@@ -13,7 +13,7 @@ import ProfilePage from "./pages/ProfilePage";
 import AdminProfilePage from "./pages/AdminProfilePage";
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminRoute from './components/AdminRoute';
-
+import ChatPage from './pages/ChatPage';
 
 import Admin from "./pages/Admin";
 import CreateOffer from "./pages/CreateOffer";
@@ -38,6 +38,7 @@ function AppContent() {
         <Route path="/tasks/new" element={<CreateTask />} />
         <Route path="/tasks" element={<ViewTasks />} />
         <Route path="/offers" element={<ViewOffers />} />
+        <Route path="/chat/:taskId" element={<ChatPage />} />
         
         {/* Admin Routes */}
         {/* We removed the confusing /admin/profile route. The dashboard IS the admin's profile. */}

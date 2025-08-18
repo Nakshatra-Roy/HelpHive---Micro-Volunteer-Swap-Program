@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Task = require("../models/taskModel.js");
 const User = require("../models/userModel.js"); 
+const Chat = require("../models/chatModel.js");
 const { getUserById } = require("../controllers/userController.js");
 const { sendNotifications } = require("../controllers/notificationController.js");
 
@@ -133,6 +134,18 @@ const acceptTask = async (req, res) => {
 
         task.curHelpers += 1;
         task.helpersArray.push(userId);
+
+        if (task.curHelpers === task.helpersReq) {
+            const participants = [task.postedBy, ...task.helpersArray];
+            const chat = await Chat.findOneAndUpdate(
+                { taskReference: id },
+                {
+                    participants,
+                    taskReference: id,
+                },
+                { upsert: true, new: true }
+            );
+        }
 
         const updatedTask = await task.save();
 

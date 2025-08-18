@@ -2,13 +2,14 @@ const app = require('./app');
 const mongoose = require('mongoose');
 const http = require('http'); 
 const { Server } = require('socket.io');
+const Chat = require('./models/chatModel');
 require('dotenv').config();
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:3000",
   },
 });
 
@@ -19,6 +20,28 @@ module.exports.io = io;
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
+
+  socket.on('joinRoom', (taskId) => {
+    socket.join(taskId);
+    console.log(`Socket ${socket.id} joined room ${taskId}`);
+  });
+
+  socket.on('sendMessage', async ({ taskId, message }) => {
+    try {
+      const chat = await Chat.findOneAndUpdate(
+        { taskReference: taskId },
+        { $push: { messages: message } },
+        { new: true }
+      ).populate('messages.sender', 'name _id');
+
+      if (chat) {
+        const newMessage = chat.messages[chat.messages.length - 1];
+        io.to(taskId).emit('receiveMessage', newMessage);
+      }
+    } catch (error) {
+      console.error('Error saving message:', error);
+    }
+  });
 
   socket.on("register", (userId) => {
     socket.join(userId);
