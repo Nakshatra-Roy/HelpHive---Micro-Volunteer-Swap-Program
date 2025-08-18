@@ -106,7 +106,7 @@ const Navbar = () => {
               <NavLink to="/tasks" active={isActive("/tasks")}>
                 View Tasks
               </NavLink>
-              <NavLink to="/admin" active={isActive("/admin")}>
+              <NavLink to="/admin/users" active={isActive("/admin")}>
                 Users
               </NavLink>
             </div>

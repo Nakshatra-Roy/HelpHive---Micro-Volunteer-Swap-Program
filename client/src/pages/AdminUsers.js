@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import "./Landing.css";
-
 function useFetch(url, initial = []) {
   const [data, setData] = useState(initial);
   const [loading, setLoading] = useState(!!url);
@@ -32,7 +30,7 @@ function useFetch(url, initial = []) {
   return { data, loading, error };
 }
 
-function Admin() {
+function AdminUsers() {
   const { data: users, loading } = useFetch(`/api/users/`, []);
   const [list, setList] = useState([]);
   const [flagPending, setFlagPending] = useState(new Set());
@@ -310,4 +308,4 @@ function Admin() {
   );
 }
 
-export default Admin;
+export default AdminUsers;

@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-
-import "./Landing.css";
+import "./style.css"
 
 const API_BASE =
   process.env.REACT_APP_API_BASE?.replace(/\/+$/, "") || "";

@@ -76,28 +76,13 @@ const getMyActivity = asyncHandler(async (req, res) => {
     res.status(200).json(activity);
 });
 
-// @desc    Get all admins
-// @route   GET /api/admin/all-admins
-// @access  Private/Admin
+
 const getAllAdmins = asyncHandler(async (req, res) => {
-    // First, get distinct admin user IDs to prevent any duplicates
     const adminIds = await User.distinct('_id', { role: 'admin' });
 
-    // Then, fetch the full user objects for those unique IDs
     const admins = await User.find({ '_id': { $in: adminIds } })
-        .select('name email profilePicture createdAt lastActive')
         .sort({ createdAt: -1 });
-
-    const adminList = admins.map(admin => ({
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        profilePicture: admin.profilePicture,
-        memberSince: admin.createdAt,
-        lastActive: admin.lastActive || admin.createdAt
-    }));
-
-    res.status(200).json(adminList);
+    res.status(200).json(admins);
 });
 
 module.exports = {

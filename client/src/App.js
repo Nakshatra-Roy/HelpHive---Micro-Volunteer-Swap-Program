@@ -10,12 +10,11 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProfilePage from "./pages/ProfilePage";
-import AdminProfilePage from "./pages/AdminProfilePage";
-import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminDashboard from './pages/AdminDashboard';
 import AdminRoute from './components/AdminRoute';
 import ChatPage from './pages/ChatPage';
 
-import Admin from "./pages/Admin";
+import AdminUsers from "./pages/AdminUsers";
 import CreateOffer from "./pages/CreateOffer";
 import CreateTask from "./pages/CreateTask";
 import ViewTasks from "./pages/ViewTasks";
@@ -41,9 +40,8 @@ function AppContent() {
         <Route path="/chat/:taskId" element={<ChatPage />} />
         
         {/* Admin Routes */}
-        {/* We removed the confusing /admin/profile route. The dashboard IS the admin's profile. */}
-        <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboardPage /></AdminRoute>} />
-        <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+        <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
       </Routes>
     </div>
     </>
