@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
         ref: 'Task' // Assumes you have or will have a 'Task' model
     }],
     credits: {
-        earned: { type: Number, default: 0 },
+        earned: { type: Number, default: 10 },
         spent: { type: Number, default: 0 }
     },
     ratingSummary: {

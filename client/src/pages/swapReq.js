@@ -11,8 +11,7 @@ const CreateTask = () => {
         helpersReq: "",
 		taskDescription: "",
 		date: "",
-		priority: "Medium",
-		credits: 1
+		priority: "",
 	});
 
 	const { createTask } = useTaskStore();
@@ -31,8 +30,7 @@ const CreateTask = () => {
             location: "",
             helpersReq: 1,
 			date: "",
-			priority: "Medium",
-			credits: 1 });
+			priority: "",});
 	};
 
 	return (
@@ -93,7 +91,6 @@ const CreateTask = () => {
 			type="number"
 			min={1}
 			value={newTask.helpersReq}
-			step={1}
 			onChange={(e) =>
 				setNewTask({ ...newTask, helpersReq: Number(e.target.value) })
 			}
@@ -102,15 +99,15 @@ const CreateTask = () => {
 
 			<label className="label">Due Date</label>
 			<input
+			placeholder="19th August"
 			name="date"
 			type="date"
-			value={newTask.date || ""}
+			value={newTask.date}
 			onChange={(e) =>
-				setNewTask({ ...newTask, date: e.target.value })
+				setNewTask({ ...newTask, date: Date(e.target.value) })
 			}
 			className="input glass-input"
 			/>
-
 
 			<label className="label">Priority</label>
 			<select
@@ -126,20 +123,6 @@ const CreateTask = () => {
 			<option value="Medium">Medium</option>
 			<option value="High">High</option>
 			</select>
-
-			<label className="label">Credits Awarded</label>
-			<input
-			placeholder="1/2/3 etc."
-			name="credits"
-			type="number"
-			min={1}
-			step={1}
-			value={newTask.credits}
-			onChange={(e) =>
-				setNewTask({ ...newTask, credits: Number(e.target.value) })
-			}
-			className="input glass-input"
-			/>
 
 
         <button className="btn glossy primary" onClick={handleAddTask}>

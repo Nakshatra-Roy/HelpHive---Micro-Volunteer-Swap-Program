@@ -19,11 +19,15 @@ export const createTask = async (req, res) => {
   const taskData = req.body;
   console.log("Received task on backend:", taskData);
 
-  // Get logged-in user's ID from auth middleware
   const userId = req.user?._id || req.user?.id;
+  const user = await User.findById(userId);
 
   if (!userId) {
     return res.status(401).json({ success: false, message: "You have to be logged in to create a task" });
+  }
+
+  if (user.credits.earned <= taskData.credits) {
+    return res.status(403).json({ success: false, message: "Insufficient Credits" });
   }
 
   try {
@@ -32,6 +36,8 @@ export const createTask = async (req, res) => {
       postedBy: userId,
     });
 
+    user.credits.earned -= taskData.credits;
+    user.credits.spent += taskData.credits;
     await newTask.save();
 
     const notifiedCount = await sendNotifications?.(newTask) || 0;
@@ -120,11 +126,86 @@ export const acceptTask = async (req, res) => {
     const user = await User.findById(userId);
     if (!user.myTasks.includes(task._id)) {
       user.myTasks.push(task._id);
+      user.credits.earned += task.credits;
       await user.save();
     }
-    res.status(200).json(task); // return updated task
+    res.status(200).json(task); 
   } catch (error) {
     console.error('Error accepting task:', error);
     res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
+export const swapReq = async (req, res) => {
+  const { tId1, tId2 } = req.params;
+
+  const userId = req.user?._id || req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: "You have to be logged in to create a swap task request" });
+  }
+  
+  try {
+    //send notification to user2
+  } catch (error) {
+    console.error("Error creating task:", error.message);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ success: false, message: "Please provide all fields" });
+    }
+
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+}; 
+
+export const acceptSwap = async (req, res) => {
+  const { tId1, tId2, flag } = req.params;
+
+  const userId = req.user?._id || req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: "You have to be logged in to create a swap task request" });
+  }
+
+  if (!flag) {
+    //send rejected notification);
+    }
+
+  try {
+
+    const task1 = await Task.findById(tId1);
+    const task2 = await Task.findById(tId2);
+
+    task1.helpersArray = task1.helpersArray.filter(id => id.toString() !== userId);
+
+    const user2 = task2.postedBy;
+
+    task1.helpersArray.push(user2._id.toString());
+
+    task2.helpersArray = task2.helpersArray.filter(id => id.toString() !== userId);
+
+    const user1 = task1.postedBy;
+
+    task2.helpersArray.push(user1._id.toString());
+
+    await task1.save();
+    await task2.save();
+
+    res.status(200).json({
+    success: true,
+    message: "Swap accepted successfully",
+    data: { task1, task2 }
+});
+
+
+  //notify both users about the swap
+  } catch (error) {
+    console.error("Error creating task:", error.message);
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ success: false, message: "Please provide all fields" });
+    }
+
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };

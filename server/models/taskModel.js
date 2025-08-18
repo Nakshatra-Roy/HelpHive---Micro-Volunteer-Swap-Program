@@ -14,7 +14,8 @@ const taskSchema = new mongoose.Schema({
     postedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     swapInterest: { type: Boolean, default: false },
     date: { type: Date, default: Date.now },
-    priority: { type: Number, enum: ['Low', 'Medium', 'High'], default: 'Medium' }
+    priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
+    credits: { type: Number, default: 10 },
 });
 
 module.exports = mongoose.model('Task', taskSchema);
