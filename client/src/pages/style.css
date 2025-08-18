@@ -222,9 +222,10 @@ body {
   box-shadow: 0 10px 24px rgba(16,185,129,0.25);
 }
 .btn:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.95);
+  box-shadow: 0 4px 12px rgba(16,185,129,0.2);
 }
-
+ .skeleton { position: relative; overflow: hidden; }
 .skeleton::after {
   content: "";
   position: absolute;
@@ -239,52 +240,199 @@ body {
   }
 }
 
-.table { width: 100%; }
+/* Landing.css */
+
+.section {
+  padding: 40px 20px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-head h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.card.glass {
+  background: rgba(255, 255, 255, 0.212);
+  backdrop-filter: blur(20px);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .row {
   display: grid;
-  grid-template-columns: 60px 1fr 120px 120px;
-  gap: 8px;
-  padding: 12px 8px;
-  border-bottom: 1px solid var(--border);
+  grid-template-columns: 40px 1.5fr 2fr 1fr 1fr;
   align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s ease;
+  position: relative;
 }
+
 .row.head {
-  background: #ecfdf5;
-  font-weight: 700;
-  color: #047857;
+  font-weight: bold;
+  background: #d9f99d;
+}
+
+.row:hover {
+  background: #eefce6;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background: #6ee7b7;
+  color: white;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 10px;
 }
 
 .user {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-.avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #10b981, #34d399);
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-weight: 800;
 }
 
-.footer {
-  padding: 36px 0;
-  border-top: 1px solid var(--border);
-  background: #ecfdf5;
+.btn {
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
 }
-.foot-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+
+.btn.glossy {
+  background: #d1fae5;
+  color: #065f46;
 }
-.brand {
-  font-weight: 800;
-  letter-spacing: .4px;
-  color: #047857;
+
+.btn.primary {
+  background: #f87171;
+  color: white;
 }
-.muted {
-  color: var(--muted);
+
+.skeleton {
+  background: #e5e7eb;
+  color: transparent;
+}
+
+.user-hover-info a {
+  color: #2563eb;
+  margin: 0 4px;
+  text-decoration: none;
+}
+
+.admin-dashboard-container {
+  padding: 2rem;
+  background-color: #f0fdf4; /* Light mint-green background */
+  min-height: 100vh;
+}
+
+.dashboard-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: #10b981;
+  text-align: center;
+}
+.dashboard-title-small {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  color: #000000;
+  text-align: center;
+}
+/* Grid layout for the dashboard cards */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+/* Base style for all cards on the dashboard */
+.dashboard-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  opacity: 100%;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Card title styling */
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #dbeafe; /* Light blue underline */
+  color: #1e3a8a;
+}
+
+/* Platform Summary Card Specifics */
+.summary-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1.5rem;
+  text-align: center;
+}
+
+.stat-item {
+  background-color: #f3f4f6;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1d4ed8;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* Global Activity Card Specifics */
+.activity-stat {
+  margin-bottom: 1rem;
+}
+
+.activity-label {
+  font-weight: bold;
+  color: #374151;
+}
+
+.activity-value {
+  font-size: 1.2rem;
+  color: #10b981;
+  margin-left: 0.5rem;
+}
+
+.activity-description {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
 }

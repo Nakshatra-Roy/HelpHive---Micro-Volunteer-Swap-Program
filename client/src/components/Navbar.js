@@ -10,7 +10,7 @@ const Navbar = () => {
   const isLoggedIn = !!user;
   const isLoggedInAdmin = user && user.role === "admin";
 
-  const isActive = (to) => pathname === to || pathname.startsWith(to + "/");
+  const isActive = (to) => pathname === to;
 
   const handleLogout = () => {
     logout();
@@ -76,7 +76,7 @@ const Navbar = () => {
             HELP HIVE
           </Link>
 
-          {!isLoggedInAdmin && (
+          {isLoggedIn && !isLoggedInAdmin && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 6 }}>
               <NavLink to="/tasks" active={isActive("/tasks")}>
                 View Tasks
@@ -87,11 +87,6 @@ const Navbar = () => {
               <NavLink to="/tasks/new" active={isActive("/tasks/new")}>
                 Create Task
               </NavLink>
-              {isLoggedIn && (
-                <NavLink to="/profile" active={isActive("/profile")}>
-                  Profile
-                </NavLink>
-              )}
             </div>
           )}
 
@@ -111,7 +106,7 @@ const Navbar = () => {
               <NavLink to="/tasks" active={isActive("/tasks")}>
                 View Tasks
               </NavLink>
-              <NavLink to="/admin" active={isActive("/admin")}>
+              <NavLink to="/admin/users" active={isActive("/admin")}>
                 Users
               </NavLink>
             </div>
@@ -119,28 +114,11 @@ const Navbar = () => {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {isLoggedIn || isLoggedInAdmin ? (
+          {isLoggedIn ? (
             <>
-              {!isLoggedInAdmin && (
                 <>
-                  <Link
-                    to="/tasks"
-                    className="btn glossy ghost"
-                    style={{
-                      padding: "8px 16px",
-                      borderRadius: "9999px",
-                      border: "1px solid #a7f3d0",
-                      background: "transparent",
-                      color: "#047857",
-                      fontWeight: 600,
-                      textDecoration: "none",
-                      transition: "all 0.3s",
-                    }}
-                  >
-                    Explore
-                  </Link>
-                  <Link
-                    to="/profile"
+                  <button
+                    onClick={() => navigate(isLoggedInAdmin ? '/admin/dashboard' : '/profile')}
                     className="btn glossy primary"
                     style={{
                       padding: "8px 16px",
@@ -155,9 +133,8 @@ const Navbar = () => {
                     }}
                   >
                     Dashboard
-                  </Link>
+                  </button>
                 </>
-              )}
 
               <button
                 onClick={handleLogout}

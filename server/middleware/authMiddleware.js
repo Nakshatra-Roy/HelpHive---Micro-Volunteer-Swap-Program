@@ -1,41 +1,47 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/userModel');
 require('dotenv').config();
 
-module.exports = function(req, res, next) {
-    // Get token from header
+const protect = async (req, res, next) => {
+    let token;
     const authHeader = req.header('Authorization');
-    
-    // Check if Authorization header exists
-    if (!authHeader) {
-        return res.status(401).json({ message: 'No authorization header, access denied' });
-    }
-    
-    // Check if it's a Bearer token
-    if (!authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Invalid token format, must be Bearer token' });
-    }
-    
-    // Extract the token
-    const token = authHeader.split(' ')[1];
-    
-    if (!token) {
-        return res.status(401).json({ message: 'No token provided, authorization denied' });
-    }
-    
-    try {
-        // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Add user from payload to request object
-        req.user = decoded.user;
-        next();
-    } catch (err) {
-        console.error('JWT Verification Error:', err.message);
-        
-        if (err.name === 'TokenExpiredError') {
-            return res.status(401).json({ message: 'Token has expired, please login again' });
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        try {
+            // Get token from header
+            token = authHeader.split(' ')[1];
+
+            // Verify token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            // --- THIS IS THE FIX ---
+            // The user ID is inside `decoded.user.id`, not `decoded.id`.
+            req.user = await User.findById(decoded.user.id).select('-password');
+            // ---------------------
+
+            // If user is not found after decoding token, it's an invalid user
+            if (!req.user) {
+                 return res.status(401).json({ message: 'User not found' });
+            }
+
+            next();
+        } catch (error) {
+            console.error('Token verification failed:', error.message);
+            return res.status(401).json({ message: 'Not authorized, token failed' });
         }
-        
-        res.status(401).json({ message: 'Token is not valid' });
+    }
+
+    if (!token) {
+        return res.status(401).json({ message: 'Not authorized, no token' });
     }
 };
+
+const admin = (req, res, next) => {
+    if (req.user && req.user.role === 'admin') {
+        next();
+    } else {
+        res.status(401).json({ message: 'Not authorized as an admin' });
+    }
+};
+
+module.exports = { protect, admin };

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./Landing.css";
 
 const CreateOffer = () => {
   const [form, setForm] = useState({

@@ -1,47 +1,14 @@
 import React, { useEffect, useState } from "react";
 
-import "./Landing.css";
-
-function useFetch(url, initial = []) {
-  const [data, setData] = useState(initial);
-  const [loading, setLoading] = useState(!!url);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    let alive = true;
-    if (!url) return;
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Failed (${res.status})`);
-        const json = await res.json();
-        if (alive) setData(json);
-      } catch (e) {
-        if (alive) setError(e.message);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [url]);
-
-  return { data, loading, error };
-}
-
-function Admin() {
-  const { data: users, loading } = useFetch(`/api/users/`, []);
+const ShowAdmins = ({ admins, loading }) => {
   const [list, setList] = useState([]);
   const [flagPending, setFlagPending] = useState(new Set());
   const [statusPending, setStatusPending] = useState(new Set());
   const [rolePending, setRolePending] = useState(new Set());
 
   useEffect(() => {
-    setList(users || []);
-  }, [users]);
+    setList(admins || []);
+  }, [admins]);
 
   const handleToggleFlag = async (user) => {
     if (!user?._id) return;
@@ -130,19 +97,12 @@ function Admin() {
 
   return (
     <>
-      <div className="backdrop">
-        <div className="blob b1" />
-        <div className="blob b2" />
-        <div className="grid-overlay" />
-      </div>
-
       <section className="section">
         <div className="container">
-          <div className="section-head">
-            <h2>All User Details</h2>
+          <div className="text-xl font-semibold mb-4">
+            <h2>Administrators</h2>
           </div>
 
-          <div className="card glass">
             <div className="table">
               <div className="row head">
                 <div>#</div>
@@ -242,7 +202,6 @@ function Admin() {
               })}
             </div>
           </div>
-        </div>
       </section>
 
       <style>
@@ -308,6 +267,7 @@ function Admin() {
       </style>
     </>
   );
+
 }
 
-export default Admin;
+export default ShowAdmins;

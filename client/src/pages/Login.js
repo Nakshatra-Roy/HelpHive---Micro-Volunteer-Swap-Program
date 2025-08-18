@@ -13,7 +13,12 @@ function Login() {
   // This hook now correctly handles navigation after a successful login
   useEffect(() => {
     if (user) {
-      navigate('/profile'); // Navigate to profile on successful login
+      // Check the user's role and redirect to the appropriate page
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard'); // Redirect admins to their dashboard
+      } else {
+        navigate('/profile'); // Redirect regular users to their profile
+      }
     }
   }, [user, navigate]);
 

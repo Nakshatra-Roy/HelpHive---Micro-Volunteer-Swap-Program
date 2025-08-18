@@ -96,7 +96,7 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, following, availability, socialLinks } = req.body;
+  const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, following, availability, socialLinks, flag, accountStatus } = req.body;
   try {
     // Create update object
     const updateData = {
@@ -110,7 +110,9 @@ exports.updateUser = async (req, res) => {
         skills,
         following,
         availability,
-        socialLinks
+        socialLinks,
+        flag,
+        accountStatus
     };
     
     // If password is provided, use it directly
