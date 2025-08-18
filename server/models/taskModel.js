@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema({
     taskName: { type: String, required: true },
@@ -18,4 +18,4 @@ const taskSchema = new mongoose.Schema({
     credits: { type: Number, default: 10 },
 });
 
-module.exports = mongoose.model('Task', taskSchema);
+export default mongoose.model('Task', taskSchema);

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const offerSchema = new mongoose.Schema({
     offerTitle: { type: String, required: true },
@@ -13,4 +13,4 @@ const offerSchema = new mongoose.Schema({
     helpersRequired: { type: Number, default: 1 },
     createdAt: { type: Date, default: Date.now }
 });
-module.exports = mongoose.model('Offer', offerSchema);
+export default mongoose.model('Offer', offerSchema);

@@ -1,64 +1,59 @@
-const nodemailer = require("nodemailer");
-// const { getIo } = require("../../client/src/socket.js");
-const User = require("../models/userModel.js");
-
+import nodemailer from 'nodemailer';
+import User from '../models/userModel.js';
 
 const sendNotifications = async (task) => {
-
-  let interestedUsers = [];
-  try {
-  interestedUsers = await User.find({ following: { $in: [task.category] } });
-  console.log("Users found:", interestedUsers.length, "emails:", interestedUsers.map(u => u.email));
-  } catch (err) {
-  console.error("Error finding users:", err.message);
-}
-
-  let emailSentCount = 0;
-  let socketSentCount = 0;
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  for (const user of interestedUsers) {
-
-    if (user.emailNotif) {
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: `New Task in ${task.category}!`,
-        text: `Hi ${user.name},\n\nA new task \"${task.taskName}\" has been posted in the category you follow.\n\nCheck it out on HelpHive!`,
-        //insert link to task
-      };
-
-      try {
-        await transporter.sendMail(mailOptions);
-        emailSentCount++;
-        console.log(`Email sent to ${user.email}`);
-      } catch (err) {
-        console.error(`Failed to send email to ${user.email}:`, err.message);
-      }
+    let interestedUsers = [];
+    try {
+        interestedUsers = await User.find({ following: { $in: [task.category] } });
+        console.log("Users found:", interestedUsers.length, "emails:", interestedUsers.map(u => u.email));
+    } catch (err) {
+        console.error("Error finding users:", err.message);
     }
 
-    // if (user.appNotif) {
-    //   io.to(user._id.toString()).emit("newTask", {
-    //     category: task.category,
-    //     taskName: task.taskName,
-    //     taskId: task._id,
-    //   });
-    //   socketSentCount++;
-    // }
-  }
+    let emailSentCount = 0;
+    let socketSentCount = 0;
 
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
 
-  console.log(`Email notifications sent: ${emailSentCount}`);
-  console.log(`In-app notifications sent: ${socketSentCount}`);
+    for (const user of interestedUsers) {
+        if (user.emailNotif) {
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: user.email,
+                subject: `New Task in ${task.category}!`,
+                text: `Hi ${user.name},\n\nA new task \"${task.taskName}\" has been posted in the category you follow.\n\nCheck it out on HelpHive!`,
+                //insert link to task
+            };
+
+            try {
+                await transporter.sendMail(mailOptions);
+                emailSentCount++;
+                console.log(`Email sent to ${user.email}`);
+            } catch (err) {
+                console.error(`Failed to send email to ${user.email}:`, err.message);
+            }
+        }
+
+        // if (user.appNotif) {
+        //   io.to(user._id.toString()).emit("newTask", {
+        //     category: task.category,
+        //     taskName: task.taskName,
+        //     taskId: task._id,
+        //   });
+        //   socketSentCount++;
+        // }
+    }
+
+    console.log(`Email notifications sent: ${emailSentCount}`);
+    console.log(`In-app notifications sent: ${socketSentCount}`);
 };
 
-module.exports = { sendNotifications };
+export { sendNotifications };
 
 

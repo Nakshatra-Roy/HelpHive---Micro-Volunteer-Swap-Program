@@ -1,12 +1,12 @@
-const mongoose = require("mongoose");
-const Task = require("../models/taskModel.js");
-const User = require("../models/userModel.js"); 
-const Chat = require("../models/chatModel.js");
-const { getUserById } = require("../controllers/userController.js");
-const { sendNotifications } = require("../controllers/notificationController.js");
+import mongoose from "mongoose";
+import Task from "../models/taskModel.js";
+import User from "../models/userModel.js"; 
+import Chat from "../models/chatModel.js";
+import { getUserById } from "../controllers/userController.js";
+import { sendNotifications } from "../controllers/notificationController.js";
 
 
-const getTasks = async (req, res) => {
+export const getTasks = async (req, res) => {
 	try {
 		const tasks = await Task.find({});
 		res.status(200).json({ success: true, data: tasks });
@@ -16,7 +16,7 @@ const getTasks = async (req, res) => {
 	}
 };
 
-const createTask = async (req, res) => {
+export const createTask = async (req, res) => {
   const taskData = req.body;
   console.log("Received task on backend:", taskData);
 
@@ -61,7 +61,7 @@ const createTask = async (req, res) => {
 
 
 
-const updateTask = async (req, res) => {
+export const updateTask = async (req, res) => {
 	const { id } = req.params;
 
 	const task = req.body;
@@ -86,7 +86,7 @@ const updateTask = async (req, res) => {
 
 };
 
-const deleteTask = async (req, res) => {
+export const deleteTask = async (req, res) => {
 	const { id } = req.params;
 
 	if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -107,7 +107,7 @@ const deleteTask = async (req, res) => {
 	}
 };
 
-const acceptTask = async (req, res) => {
+export const acceptTask = async (req, res) => {
     const { id } = req.params;
     const userId = req.user?._id || req.user?.id;
 
@@ -160,14 +160,6 @@ const acceptTask = async (req, res) => {
         console.error("Error accepting task:", error);
         res.status(500).json({ success: false, message: "Server Error" });
     }
-};
-
-module.exports = {
-    getTasks,
-    createTask,
-    updateTask,
-    deleteTask,
-    acceptTask
 };
 
 export const swapReq = async (req, res) => {

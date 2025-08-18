@@ -1,7 +1,7 @@
-const cloudinary = require('../config/cloudinary');
-const User = require('../models/userModel');
+import cloudinary from '../config/cloudinary.js';
+import User from '../models/userModel.js';
 
-exports.getProfile = async (req, res) => {
+export const getProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         res.json(user);
@@ -10,7 +10,7 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-exports.updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
     const profileFields = { ...req.body };
     try {
         if (req.file) {

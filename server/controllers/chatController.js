@@ -1,6 +1,6 @@
-const Chat = require('../models/chatModel');
+import Chat from '../models/chatModel.js';
 
-exports.initializeChat = async (req, res) => {
+export const initializeChat = async (req, res) => {
   const { taskId, participants } = req.body;
 
   try {
@@ -20,7 +20,7 @@ exports.initializeChat = async (req, res) => {
   }
 };
 
-exports.getChatHistory = async (req, res) => {
+export const getChatHistory = async (req, res) => {
   try {
     const chat = await Chat.findOne({ taskReference: req.params.taskId }).populate('messages.sender', 'name _id');
     if (!chat) {

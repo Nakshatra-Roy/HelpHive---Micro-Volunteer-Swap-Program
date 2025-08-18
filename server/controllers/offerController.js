@@ -1,7 +1,7 @@
-const Offer = require('../models/offerModel.js');
-const express = require('express');
+import Offer from '../models/offerModel.js';
+import express from 'express';
 
-exports.getAllOffers = async (req, res) => {
+export const getAllOffers = async (req, res) => {
   try {
     const offers = await Offer.find().sort({ createdAt: -1 }); // Sort by creation date, newest first
     res.status(200).json(offers);
@@ -10,7 +10,7 @@ exports.getAllOffers = async (req, res) => {
   }
 }
 
-exports.getOfferById = async (req, res) => {
+export const getOfferById = async (req, res) => {
   const { id } = req.params;
   try {
     const offer = await Offer.findById(id);
@@ -23,7 +23,7 @@ exports.getOfferById = async (req, res) => {
   }
 }
 
-exports.getOffersByUser = async (req, res) => {
+export const getOffersByUser = async (req, res) => {
   const { userId } = req.params;
 
   try {
@@ -41,7 +41,7 @@ exports.getOffersByUser = async (req, res) => {
   }
 }
 
-exports.createOffer = async (req, res) => {
+export const createOffer = async (req, res) => {
   const { offerTitle, offerDescription, offerDuration, offerCategory, location, skillsRequired, helpersRequired, availability, contactInfo } = req.body;
   try {
     const newOffer = new Offer({
@@ -64,7 +64,7 @@ exports.createOffer = async (req, res) => {
   }
 }
 
-exports.updateOffer = async (req, res) => {
+export const updateOffer = async (req, res) => {
   const { id } = req.params;
   const { offerTitle, offerDescription, offerDuration, offerCategory, availability, location, helpersRequired } = req.body;
   try {
@@ -87,7 +87,7 @@ exports.updateOffer = async (req, res) => {
   }
 }
 
-exports.deleteOffer = async (req, res) => {
+export const deleteOffer = async (req, res) => {
   const { id } = req.params;
   try {
     const deletedOffer = await Offer.findByIdAndDelete(id);

@@ -1,13 +1,23 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import { config } from 'dotenv';
+config();
+import User from './models/userModel.js';
+import taskRoutes from './routes/taskRoutes.js';
+import offerRoutes from './routes/offerRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+
 const app = express();
-const User=require('./models/userModel.js');
+
 app.use(cors());
 app.use(express.json());
 
 // Serve static files from the public directory
+const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, 'public')));
 
 
@@ -16,8 +26,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // For example, if we have a problem and user routes, we can import them like this
 // const problemRoutes = require('./routes/problemRoutes');
 
-const userRoutes = require('./routes/userRoutes');
-const adminRoutes = require('./routes/adminRoutes');
 // FOR REACH ROUTES, WE NEED A 
 // 1. Routes
 // 2. MODEL AND A 
@@ -27,14 +35,11 @@ const adminRoutes = require('./routes/adminRoutes');
 
 
 // Using the routes:
-const taskRoutes = require('./routes/taskRoutes');
-const offerRoutes = require('./routes/offerRoutes');
-const chatRoutes = require('./routes/chatRoutes');
 app.use('/api/tasks', taskRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
-app.use('/api/profile', require('./routes/profileRoutes'));
+app.use('/api/profile', profileRoutes);
 app.use('/api/admin', adminRoutes);
 
-module.exports = app;
+export default app;

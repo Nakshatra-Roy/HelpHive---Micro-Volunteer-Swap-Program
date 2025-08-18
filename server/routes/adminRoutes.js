@@ -1,14 +1,14 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
     getStats,
     getMyActivity,
     getAllAdmins,
-} = require('../controllers/adminController');
-const { protect, admin } = require('../middleware/authMiddleware');
+} from '../controllers/adminController.js';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 router.get('/stats', protect, admin, getStats);
 router.get('/my-activity', protect, admin, getMyActivity);
 router.get('/all-admins', protect, admin, getAllAdmins);
 
-module.exports = router;
+export default router;

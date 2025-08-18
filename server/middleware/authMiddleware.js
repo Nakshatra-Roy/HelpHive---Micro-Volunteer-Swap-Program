@@ -1,8 +1,9 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
-require('dotenv').config();
+import jwt from 'jsonwebtoken';
+import User from '../models/userModel.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
     let token;
     const authHeader = req.header('Authorization');
 
@@ -36,12 +37,10 @@ const protect = async (req, res, next) => {
     }
 };
 
-const admin = (req, res, next) => {
+export const admin = (req, res, next) => {
     if (req.user && req.user.role === 'admin') {
         next();
     } else {
         res.status(401).json({ message: 'Not authorized as an admin' });
     }
 };
-
-module.exports = { protect, admin };

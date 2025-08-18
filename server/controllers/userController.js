@@ -1,8 +1,8 @@
-const User = require('../models/userModel.js');
-const express = require('express');
-const jwt = require('jsonwebtoken');
+import User from '../models/userModel.js';
+import express from 'express';
+import jwt from 'jsonwebtoken';
 
-exports.loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -42,7 +42,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-exports.getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().sort({ createdAt: -1 }); // Sort by creation date, newest first
     res.status(200).json(users);
@@ -51,7 +51,7 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-exports.getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
   const { id } = req.params;
   try {
     const user = await User.findById(id);
@@ -64,7 +64,7 @@ exports.getUserById = async (req, res) => {
   }
 }
 
-exports.createUser = async (req, res) => {
+export const createUser = async (req, res) => {
   const { firstName, lastName, email, password, role, bio, location, skills, following, availability, status, socialLinks } = req.body;
   try {
     // Check if user with this email already exists
@@ -94,7 +94,7 @@ exports.createUser = async (req, res) => {
   }
 }
 
-exports.updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
   const { id } = req.params;
   const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, following, availability, socialLinks, flag, accountStatus } = req.body;
   try {
@@ -131,7 +131,7 @@ exports.updateUser = async (req, res) => {
   }
 }
 
-exports.deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
     const deletedUser = await User.findByIdAndDelete(id);

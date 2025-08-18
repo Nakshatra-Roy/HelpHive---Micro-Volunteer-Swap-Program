@@ -1,13 +1,14 @@
-const app = require('./app');
-const mongoose = require('mongoose');
-const http = require('http'); 
-const { Server } = require('socket.io');
-const Chat = require('./models/chatModel');
-require('dotenv').config();
+import app from './app.js';
+import mongoose from 'mongoose';
+import http from 'http';
+import { Server } from 'socket.io';
+import Chat from './models/chatModel.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const server = http.createServer(app);
 
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
   },
@@ -15,8 +16,6 @@ const io = new Server(server, {
 
 // create a http server, then give the server access to whole app
 // give socket access to the server. this way the socket listens in to any changes to the server
-
-module.exports.io = io;
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
