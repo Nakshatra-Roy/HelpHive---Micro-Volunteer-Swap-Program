@@ -11,6 +11,6 @@ router.delete('/:id', protect, deleteTask);
 router.put('/:id/accept', protect, acceptTask);
 router.put('/:tId1/:tId2/swap', protect, swapReq);
 router.put('/:tId1/:tId2/acceptSwap', protect, acceptSwap);
-router.put('/:id/complete', protect, completeTask);
+router.patch('/:id/complete', protect, completeTask);
 
 export default router;

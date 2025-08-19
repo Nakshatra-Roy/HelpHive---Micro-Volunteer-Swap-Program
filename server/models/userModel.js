@@ -83,8 +83,8 @@ userSchema.virtual('fullName').get(function() {
 // Creates a "virtual" field for the user's current credit balance
 userSchema.virtual('credits.balance').get(function() {
   // Use `|| 0` to handle cases where a field might be missing on an old document
-  const earned = this.credits?.earned || 0;
-  const spent = this.credits?.spent || 0;
+  const earned = this.credits.earned || 0;
+  const spent = this.credits.spent || 0;
   return earned - spent;
 });
 

@@ -56,7 +56,7 @@ export const useTaskStore = create((set) => ({
 
   set({ loading: true, error: null });
   try {
-    const response = await axios.patch(`/api/tasks/${task._id}/accept`, { userId });
+    const response = await axios.put(`/api/tasks/${task._id}/accept`, { userId });
     set((state) => ({
   tasks: state.tasks.map(t => t._id === task._id ? response.data.data : t),
   loading: false
@@ -70,6 +70,26 @@ export const useTaskStore = create((set) => ({
     });
     return { success: false, message: error.response?.data?.message || 'Failed to accept task' };
   }
-}
+},
+
+completeTask: async (taskId) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await axios.patch(`/api/tasks/${taskId}/complete`);
+      set((state) => ({
+        tasks: state.tasks.map(t =>
+          t._id === taskId ? { ...t, status: 'completed' } : t
+        ),
+        loading: false
+      }));
+
+      return { success: true, message: response.data.message };
+
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to complete task';
+      set({ error: message, loading: false });
+      return { success: false, message };
+    }
+  },
 
 }));

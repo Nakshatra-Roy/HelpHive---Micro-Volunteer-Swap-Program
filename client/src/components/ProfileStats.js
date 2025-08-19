@@ -8,8 +8,8 @@ function ProfileStats({ user }) {
     tasksPosted: 0,
     rating: user.ratingSummary?.average || 0,
     joinedDate: new Date(user.createdAt).toLocaleDateString(),
-    creditsEarned: user.credits?.earned || 0,
-    creditsSpent: user.credits?.spent || 0
+    creditsEarned: user.credits.earned || 0,
+    creditsSpent: user.credits.spent || 0
   };
 
   return (

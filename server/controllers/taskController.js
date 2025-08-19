@@ -37,7 +37,6 @@ export const createTask = async (req, res) => {
       postedBy: userId,
     });
 
-    user.credits.earned -= taskData.credits;
     user.credits.spent += taskData.credits;
     await user.save();
     await newTask.save();

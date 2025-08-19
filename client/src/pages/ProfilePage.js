@@ -8,6 +8,7 @@ import ProfileStats from '../components/ProfileStats';
 import ActivityStats from '../components/ActivityStats';
 import UserTasks from '../components/UserTasks';
 
+
 function ProfilePage() {
   const { user, loading, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
