@@ -3,8 +3,13 @@ import Chat from './models/chatModel.js';
 
 // This function will be called for each new client that connects.
 // It sets up the listeners specific to the chat feature.
+
+
 export const registerChatHandlers = (io, socket) => {
-  
+  socket.on('joinNotificationRoom', (userId) => {
+    socket.join(userId);
+    console.log(`Socket ${socket.id} joined notification room for user: ${userId}`);
+  });
   // Listen for the 'joinRoom' event from ChatPage.js
   socket.on('joinRoom', (taskId) => {
     socket.join(taskId);

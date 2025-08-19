@@ -27,7 +27,7 @@ export const createTask = async (req, res) => {
     return res.status(401).json({ success: false, message: "You have to be logged in to create a task" });
   }
 
-  if (user.credits.earned <= taskData.credits) {
+  if (user.credits.earned - user.credits.spent < taskData.credits) {
     return res.status(403).json({ success: false, message: "Insufficient Credits" });
   }
 
@@ -41,7 +41,7 @@ export const createTask = async (req, res) => {
     await user.save();
     await newTask.save();
 
-    const notifiedCount = await sendNotifications?.(newTask) || 0;
+    const notifiedCount = await sendNotifications?.(newTask, req.io) || 0;
 
     res.status(201).json({
       success: true,

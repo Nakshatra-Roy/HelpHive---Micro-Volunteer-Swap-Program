@@ -13,6 +13,8 @@ const sendNotifications = async (task) => {
     let emailSentCount = 0;
     let socketSentCount = 0;
 
+    console.log('Checking credentials inside notifications file:', process.env.EMAIL_USER); 
+
     const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -22,7 +24,7 @@ const sendNotifications = async (task) => {
     });
 
     for (const user of interestedUsers) {
-        if (user.emailNotif) {
+        if (true) {
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: user.email,
