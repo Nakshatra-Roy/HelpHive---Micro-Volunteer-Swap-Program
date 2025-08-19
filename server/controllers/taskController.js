@@ -39,6 +39,7 @@ export const createTask = async (req, res) => {
 
     user.credits.earned -= taskData.credits;
     user.credits.spent += taskData.credits;
+    await user.save();
     await newTask.save();
 
     const notifiedCount = await sendNotifications?.(newTask) || 0;
@@ -58,8 +59,6 @@ export const createTask = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
-
-
 
 export const updateTask = async (req, res) => {
 	const { id } = req.params;
@@ -109,7 +108,8 @@ export const deleteTask = async (req, res) => {
 
 export const acceptTask = async (req, res) => {
     const { id } = req.params;
-    const userId = req.user?._id || req.user?.id; // This is the helper's ID
+    const userId = req.user?._id || req.user?.id;
+    const user = await getUserById(userId);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ success: false, message: "Invalid Task Id" });
@@ -166,6 +166,74 @@ export const acceptTask = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error while accepting task" });
     }
 };
+
+export const completeTask = async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user?._id || req.user?.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ success: false, message: "Invalid Task Id" });
+    }
+
+    if (!userId) {
+        return res.status(401).json({ success: false, message: "You have to be logged in to complete a task" });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction(); // to ensure database consistency, all operations occur in a single transaction or get rolled back
+
+    try {
+        const task = await Task.findById(id).session(session);
+
+        if (!task) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ success: false, message: "Task does not exist" });
+        }
+
+        if (task.postedBy.toString() !== userId.toString()) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(403).json({ success: false, message: "You are not authorized to complete this task" });
+        }
+
+        if (task.status === 'completed') {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ success: false, message: "This task has already been completed" });
+        }
+        
+        if (task.helpersArray.length === 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ success: false, message: "This task has no helpers to award credits to" });
+        }
+
+        task.status = 'completed';
+        await task.save({ session });
+
+        const credits = task.credits / task.helpersArray.length;
+
+        await User.updateMany(
+            { _id: { $in: task.helpersArray } },
+            { $inc: { 'credits.earned': credits } },
+            { session }
+        );
+
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(200).json({ success: true, message: "Task successfully completed and credits awarded." });
+
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+
+        console.error("Error completing task:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 
 export const swapReq = async (req, res) => {
   const { tId1, tId2 } = req.params;

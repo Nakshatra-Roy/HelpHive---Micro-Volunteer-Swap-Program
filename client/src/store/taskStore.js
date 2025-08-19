@@ -30,9 +30,10 @@ export const useTaskStore = create((set) => ({
     try {
       const response = await axios.post('/api/tasks', taskData);
       set((state) => ({
-        tasks: [...state.tasks, response.data],
-        loading: false
-      }));
+  tasks: [...state.tasks, response.data.data],
+  loading: false
+}));
+
       return { success: true, message: 'Task created successfully' };
     } catch (error) {
       set({ 
@@ -55,7 +56,7 @@ export const useTaskStore = create((set) => ({
 
   set({ loading: true, error: null });
   try {
-    const response = await axios.put(`/api/tasks/${task._id}/accept`, { userId });
+    const response = await axios.patch(`/api/tasks/${task._id}/accept`, { userId });
     set((state) => ({
   tasks: state.tasks.map(t => t._id === task._id ? response.data.data : t),
   loading: false

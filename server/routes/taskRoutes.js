@@ -1,5 +1,5 @@
 import express from 'express';
-import { createTask, deleteTask, getTasks, updateTask, acceptTask, swapReq, acceptSwap } from '../controllers/taskController.js';
+import { createTask, deleteTask, getTasks, updateTask, acceptTask, completeTask, swapReq, acceptSwap } from '../controllers/taskController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -11,5 +11,6 @@ router.delete('/:id', protect, deleteTask);
 router.put('/:id/accept', protect, acceptTask);
 router.put('/:tId1/:tId2/swap', protect, swapReq);
 router.put('/:tId1/:tId2/acceptSwap', protect, acceptSwap);
+router.put('/:id/complete', protect, completeTask);
 
 export default router;

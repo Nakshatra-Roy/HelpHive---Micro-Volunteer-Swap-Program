@@ -7,8 +7,7 @@ const CreateTask = () => {
 		taskDescription: "",
         category: "",
         location: "",
-        helpersReq: "",
-		taskDescription: "",
+        helpersReq: 1,
 		date: "",
 		priority: "Medium",
 		credits: 1
@@ -35,7 +34,10 @@ const CreateTask = () => {
       ["location", newTask.location],
       ["date", newTask.date],
       ["priority", newTask.priority],
+      ["helpersReq", newTask.helpersReq],
+      ["credits", newTask.credits]
     ];
+
     const missing = required.filter(([, v]) => !String(v || "").trim()).map(([k]) => k);
     if (missing.length) {
       show("warning", `Please fill: ${missing.join(", ")}`);
@@ -55,6 +57,7 @@ const CreateTask = () => {
         helpersReq: 1,
         date: "",
         priority: "",
+        credits: 1
       });
     } catch (err) {
       show("error", err.message || "An error occurred");
@@ -176,6 +179,19 @@ const CreateTask = () => {
                   </select>
                 </div>
 
+                <div className="grid cols-2 gap">
+                  <div className="field">
+                    <label className="label">Credits Awarded</label>
+                    <input
+                      type="number"
+                      min={1}
+                      className="input glass-input"
+                      value={newTask.credits}
+                      onChange={(e) => onChange("credits", Math.max(1, parseInt(e.target.value || "1", 10)))}
+                    />
+                  </div>
+                </div>
+
                 <div className="actions">
                   <button
                     type="submit"
@@ -197,6 +213,7 @@ const CreateTask = () => {
                         helpersReq: 1,
                         date: "",
                         priority: "",
+                        credits: 1
                       })
                     }
                   >

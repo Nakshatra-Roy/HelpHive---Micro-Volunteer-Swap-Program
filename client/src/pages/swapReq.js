@@ -8,10 +8,11 @@ const CreateTask = () => {
 		taskDescription: "",
         category: "",
         location: "",
-        helpersReq: "",
+        helpersReq: 1,
 		taskDescription: "",
 		date: "",
 		priority: "",
+		credi
 	});
 
 	const { createTask } = useTaskStore();
