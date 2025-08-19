@@ -181,7 +181,7 @@ const CreateTask = () => {
 
                 <div className="grid cols-2 gap">
                   <div className="field">
-                    <label className="label">Credits Awarded</label>
+                    <label className="label">Credits Awarded (each helper, per hour of work)*</label>
                     <input
                       type="number"
                       min={1}
@@ -190,6 +190,8 @@ const CreateTask = () => {
                       onChange={(e) => onChange("credits", Math.max(1, parseInt(e.target.value || "1", 10)))}
                     />
                   </div>
+				  <br/>
+				  <p>* Choose this field carefuly as it may affect the chances of a potential helper accepting your task!</p>
                 </div>
 
                 <div className="actions">

@@ -45,11 +45,11 @@ export const useTaskStore = create((set) => ({
   // Accept a task
  acceptTask: async (task, userId) => {
   if (!userId) {
-    return { success: false, message: 'You have to be logged in to accept tasks' };
+    return { success: false, message: 'You have to be logged in to accept tasks!' };
   }
 
   if (userId === task.postedBy) {
-    return { success: false, message: 'You cannot accept your own tasks' };
+    return { success: false, message: 'You cannot accept your own tasks!' };
   }
 
   set({ loading: true, error: null });
@@ -60,13 +60,13 @@ export const useTaskStore = create((set) => ({
   loading: false
     }));
 
-    return { success: true, message: 'Task accepted successfully' };
+    return { success: true, message: 'Task accepted successfully!' };
   } catch (error) {
     set({ 
-      error: error.response?.data?.message || 'Failed to accept task', 
+      error: error.response?.data?.message || 'Failed to accept task!', 
       loading: false 
     });
-    return { success: false, message: error.response?.data?.message || 'Failed to accept task' };
+    return { success: false, message: error.response?.data?.message || 'Failed to accept task!' };
   }
 },
 

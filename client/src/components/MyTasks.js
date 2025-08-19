@@ -61,9 +61,13 @@ const MyTasks = () => {
     handleCloseModal();
   };
 
-  // --- Data Filtering ---
-  const myPostedTasks = tasks.filter(task => task.postedBy === user?._id);
-  const myHelperTasks = tasks.filter(task => task.helpersArray.includes(user?._id));
+const myPostedTasks = tasks.filter(task => task.postedBy === user?._id);
+
+// Check if any object in helpersArray has user === user._id
+const myHelperTasks = tasks.filter(task =>
+  task.helpersArray?.some(helper => helper.user === user?._id || helper.user?._id === user?._id)
+);
+
 
   // --- JSX ---
   return (

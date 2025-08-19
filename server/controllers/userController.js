@@ -152,12 +152,13 @@ export const getUserTasks = async (req, res) => {
     // Find tasks created by the user
     const created = await Task.find({ postedBy: userId }).sort({ createdAt: -1 });
 
-    // Find tasks where the user is a helper
-    // This assumes your Task schema has an array field named 'helpers' that stores user IDs
-    const helping = await Task.find({ helpersArray: userId }).sort({ createdAt: -1 });
+    // Find tasks where the user is a helper (based on nested user field in helpersArray)
+    const helping = await Task.find({ "helpersArray.user": userId }).sort({ createdAt: -1 });
 
     res.status(200).json({ created, helping });
+
   } catch (error) {
+    console.error("Error in getUserTasks:", error);
     res.status(500).json({ message: 'Error fetching user tasks', error: error.message });
   }
 };

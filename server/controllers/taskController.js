@@ -128,7 +128,11 @@ export const acceptTask = async (req, res) => {
             return res.status(400).json({ success: false, message: "You cannot accept your own task" });
         }
 
-        if (task.helpersArray.includes(userId)) {
+        const alreadyAccepted = task.helpersArray.some(
+            (helper) => helper.user.toString() === userId.toString()
+        );
+
+        if (alreadyAccepted) {
             return res.status(400).json({ success: false, message: "You have already accepted this task" });
         }
 
@@ -138,26 +142,29 @@ export const acceptTask = async (req, res) => {
 
         // Update task properties
         task.curHelpers += 1;
-        task.helpersArray.push(userId);
+        task.helpersArray.push({
+            user: userId,
+            acceptedAt: new Date()
+        });
         task.status = 'in-progress'; // Set status as soon as the first helper joins
 
-        // This is the new, smarter chat logic.
-        // It will CREATE the chat for the first helper and UPDATE it for all subsequent helpers.
+        // Smart chat logic
         await Chat.findOneAndUpdate(
-            { taskReference: id }, // Find the chat for this task
-            { 
-                // Add the task creator and the new helper to the participants list.
-                // $addToSet prevents duplicates if they are already in the array.
-                $addToSet: { participants: [task.postedBy, userId] }, 
+            { taskReference: id },
+            {
+                $addToSet: { participants: [task.postedBy, userId] },
                 taskReference: id,
             },
-            { upsert: true, new: true } // upsert:true creates the document if it doesn't exist
+            { upsert: true, new: true }
         );
 
-        // Save all the changes made to the task document
         const updatedTask = await task.save();
 
-        res.status(200).json({ success: true, message: "Successfully accepted the task!", data: updatedTask });
+        res.status(200).json({
+            success: true,
+            message: "Successfully accepted the task!",
+            data: updatedTask
+        });
 
     } catch (error) {
         console.error("Error in acceptTask:", error);
@@ -178,7 +185,7 @@ export const completeTask = async (req, res) => {
     }
 
     const session = await mongoose.startSession();
-    session.startTransaction(); // to ensure database consistency, all operations occur in a single transaction or get rolled back
+    session.startTransaction();
 
     try {
         const task = await Task.findById(id).session(session);
@@ -200,28 +207,39 @@ export const completeTask = async (req, res) => {
             session.endSession();
             return res.status(400).json({ success: false, message: "This task has already been completed" });
         }
-        
+
         if (task.helpersArray.length === 0) {
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({ success: false, message: "This task has no helpers to award credits to" });
         }
 
+        const now = new Date();
+
+        // Award credits to each helper based on time spent
+        for (const helper of task.helpersArray) {
+            const acceptedAt = new Date(helper.acceptedAt);
+            const hoursWorked = Math.max((now - acceptedAt) / (1000 * 60 * 60), 0);
+            const creditsToAward = Math.ceil(hoursWorked * task.credits);
+
+            await User.findByIdAndUpdate(
+                helper.user,
+                { $inc: { 'credits.earned': creditsToAward } },
+                { session }
+            );
+        }
+
+        // Mark task as completed
         task.status = 'completed';
         await task.save({ session });
-
-        const credits = task.credits / task.helpersArray.length;
-
-        await User.updateMany(
-            { _id: { $in: task.helpersArray } },
-            { $inc: { 'credits.earned': credits } },
-            { session }
-        );
 
         await session.commitTransaction();
         session.endSession();
 
-        res.status(200).json({ success: true, message: "Task successfully completed and credits awarded." });
+        res.status(200).json({
+            success: true,
+            message: "Task successfully completed and credits awarded based on hours worked."
+        });
 
     } catch (error) {
         await session.abortTransaction();
