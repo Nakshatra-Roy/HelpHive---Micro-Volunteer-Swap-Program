@@ -11,7 +11,70 @@ export const getProfile = async (req, res) => {
 };
 
 export const updateProfile = async (req, res) => {
-    const profileFields = { ...req.body };
+    console.log('Update Profile Request Body:', req.body);
+    console.log('Request Content-Type:', req.headers['content-type']);
+    
+    const { firstName, lastName, bio, location, skills, availability } = req.body;
+    let { contactInfo, socialLinks } = req.body;
+
+    console.log('Raw contactInfo:', contactInfo);
+    console.log('Raw socialLinks:', socialLinks);
+
+    // Create the base profile fields object
+    const profileFields = { firstName, lastName, bio, location, skills, availability };
+
+    // Process contactInfo - handle both string (from FormData) and object formats
+    if (contactInfo) {
+        try {
+            if (typeof contactInfo === 'string') {
+                try {
+                    profileFields.contactInfo = JSON.parse(contactInfo);
+                } catch (parseErr) {
+                    console.error('Error parsing contactInfo as JSON:', parseErr);
+                    // If it's a string but not valid JSON, initialize as empty object
+                    profileFields.contactInfo = {};
+                }
+            } else {
+                // It's already an object
+                profileFields.contactInfo = contactInfo;
+            }
+        } catch (err) {
+            console.error('Error processing contactInfo:', err);
+            // Initialize as empty object on any error
+            profileFields.contactInfo = {};
+        }
+    } else {
+        // Ensure contactInfo exists even if not provided
+        profileFields.contactInfo = {};
+    }
+
+    // Process socialLinks - handle both string (from FormData) and object formats
+    if (socialLinks) {
+        try {
+            if (typeof socialLinks === 'string') {
+                try {
+                    profileFields.socialLinks = JSON.parse(socialLinks);
+                } catch (parseErr) {
+                    console.error('Error parsing socialLinks as JSON:', parseErr);
+                    // If it's a string but not valid JSON, initialize as empty object
+                    profileFields.socialLinks = {};
+                }
+            } else {
+                // It's already an object
+                profileFields.socialLinks = socialLinks;
+            }
+        } catch (err) {
+            console.error('Error processing socialLinks:', err);
+            // Initialize as empty object on any error
+            profileFields.socialLinks = {};
+        }
+    } else {
+        // Ensure socialLinks exists even if not provided
+        profileFields.socialLinks = {};
+    }
+    
+    console.log('Processed profileFields:', profileFields);
+    
     try {
         if (req.file) {
             const result = await new Promise((resolve, reject) => {
@@ -25,7 +88,35 @@ export const updateProfile = async (req, res) => {
             });
             profileFields.profilePicture = result.secure_url;
         }
-        const user = await User.findByIdAndUpdate(req.user.id, { $set: profileFields }, { new: true }).select('-password');
+        // Explicitly ensure contactInfo and socialLinks are included in the update
+        console.log('Final profileFields before DB update:', JSON.stringify(profileFields, null, 2));
+        
+        // Make sure these fields are explicitly set in the update operation
+        const updateOperation = {
+            $set: {
+                firstName: profileFields.firstName,
+                lastName: profileFields.lastName,
+                bio: profileFields.bio,
+                location: profileFields.location,
+                skills: profileFields.skills,
+                availability: profileFields.availability,
+                'contactInfo.phone': profileFields.contactInfo?.phone || '',
+                'contactInfo.publicEmail': profileFields.contactInfo?.publicEmail || '',
+                'socialLinks.github': profileFields.socialLinks?.github || '',
+                'socialLinks.linkedin': profileFields.socialLinks?.linkedin || '',
+                'socialLinks.twitter': profileFields.socialLinks?.twitter || '',
+                'socialLinks.website': profileFields.socialLinks?.website || ''
+            }
+        };
+        
+        // Add profilePicture to update if it exists
+        if (profileFields.profilePicture) {
+            updateOperation.$set.profilePicture = profileFields.profilePicture;
+        }
+        
+        console.log('Update operation:', JSON.stringify(updateOperation, null, 2));
+        
+        const user = await User.findByIdAndUpdate(req.user.id, updateOperation, { new: true }).select('-password');
         res.json(user);
     } catch (err) {
         console.error(err);

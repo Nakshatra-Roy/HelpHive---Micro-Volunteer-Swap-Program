@@ -75,7 +75,7 @@ export const useTaskStore = create((set) => ({
 completeTask: async (taskId) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.patch(`/api/tasks/${taskId}/complete`);
+      const response = await axios.put(`/api/tasks/${taskId}/complete`);
       set((state) => ({
         tasks: state.tasks.map(t =>
           t._id === taskId ? { ...t, status: 'completed' } : t

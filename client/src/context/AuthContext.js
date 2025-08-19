@@ -115,24 +115,32 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      // Create FormData if there's a profile picture
       let data;
+      let headers = {};
+      
       if (profilePicture) {
+        // With profile picture: use FormData
         data = new FormData();
-        // Add all profile data to FormData
         for (const key in profileData) {
-          data.append(key, profileData[key]);
+          if (key === 'contactInfo' || key === 'socialLinks') {
+            data.append(key, JSON.stringify(profileData[key]));
+          } else {
+            data.append(key, profileData[key]);
+          }
         }
         data.append('profilePicture', profilePicture);
+        headers = { 'Content-Type': 'multipart/form-data' };
       } else {
-        data = profileData;
+        // Without profile picture: use JSON but ensure nested objects are properly handled
+        data = {
+          ...profileData,
+          contactInfo: profileData.contactInfo || {},
+          socialLinks: profileData.socialLinks || {}
+        };
+        headers = { 'Content-Type': 'application/json' };
       }
       
-      const res = await axios.put('http://localhost:5001/api/profile', data, {
-        headers: {
-          'Content-Type': profilePicture ? 'multipart/form-data' : 'application/json'
-        }
-      });
+      const res = await axios.put('http://localhost:5001/api/profile', data, { headers });
       
       setUser(res.data);
       setError(null);

@@ -108,7 +108,6 @@ export const deleteTask = async (req, res) => {
 export const acceptTask = async (req, res) => {
     const { id } = req.params;
     const userId = req.user?._id || req.user?.id;
-    const user = await getUserById(userId);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ success: false, message: "Invalid Task Id" });

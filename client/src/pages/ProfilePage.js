@@ -34,7 +34,8 @@ function ProfilePage() {
         'contactInfo.publicEmail': user.contactInfo?.publicEmail || '',
         'socialLinks.github': user.socialLinks?.github || '',
         'socialLinks.linkedin': user.socialLinks?.linkedin || '',
-        'socialLinks.twitter': user.socialLinks?.twitter || ''
+        'socialLinks.twitter': user.socialLinks?.twitter || '',
+        'socialLinks.website': user.socialLinks?.website || ''
       });
     }
   }, [user, reset]);
@@ -58,13 +59,14 @@ function ProfilePage() {
       following: formData.following.split(',').map(following => following.trim()).filter(Boolean),
       // Reconstruct nested objects
       contactInfo: {
-        phone: formData['contactInfo.phone'],
-        publicEmail: formData['contactInfo.publicEmail']
+        phone: formData['contactInfo.phone'] || '',
+        publicEmail: formData['contactInfo.publicEmail'] || ''
       },
       socialLinks: {
-        github: formData['socialLinks.github'],
-        linkedin: formData['socialLinks.linkedin'],
-        twitter: formData['socialLinks.twitter']
+        github: formData['socialLinks.github'] || '',
+        linkedin: formData['socialLinks.linkedin'] || '',
+        twitter: formData['socialLinks.twitter'] || '',
+        website: formData['socialLinks.website'] || ''
       }
     };
     
@@ -74,10 +76,18 @@ function ProfilePage() {
     delete formattedData['socialLinks.github'];
     delete formattedData['socialLinks.linkedin'];
     delete formattedData['socialLinks.twitter'];
+    delete formattedData['socialLinks.website'];
+    
+    // Add more detailed logging
+    console.log('Submitting profile data:', formattedData);
+    console.log('Contact Info:', formattedData.contactInfo);
+    console.log('Social Links:', formattedData.socialLinks);
     
     const success = await updateProfile(formattedData, profilePicture);
     if (success) {
       handleCancel();
+    } else {
+      console.error('Failed to update profile');
     }
   };
 
@@ -100,7 +110,8 @@ function ProfilePage() {
         'contactInfo.publicEmail': user.contactInfo?.publicEmail || '',
         'socialLinks.github': user.socialLinks?.github || '',
         'socialLinks.linkedin': user.socialLinks?.linkedin || '',
-        'socialLinks.twitter': user.socialLinks?.twitter || ''
+        'socialLinks.twitter': user.socialLinks?.twitter || '',
+        'socialLinks.website': user.socialLinks?.website || ''
       });
     }
   };
@@ -229,6 +240,15 @@ function ProfilePage() {
                   type="url" 
                   {...register('socialLinks.twitter')} 
                   placeholder="https://twitter.com/username"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Website</label>
+                <input 
+                  type="url" 
+                  {...register('socialLinks.website')} 
+                  placeholder="https://yourwebsite.com"
                 />
               </div>
             </div>
