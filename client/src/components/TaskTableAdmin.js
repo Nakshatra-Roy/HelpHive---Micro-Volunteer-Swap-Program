@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-const TaskTable = ({
+const TaskTableAdmin = ({
   tasks = [],
   loading = false,
   userId,
@@ -36,7 +36,6 @@ const TaskTable = ({
             <div>Due Date</div>
             <div>Priority</div>
             <div>Credits</div>
-            <div>Actions</div>
           </div>
 
           {rows.map((t, i) => {
@@ -78,30 +77,6 @@ const TaskTable = ({
                     gap: 6,
                   }}
                 >
-                  {!loading ? (
-                    <button
-                      onClick={() => t && onAccept?.(t)}
-                      className="btn glossy primary"
-                      style={{
-                        padding: "6px 12px",
-                        fontSize: "0.8rem",
-                        background: !isFull ? "#10b981" : undefined,
-                      }}
-                      disabled={isBusy || isFull || !userId}
-                      aria-busy={isBusy}
-                      title={
-                        !userId
-                          ? "Login required"
-                          : isFull
-                          ? "Task is full"
-                          : "Accept this task"
-                      }
-                    >
-                      {isBusy ? "..." : isFull ? "Full" : "Accept"}
-                    </button>
-                  ) : (
-                    <div className="pill">—</div>
-                  )}
                 </div>
 
                 <div className="task-hover-info">
@@ -178,4 +153,4 @@ const TaskTable = ({
   );
 };
 
-export default TaskTable;
+export default TaskTableAdmin;

@@ -27,6 +27,42 @@ const TaskFilters = ({ onFilterChange, categories, locations, priorities }) => {
     onFilterChange(newFilters); // update parent
   };
 
+  const handleReset = () => {
+    setSearch("");
+    setCategory("");
+    setLocation("");
+    setPriority("");
+    setSortCredits("");
+    onFilterChange({ search: "", category: "", location: "", priority: "", sortCredits: ""})
+  };
+
+  const glassGreenStyle = {
+    position: "relative",
+    borderRadius: 10,
+    width: 160,
+    fontSize: 16,
+    color: "#000000ff",
+    background: "#d9f99d69",
+    backdropFilter: "blur(8px) saturate(150%)",
+    WebkitBackdropFilter: "blur(8px) saturate(150%)",
+    border: "1px solid rgba(187, 255, 0, 0.4)",
+    boxShadow: "4px 4px 5px rgba(71, 110, 0, 0.23)",
+    padding: "8px",
+    userSelect: "none",
+    outline: "none",
+    marginRight: "10px",
+    transition: "all 0.3s ease",
+  };
+
+  const glassGreenFocus = {
+    ...glassGreenStyle,
+    boxShadow: "0 0 10px rgba(158, 250, 166, 0.47)",
+    border: "1px solid rgba(187, 255, 0, 0.8)",
+  };
+
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [dropdownFocus, setDropdownFocus] = useState(null); // track focus per dropdown
+
   return (
     <div className="filter-section" style={{ marginBottom: "20px" }}>
       {/* Search Bar */}
@@ -35,20 +71,25 @@ const TaskFilters = ({ onFilterChange, categories, locations, priorities }) => {
         placeholder="Search by task name..."
         value={search}
         onChange={(e) => handleChange("search", e.target.value)}
+        onFocus={() => setSearchFocused(true)}
+        onBlur={() => setSearchFocused(false)}
         style={{
-          padding: "8px",
-          width: "250px",
-          marginRight: "10px",
-          border: "1px solid #ccc",
-          borderRadius: "6px",
-        }}
+        ...(searchFocused ? glassGreenFocus : glassGreenStyle),
+        display: "block",   
+        width: "100%",       
+        boxSizing: "border-box"   
+      }}
       />
+
+      <br/>
 
       {/* Category Filter */}
       <select
         value={category}
         onChange={(e) => handleChange("category", e.target.value)}
-        style={{ marginRight: "10px", padding: "8px" }}
+        onFocus={() => setDropdownFocus("category")}
+        onBlur={() => setDropdownFocus(null)}
+        style={dropdownFocus === "category" ? glassGreenFocus : glassGreenStyle}
       >
         <option value="">All Categories</option>
         {categories.map((cat) => (
@@ -62,7 +103,9 @@ const TaskFilters = ({ onFilterChange, categories, locations, priorities }) => {
       <select
         value={location}
         onChange={(e) => handleChange("location", e.target.value)}
-        style={{ marginRight: "10px", padding: "8px" }}
+        onFocus={() => setDropdownFocus("location")}
+        onBlur={() => setDropdownFocus(null)}
+        style={dropdownFocus === "location" ? glassGreenFocus : glassGreenStyle}
       >
         <option value="">All Locations</option>
         {locations.map((loc) => (
@@ -76,7 +119,9 @@ const TaskFilters = ({ onFilterChange, categories, locations, priorities }) => {
       <select
         value={priority}
         onChange={(e) => handleChange("priority", e.target.value)}
-        style={{ marginRight: "10px", padding: "8px" }}
+        onFocus={() => setDropdownFocus("priority")}
+        onBlur={() => setDropdownFocus(null)}
+        style={dropdownFocus === "priority" ? glassGreenFocus : glassGreenStyle}
       >
         <option value="">All Priorities</option>
         {priorities.map((p) => (
@@ -90,11 +135,21 @@ const TaskFilters = ({ onFilterChange, categories, locations, priorities }) => {
       <select
         value={sortCredits}
         onChange={(e) => handleChange("sortCredits", e.target.value)}
-        style={{ padding: "8px" }}
+        onFocus={() => setDropdownFocus("credits")}
+        onBlur={() => setDropdownFocus(null)}
+        style={dropdownFocus === "credits" ? glassGreenFocus : glassGreenStyle}
       >
-        <option value="desc">Credits: High → Low</option>
-        <option value="asc">Credits: Low → High</option>
+        <option value="desc">Credits: High to Low</option>
+        <option value="asc">Credits: Low to High</option>
       </select>
+
+      {/* Reset Button */}
+      <button
+        onClick={handleReset}
+        className="btn glossy primary"
+      >
+        Reset Filters
+      </button>
     </div>
   );
 };

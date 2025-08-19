@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import UserFilters from "../components/UserFilters"; // Ensure this exists
 
 function useFetch(url, initial = []) {
   const [data, setData] = useState(initial);
@@ -33,6 +35,8 @@ function useFetch(url, initial = []) {
 function AdminUsers() {
   const { data: users, loading } = useFetch(`/api/users/`, []);
   const [list, setList] = useState([]);
+  const [filters, setFilters] = useState({ search: "", role: "", accountStatus: "" });
+
   const [flagPending, setFlagPending] = useState(new Set());
   const [statusPending, setStatusPending] = useState(new Set());
   const [rolePending, setRolePending] = useState(new Set());
@@ -40,6 +44,23 @@ function AdminUsers() {
   useEffect(() => {
     setList(users || []);
   }, [users]);
+
+  const roles = useMemo(() => [...new Set((users || []).map(u => u.role).filter(Boolean))], [users]);
+
+  const filteredUsers = useMemo(() => {
+  const s = filters.search.trim().toLowerCase();
+  return (list || []).filter(u => {
+    const matchSearch =
+      s === "" ||
+      (u.firstName + " " + u.lastName).toLowerCase().includes(s) ||
+      u.email.toLowerCase().includes(s);
+    const matchRole = filters.role ? u.role === filters.role : true;
+    const matchStatus =
+      filters.accountStatus ? u.accountStatus === filters.accountStatus : true;
+    return matchSearch && matchRole && matchStatus;
+  });
+}, [list, filters]);
+
 
   const handleToggleFlag = async (user) => {
     if (!user?._id) return;
@@ -114,7 +135,6 @@ function AdminUsers() {
       if (!res.ok) throw new Error(`Failed (${res.status})`);
       alert(`Role updated to ${newRole}`);
     } catch {
-      // revert on failure
       setList(prev => prev.map(u => (u._id === id ? { ...u, role: prevRole } : u)));
       alert("Error updating role");
     } finally {
@@ -128,14 +148,10 @@ function AdminUsers() {
 
   return (
     <>
-      <div className="backdrop">
-        <div className="blob b1" />
-        <div className="blob b2" />
-        <div className="grid-overlay" />
-      </div>
-
       <section className="section">
         <div className="container">
+          <UserFilters roles={roles} onFilterChange={setFilters} />
+
           <div className="section-head">
             <h2>All User Details</h2>
           </div>
@@ -150,7 +166,7 @@ function AdminUsers() {
                 <div>Actions</div>
               </div>
 
-              {(loading ? Array.from({ length: 8 }) : list).map((u, i) => {
+              {(loading ? Array.from({ length: 8 }) : filteredUsers).map((u, i) => {
                 const isFlagged = !!u?.flag;
                 const isInactive = u?.accountStatus === "inactive";
                 const isFlagBusy = u?._id ? flagPending.has(u._id) : false;
@@ -166,9 +182,7 @@ function AdminUsers() {
                     <div>{i + 1}</div>
 
                     <div className="user">
-                      <div className="avatar">
-                        {u?.firstName?.[0]?.toUpperCase() || "U"}
-                      </div>
+                      <div className="avatar">{u?.firstName?.[0]?.toUpperCase() || "U"}</div>
                       <span>{u?.firstName} {u?.lastName}</span>
                     </div>
 
@@ -220,29 +234,18 @@ function AdminUsers() {
                         {isStatusBusy ? "..." : isInactive ? "Activate" : "Deactivate"}
                       </button>
                     </div>
-
-                    <div className="user-hover-info">
-                      <p><strong>Location:</strong> {u?.location || "—"}</p>
-                      <p><strong>Bio:</strong> {u?.bio || "—"}</p>
-                      <p><strong>Availability:</strong> {u?.availability || "—"}</p>
-                      <p><strong>Skills:</strong> {u?.skills?.join(", ") || "—"}</p>
-                      <p><strong>Interests:</strong> {u?.interests?.join(", ") || "—"}</p>
-                      <p>
-                        <strong>Social:</strong>{" "}
-                        {u?.socialLinks?.github && (<a href={u.socialLinks.github} target="_blank" rel="noreferrer">GH</a>)}{" "}
-                        {u?.socialLinks?.linkedin && (<>| <a href={u.socialLinks.linkedin} target="_blank" rel="noreferrer">LI</a></>)}{" "}
-                        {u?.socialLinks?.twitter && (<>| <a href={u.socialLinks.twitter} target="_blank" rel="noreferrer">TW</a></>)}{" "}
-                        {u?.socialLinks?.website && (<>| <a href={u.socialLinks.website} target="_blank" rel="noreferrer">WB</a></>)}
-                      </p>
-                    </div>
                   </div>
                 );
               })}
+                        {!loading && filteredUsers.length === 0 && (
+                    <p style={{ marginTop: 16, textAlign: "center", color: "#6b7280" }}>
+                      No users found.{" "}
+                    </p>
+                  )}
             </div>
           </div>
         </div>
       </section>
-
       <style>
         {`
           .row:hover .user-hover-info { display: block; }

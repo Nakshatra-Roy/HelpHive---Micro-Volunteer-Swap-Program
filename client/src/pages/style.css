@@ -206,6 +206,11 @@ body {
   padding: 8px 12px;
   font-size: 14px;
 }
+.btn.tiny.under {
+  padding: 8px 12px;
+  color: #15803d;
+  font-size: 14px;
+}
 .btn.glossy.primary {
   background: linear-gradient(135deg, #10b981, #34d399);
   color: #fff;
