@@ -4,6 +4,7 @@ import { useTaskStore } from "../store/taskStore";
 import { useAuth } from "../context/AuthContext";
 import TaskFilters from "../components/TaskFilters";
 import TaskTable from "../components/TaskTable";
+import TaskTableAdmin from "../components/TaskTableAdmin";
 
 const ViewTasks = () => {
   const { tasks, loading, fetchTask, acceptTask } = useTaskStore();
@@ -13,9 +14,10 @@ const ViewTasks = () => {
     category: "",
     location: "",
     priority: "",
-    sortCredits: "desc", // ✅ default
+    sortCredits: "desc", //default
   });
   const [acceptPending, setAcceptPending] = useState(new Set());
+  const isLoggedInAdmin = user && user.role === "admin";
 
   useEffect(() => {
     fetchTask();
@@ -86,7 +88,7 @@ const ViewTasks = () => {
 
         <h2>All Tasks</h2>
 
-        {/* Table now gets filters.sortCredits passed as sortOrder */}
+		{!isLoggedInAdmin && (
         <TaskTable
           tasks={filteredTasks}
           loading={loading}
@@ -95,11 +97,22 @@ const ViewTasks = () => {
           onAccept={handleAcceptTask}
           sortOrder={filters.sortCredits} // ✅ pass sort order
         />
+		)}
+
+		{isLoggedInAdmin && (
+        <TaskTableAdmin
+          tasks={filteredTasks}
+          loading={loading}
+          userId={user?._id}
+          busyIds={acceptPending}
+          sortOrder={filters.sortCredits} // ✅ pass sort order
+        />
+		)}
 
         {!loading && filteredTasks.length === 0 && (
           <p style={{ marginTop: 16, textAlign: "center", color: "#6b7280" }}>
             No tasks found 😢{" "}
-            <Link to="/createTask" className="admin-link">
+            <Link to="/createTask" className="btn tiny under">
               Create a task
             </Link>
           </p>
