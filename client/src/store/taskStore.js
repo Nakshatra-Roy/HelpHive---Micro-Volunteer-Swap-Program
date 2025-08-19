@@ -57,10 +57,8 @@ export const useTaskStore = create((set) => ({
   try {
     const response = await axios.put(`/api/tasks/${task._id}/accept`, { userId });
     set((state) => ({
-      tasks: state.tasks.map(t => 
-        t._id === task._id ? response.data : t
-      ),
-      loading: false
+  tasks: state.tasks.map(t => t._id === task._id ? response.data.data : t),
+  loading: false
     }));
 
     return { success: true, message: 'Task accepted successfully' };

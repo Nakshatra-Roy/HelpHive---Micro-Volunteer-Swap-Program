@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProfilePage from "./pages/ProfilePage";
 import AdminDashboard from './pages/AdminDashboard';
+import TaskFilters from './components/TaskFilters';
 import AdminRoute from './components/AdminRoute';
 import ChatPage from './pages/ChatPage';
 
