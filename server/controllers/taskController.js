@@ -109,7 +109,7 @@ export const deleteTask = async (req, res) => {
 
 export const acceptTask = async (req, res) => {
     const { id } = req.params;
-    const userId = req.user?._id || req.user?.id;
+    const userId = req.user?._id || req.user?.id; // This is the helper's ID
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(404).json({ success: false, message: "Invalid Task Id" });
@@ -138,30 +138,32 @@ export const acceptTask = async (req, res) => {
             return res.status(400).json({ success: false, message: "This task has already been filled" });
         }
 
+        // Update task properties
         task.curHelpers += 1;
         task.helpersArray.push(userId);
+        task.status = 'in-progress'; // Set status as soon as the first helper joins
 
-        if (task.curHelpers === task.helpersReq) {
-            const participants = [task.postedBy, ...task.helpersArray];
-            const chat = await Chat.findOneAndUpdate(
-                { taskReference: id },
-                {
-                    participants,
-                    taskReference: id,
-                },
-                { upsert: true, new: true }
-            );
-        }
+        // This is the new, smarter chat logic.
+        // It will CREATE the chat for the first helper and UPDATE it for all subsequent helpers.
+        await Chat.findOneAndUpdate(
+            { taskReference: id }, // Find the chat for this task
+            { 
+                // Add the task creator and the new helper to the participants list.
+                // $addToSet prevents duplicates if they are already in the array.
+                $addToSet: { participants: [task.postedBy, userId] }, 
+                taskReference: id,
+            },
+            { upsert: true, new: true } // upsert:true creates the document if it doesn't exist
+        );
 
-        task.status = 'in-progress';
-
-
+        // Save all the changes made to the task document
         const updatedTask = await task.save();
 
-        res.status(200).json({ success: true, data: updatedTask });
+        res.status(200).json({ success: true, message: "Successfully accepted the task!", data: updatedTask });
+
     } catch (error) {
-        console.error("Error accepting task:", error);
-        res.status(500).json({ success: false, message: "Server Error" });
+        console.error("Error in acceptTask:", error);
+        res.status(500).json({ success: false, message: "Server error while accepting task" });
     }
 };
 
