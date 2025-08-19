@@ -21,6 +21,7 @@ import CreateTask from "./pages/CreateTask";
 import ViewTasks from "./pages/ViewTasks";
 import ViewOffers from "./pages/ViewOffers";
 import MyTasks from './components/MyTasks'; 
+import SwapRequests from './pages/SwapRequests'; 
 
 function AppContent() {
   return (
@@ -42,6 +43,15 @@ function AppContent() {
         <Route path="/tasks" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><ViewTasks /></div>} />
         <Route path="/offers" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><ViewOffers /></div>} />
         <Route path="/mytasks" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><MyTasks /></div>} />
+         <Route 
+          path="/swap-requests" 
+          element={
+            <div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}>
+                <SwapRequests />
+            </div>
+          } 
+        />
+        
         
         {/* Admin Routes */}
         <Route path="/admin/dashboard" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><AdminRoute><AdminDashboard /></AdminRoute></div>} />

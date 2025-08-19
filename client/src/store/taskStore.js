@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
 
-
-
 export const useTaskStore = create((set) => ({
   tasks: [],
   loading: false,
@@ -92,4 +90,62 @@ completeTask: async (taskId) => {
     }
   },
 
+fetchSwapRequests: async () => {
+    set({ loading: true });
+    try {
+        // Note the URL is now /api/tasks/swaps
+        const response = await axios.get('/api/tasks/swaps');
+        set({ swapRequests: response.data.data, loading: false });
+    } catch (error) {
+        // handle error
+    }
+},
+
+// Creates a new swap request
+requestTaskSwap: async (taskToGiveId, taskToReceiveId) => {
+    try {
+        // Note the URL is now /api/tasks/swaps
+        const response = await axios.post('/api/tasks/swaps', { taskToGiveId, taskToReceiveId });
+        return { success: true, message: response.data.message };
+    } catch (error) {
+        return { success: false, message: error.response?.data?.message };
+    }
+},
+
+// Responds to a swap request
+respondToSwapRequest: async (swapRequestId, accepted) => {
+    try {
+        // Note the URL is now /api/tasks/swaps/:id/respond
+        const response = await axios.put(`/api/tasks/swaps/${swapRequestId}/respond`, { accepted });
+        set(state => ({
+            swapRequests: state.swapRequests.filter(req => req._id !== swapRequestId)
+        }));
+        return { success: true, message: response.data.message };
+    } catch (error) {
+        return { success: false, message: error.response?.data?.message };
+    }
+},
+
+initiateHelperSwap: async (myCommittedTaskId, theirOpenTaskId) => {
+  set({ loading: true });
+  try {
+    const response = await axios.put(`/api/tasks/${myCommittedTaskId}/${theirOpenTaskId}/helper-swap`);
+    
+    // Update the two modified tasks in our local state
+    const { updatedMyCommittedTask, updatedTheirOpenTask } = response.data.data;
+    set(state => ({
+      tasks: state.tasks.map(t => {
+        if (t._id === updatedMyCommittedTask._id) return updatedMyCommittedTask;
+        if (t._id === updatedTheirOpenTask._id) return updatedTheirOpenTask;
+        return t;
+      }),
+      loading: false,
+    }));
+    
+    return { success: true, message: response.data.message };
+  } catch (error) {
+    set({ loading: false });
+    return { success: false, message: error.response?.data?.message };
+  }
+}
 }));

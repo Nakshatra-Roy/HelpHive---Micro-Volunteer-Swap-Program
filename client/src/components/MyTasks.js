@@ -2,94 +2,150 @@ import React, { useEffect, useState } from "react";
 import styles from './TaskTable.module.css';
 import { useTaskStore } from "../store/taskStore";
 import { useAuth } from '../context/AuthContext'; 
+import SwapModal from './SwapModal';
 
 const MyTasks = () => {
-  // 1. Get `completeTask` from the store
-  const { tasks, fetchTask, completeTask } = useTaskStore();
-  const { user } = useAuth(); // Get logged-in user
-
-  // Local state for loading feedback on each button
+  // Get all necessary functions from the store, including the new one
+  const { tasks, fetchTask, completeTask, requestTaskSwap, initiateHelperSwap } = useTaskStore();
+  const { user } = useAuth();
   const [loadingTaskId, setLoadingTaskId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // State to track the task being offered and the type of swap
+  const [taskInPlay, setTaskInPlay] = useState(null);
+  const [swapType, setSwapType] = useState(null); // Will be 'owner' or 'helper'
 
   useEffect(() => {
-    // Only fetch if tasks are not already loaded
-    if (tasks.length === 0) {
-      fetchTask();
-    }
+    if (tasks.length === 0) fetchTask();
   }, [fetchTask, tasks.length]);
 
-  // 2. Correctly handle the complete task action
+  // --- Handlers ---
   const handleCompleteTask = async (taskId) => {
-    setLoadingTaskId(taskId); // Set loading state for this button
-    // The store expects only the task ID, not the whole object
+    setLoadingTaskId(taskId);
     const { success, message } = await completeTask(taskId); 
-    
-    if (!success) {
-      console.error("Error completing task:", message);
-      alert(`Error: ${message}`);
-    } else {
-      console.log("Success:", message);
-      // The state will update automatically from the store, no need for an alert here
-    }
-    setLoadingTaskId(null); // Reset loading state
+    if (!success) alert(`Error: ${message}`);
+    setLoadingTaskId(null);
   };
 
-  // 3. Filter the tasks to show ONLY the ones posted by the current user
+  // This function now opens the modal and sets what kind of swap it is
+  const handleOpenModal = (task, type) => {
+    setTaskInPlay(task);
+    setSwapType(type);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTaskInPlay(null);
+    setSwapType(null);
+  };
+
+  // This one function now handles both swap types based on the state
+  const handleConfirmSwap = async (theirTaskId) => {
+    if (!taskInPlay || !swapType) return;
+
+    let result;
+    if (swapType === 'owner') {
+      // This is the original "Owner Swap" which creates a request
+      result = await requestTaskSwap(taskInPlay._id, theirTaskId);
+    } else if (swapType === 'helper') {
+      // This is the new "Helper Swap" which is a direct action
+      result = await initiateHelperSwap(taskInPlay._id, theirTaskId);
+    }
+    
+    if (result.success) {
+      alert(result.message || "Action successful!");
+    } else {
+      alert(`Error: ${result.message}`);
+    }
+    handleCloseModal();
+  };
+
+  // --- Data Filtering ---
   const myPostedTasks = tasks.filter(task => task.postedBy === user?._id);
+  const myHelperTasks = tasks.filter(task => task.helpersArray.includes(user?._id));
 
-  // Show a loading or empty state
-  if (myPostedTasks.length === 0) {
-    return (
-      <div className={styles.container}>
-        <p className={styles.text}>
-          You have not posted any tasks yet 😢
-        </p>
-      </div>
-    );
-  }
-
+  // --- JSX ---
   return (
-    <div className={styles.container}>
-      <div className={styles.vstack}>
-        <h1>My Posted Tasks</h1>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th className={styles.th}>Task Name</th>
-              <th className={styles.th}>Status</th>
-              <th className={styles.th}>Helpers</th>
-              <th className={styles.th}>Due Date</th>
-              <th className={styles.th}>Credits</th>
-              <th className={styles.th}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* 4. Map over the NEW filtered array */}
-            {myPostedTasks.map((task) => (
-              <tr key={task._id}>
-                <td className={styles.td}>{task.taskName}</td>
-                <td className={styles.td}><span className={`${styles.pill} ${styles[task.status]}`}>{task.status}</span></td>
-                <td className={styles.td}>{task.curHelpers || 0} / {task.helpersReq}</td>
-                <td className={styles.td}>{new Date(task.date).toLocaleDateString()}</td>
-                <td className={styles.td}>{task.credits}</td>
-                <td className={styles.td}>
-                  {/* 5. Only show the button if the task can be completed */}
-                  {task.status === 'in-progress' && (
-                    <button
-                      className={styles.button}
-                      onClick={() => handleCompleteTask(task._id)}
-                      disabled={loadingTaskId === task._id} // Disable button while loading
-                    >
-                      {loadingTaskId === task._id ? 'Completing...' : 'Mark as Complete'}
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <>
+      {/* SECTION 1: MY POSTED TASKS (OWNER VIEW) */}
+      <div className={styles.container}>
+        <div className={styles.vstack}>
+          <h1>My Posted Tasks</h1>
+          {myPostedTasks.length > 0 ? (
+            <table className={styles.table}>
+               {/* ... (thead remains the same as your previous code) ... */}
+              <thead>
+                <tr>
+                  <th className={styles.th}>Task Name</th>
+                  <th className={styles.th}>Helpers</th>
+                  <th className={styles.th}>Status</th>
+                  <th className={styles.th}>Swap Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {myPostedTasks.map((task) => (
+                  <tr key={task._id}>
+                    <td className={styles.td}>{task.taskName}</td>
+                    <td className={styles.td}>{task.curHelpers || 0} / {task.helpersReq}</td>
+                    <td className={styles.td}>
+                      {task.status === 'in-progress' && <button className={styles.button} onClick={() => handleCompleteTask(task._id)} disabled={loadingTaskId === task._id}>{loadingTaskId === task._id ? '...' : 'Mark as Complete'}</button>}
+                      {task.status === 'open' && <span className={`${styles.pill} ${styles.open}`}>Open</span>}
+                      {task.status === 'completed' && <span className={`${styles.pill} ${styles.open}`}>Completed</span>}
+                    </td>
+                    <td className={styles.td}>
+                      {task.status === 'open' && <button className={styles.button} onClick={() => handleOpenModal(task, 'owner')}>Send Swap Request</button>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : <p className={styles.text}>You have not posted any tasks yet.</p>}
+        </div>
       </div>
-    </div>
+
+      {/* SECTION 2: TASKS I'M HELPING WITH (HELPER VIEW) */}
+      <div className={styles.container} style={{ marginTop: '2rem' }}>
+        <div className={styles.vstack}>
+          <h1>Tasks I'm Helping With</h1>
+          {myHelperTasks.length > 0 ? (
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th className={styles.th}>Task Name</th>
+                  <th className={styles.th}>Status</th>
+                  <th className={styles.th}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {myHelperTasks.map(task => (
+                  <tr key={task._id}>
+                    <td className={styles.td}>{task.taskName}</td>
+                    <td className={styles.td}><span className={`${styles.pill} ${styles[task.status]}`}>{task.status}</span></td>
+                    <td className={styles.td}>
+                      {task.status === 'in-progress' && (
+                        <button className={styles.button} onClick={() => handleOpenModal(task, 'helper')}>
+                          Request Direct Swap
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : <p className={styles.text}>You have not accepted any tasks yet.</p>}
+        </div>
+      </div>
+      
+      {/* The same modal is used for both swap types */}
+      {isModalOpen && (
+        <SwapModal 
+          myTaskToOffer={taskInPlay}
+          onClose={handleCloseModal}
+          onConfirmSwap={handleConfirmSwap}
+        />
+      )}
+    </>
   );
 };
 

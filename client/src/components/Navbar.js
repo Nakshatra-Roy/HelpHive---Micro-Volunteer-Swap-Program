@@ -88,7 +88,15 @@ const Navbar = () => {
                 Create Task
               </NavLink>
             </div>
+
+            
           )}
+          <NavLink to="/mytasks" active={isActive("/mytasks")}>
+                My Tasks
+              </NavLink>
+              <NavLink to="/swap-requests" active={isActive("/swap-requests")}>
+                Swap Requests
+              </NavLink>
 
           {isLoggedInAdmin && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 6 }}>
