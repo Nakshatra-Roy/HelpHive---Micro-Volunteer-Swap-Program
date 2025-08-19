@@ -153,6 +153,9 @@ export const acceptTask = async (req, res) => {
             );
         }
 
+        task.status = 'in-progress';
+
+
         const updatedTask = await task.save();
 
         res.status(200).json({ success: true, data: updatedTask });

@@ -33,7 +33,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-
 // Using the routes:
 app.use('/api/tasks', taskRoutes);
 app.use('/api/offers', offerRoutes);

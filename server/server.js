@@ -1,65 +1,46 @@
+// server/server.js
 import app from './app.js';
 import mongoose from 'mongoose';
 import http from 'http';
 import { Server } from 'socket.io';
-import Chat from './models/chatModel.js';
 import dotenv from 'dotenv';
+import { registerChatHandlers } from './socketHandlers.js'; // <-- Import from the NEW server-side file
+
 dotenv.config();
 
 const server = http.createServer(app);
 
-export const io = new Server(server, {
+const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
   },
 });
 
-// create a http server, then give the server access to whole app
-// give socket access to the server. this way the socket listens in to any changes to the server
-
+// THIS IS THE ONLY io.on('connection') BLOCK
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  socket.on('joinRoom', (taskId) => {
-    socket.join(taskId);
-    console.log(`Socket ${socket.id} joined room ${taskId}`);
-  });
-
-  socket.on('sendMessage', async ({ taskId, message }) => {
-    try {
-      const chat = await Chat.findOneAndUpdate(
-        { taskReference: taskId },
-        { $push: { messages: message } },
-        { new: true }
-      ).populate('messages.sender', 'name _id');
-
-      if (chat) {
-        const newMessage = chat.messages[chat.messages.length - 1];
-        io.to(taskId).emit('receiveMessage', newMessage);
-      }
-    } catch (error) {
-      console.error('Error saving message:', error);
-    }
-  });
-
+  // Set up the generic handlers
   socket.on("register", (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined their room`);
   });
 
+  // Set up the chat-specific handlers by calling our imported function
+  registerChatHandlers(io, socket);
+
+  // Set up the disconnect handler
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
 });
-// When someone connects → log them in
-// When they “register” with a userId → put them in their own personal room
-// When they disconnect → log it out
 
+// --- Database and Server Startup ---
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => {
   console.log("MongoDB Connected");
   server.listen(process.env.PORT || 5001, () => {
-    console.log("Connection Successful: Server is running");
+    console.log("Connection Successful: Server is running on port " + (process.env.PORT || 5001));
   });
 })
 .catch((err) => console.error("DB Connection Error:", err));

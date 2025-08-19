@@ -1,3 +1,4 @@
+import Task from '../models/taskModel.js';
 import User from '../models/userModel.js';
 import express from 'express';
 import jwt from 'jsonwebtoken';
@@ -143,3 +144,20 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error });
   }
 }
+
+export const getUserTasks = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Find tasks created by the user
+    const created = await Task.find({ postedBy: userId }).sort({ createdAt: -1 });
+
+    // Find tasks where the user is a helper
+    // This assumes your Task schema has an array field named 'helpers' that stores user IDs
+    const helping = await Task.find({ helpersArray: userId }).sort({ createdAt: -1 });
+
+    res.status(200).json({ created, helping });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user tasks', error: error.message });
+  }
+};

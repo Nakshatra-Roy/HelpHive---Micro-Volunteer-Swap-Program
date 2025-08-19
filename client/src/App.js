@@ -24,26 +24,26 @@ function AppContent() {
   return (
     <>
       <Navbar />
-      <div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}>
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-
-        {/* Regular User Routes */}
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/offers/new" element={<CreateOffer />} />
-        <Route path="/tasks/new" element={<CreateTask />} />
-        <Route path="/tasks" element={<ViewTasks />} />
-        <Route path="/offers" element={<ViewOffers />} />
+        {/* Chat Route - Full Width */}
         <Route path="/chat/:taskId" element={<ChatPage />} />
         
+        {/* All Other Routes - With Container */}
+        <Route path="/" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><Landing /></div>} />
+        <Route path="/login" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><Login /></div>} />
+        <Route path="/signup" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><Signup /></div>} />
+
+        {/* Regular User Routes */}
+        <Route path="/profile" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><ProfilePage /></div>} />
+        <Route path="/offers/new" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><CreateOffer /></div>} />
+        <Route path="/tasks/new" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><CreateTask /></div>} />
+        <Route path="/tasks" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><ViewTasks /></div>} />
+        <Route path="/offers" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><ViewOffers /></div>} />
+        
         {/* Admin Routes */}
-        <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+        <Route path="/admin/dashboard" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><AdminRoute><AdminDashboard /></AdminRoute></div>} />
+        <Route path="/admin/users" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><AdminRoute><AdminUsers /></AdminRoute></div>} />
       </Routes>
-    </div>
     </>
   );
 }

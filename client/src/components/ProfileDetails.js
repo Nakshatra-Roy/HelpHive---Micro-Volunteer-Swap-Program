@@ -23,8 +23,8 @@ function ProfileDetails({ user }) {
           <h3>Skills</h3>
           <div className="tags-container">
             {Array.isArray(user.skills) && user.skills.length > 0 ? (
-              user.skills.map((skill) => (
-                <span key={skill} className="tag">{skill}</span>
+              user.skills.map((skill, index) => (
+                <span key={`${skill}-${index}`} className="tag">{skill}</span>
               ))
             ) : (
               <p>No skills listed</p>
@@ -36,8 +36,8 @@ function ProfileDetails({ user }) {
           <h3>Following</h3>
           <div className="tags-container">
             {Array.isArray(user.following) && user.following.length > 0 ? (
-              user.following.map((following) => (
-                <span key={following} className="tag">{following}</span>
+              user.following.map((following, index) => (
+                <span key={`${following}-${index}`} className="tag">{following}</span>
               ))
             ) : (
               <p>No Following skills listed</p>

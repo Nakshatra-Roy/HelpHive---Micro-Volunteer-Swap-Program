@@ -43,7 +43,7 @@ function ProfileStats({ user }) {
         {Array.isArray(user.volunteerHistory) && user.volunteerHistory.length > 0 ? (
           <div className="history-list">
             {user.volunteerHistory.map((history, index) => (
-              <div key={history._id || history.date || `history-${index}`} className="history-item">
+              <div key={history._id || `${history.date}-${index}`} className="history-item">
                 <h4>{history.title || 'Volunteer Activity'}</h4>
                 <p>{history.description || 'No description provided'}</p>
                 <div className="history-meta">

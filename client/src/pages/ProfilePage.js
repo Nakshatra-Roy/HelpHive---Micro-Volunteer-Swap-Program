@@ -6,6 +6,7 @@ import ProfileHeader from '../components/ProfileHeader';
 import ProfileDetails from '../components/ProfileDetails';
 import ProfileStats from '../components/ProfileStats';
 import ActivityStats from '../components/ActivityStats';
+import UserTasks from '../components/UserTasks';
 
 function ProfilePage() {
   const { user, loading, updateProfile } = useAuth();
@@ -263,8 +264,8 @@ function ProfilePage() {
                     <h3 className="skills-subtitle">Skills I Can Offer</h3>
                     <div className="skills-pills">
                       {Array.isArray(user.skills) && user.skills.length > 0 ? (
-                        user.skills.map((skill) => (
-                          <span key={skill} className="skill-pill">🔹 {skill}</span>
+                        user.skills.map((skill, index) => (
+                          <span key={`${skill}-${index}`} className="skill-pill">🔹 {skill}</span>
                         ))
                       ) : (
                         <p className="empty-skills">No skills listed</p>
@@ -276,8 +277,8 @@ function ProfilePage() {
                     <h3 className="skills-subtitle">Skills I Need Help With</h3>
                     <div className="skills-pills">
                       {Array.isArray(user.following) && user.following.length > 0 ? (
-                        user.following.map((following) => (
-                          <span key={following} className="skill-pill need-help">🔸 {following}</span>
+                        user.following.map((following, index) => (
+                          <span key={`${following}-${index}`} className="skill-pill need-help">🔸 {following}</span>
                         ))
                       ) : (
                         <p className="empty-skills">No skills listed</p>
@@ -291,36 +292,8 @@ function ProfilePage() {
               <ActivityStats user={user} />
               
               {/* Volunteer History Card */}
-              <div className="profile-card">
-                <h2 className="card-title">Volunteer History</h2>
-                <div className="volunteer-history-table">
-                  <div className="history-table-header">
-                    <div className="history-header-cell">Task Description</div>
-                    <div className="history-header-cell">Date</div>
-                    <div className="history-header-cell">Credits</div>
-                  </div>
-                  
-                  {Array.isArray(user.volunteerHistory) && user.volunteerHistory.length > 0 ? (
-                    user.volunteerHistory.map((history, index) => (
-                      <div key={index} className="history-table-row">
-                        <div className="history-cell">{history.title || 'Volunteer Activity'}</div>
-                        <div className="history-cell">{new Date(history.date).toLocaleDateString()}</div>
-                        <div className="history-cell credit-cell">
-                          {history.credits > 0 ? (
-                            <span className="credit-earned">+{history.credits} <span className="credit-icon">↑</span></span>
-                          ) : (
-                            <span className="credit-spent">{history.credits} <span className="credit-icon">↓</span></span>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="empty-history">No volunteer history to display.</div>
-                  )}
-                </div>
-              </div>
+              <UserTasks userId={user._id} />
             </div>
-            
             {/* Summary Card (Right Column) */}
             <div className="profile-summary-column">
               <div className="profile-card summary-card">

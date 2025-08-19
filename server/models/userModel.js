@@ -76,12 +76,16 @@ const userSchema = new mongoose.Schema({
 
 // Creates a "virtual" field for the user's full name
 userSchema.virtual('fullName').get(function() {
-    return `${this.firstName} ${this.lastName}`;
+  const first = this.firstName || '';
+  const last = this.lastName || '';
+  return `${first} ${last}`.trim();
 });
-
 // Creates a "virtual" field for the user's current credit balance
 userSchema.virtual('credits.balance').get(function() {
-    return this.credits.earned - this.credits.spent;
+  // Use `|| 0` to handle cases where a field might be missing on an old document
+  const earned = this.credits?.earned || 0;
+  const spent = this.credits?.spent || 0;
+  return earned - spent;
 });
 
 // To include virtuals when you convert a document to JSON (e.g., in an API response)

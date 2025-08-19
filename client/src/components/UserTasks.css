@@ -1,0 +1,103 @@
+.tasks-section {
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.tasks-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4a5568;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tasks-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.task-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.task-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.task-card-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.task-card-description {
+  margin: 0 0 1rem 0;
+  color: #718096;
+}
+
+.task-card-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.task-card-details div > strong {
+  color: #2d3748;
+}
+
+.task-card-actions {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.task-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  flex-shrink: 0; /* Prevents the status from wrapping */
+}
+
+/* Status colors */
+.status-open { background-color: #ebf8ff; color: #3182ce; }
+.status-in-progress { background-color: #fefcbf; color: #d69e2e; }
+.status-completed { background-color: #c6f6d5; color: #38a169; }
+.status-unknown { background-color: #e2e8f0; color: #718096; }
+
+
+.chat-button {
+  background-color: #4299e1;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.chat-button:hover {
+  background-color: #3182ce;
+}
+
+.empty-state {
+  color: #718096;
+  padding: 1rem;
+  background-color: #f7fafc;
+  border-radius: 8px;
+  text-align: center;
+}
