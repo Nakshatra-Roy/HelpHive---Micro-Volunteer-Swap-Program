@@ -41,12 +41,12 @@ const CreateTask = () => {
     ];
 
 
-    const missing = required.filter(([, v]) => !String(v || "").trim()).map(([k]) => k);
+    /*const missing = required.filter(([, v]) => !String(v || "").trim()).map(([k]) => k);
     if (missing.length) {
       show("warning", `Please fill: ${missing.join(", ")}`);
       return;
     }
-
+*/
     try {
       setLoading(true);
       const { success, message } = await createTask(newTask);
