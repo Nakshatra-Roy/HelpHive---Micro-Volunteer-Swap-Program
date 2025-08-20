@@ -219,7 +219,6 @@ const CreateTask = () => {
                         date: "",
                         priority: "",
                         credits: 1
-                        credits: 1
                       })
                     }
                   >
