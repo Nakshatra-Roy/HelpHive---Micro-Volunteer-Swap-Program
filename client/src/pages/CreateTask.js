@@ -36,7 +36,10 @@ const CreateTask = () => {
       ["priority", newTask.priority],
       ["helpersReq", newTask.helpersReq],
       ["credits", newTask.credits]
+      ["helpersReq", newTask.helpersReq],
+      ["credits", newTask.credits]
     ];
+
 
     const missing = required.filter(([, v]) => !String(v || "").trim()).map(([k]) => k);
     if (missing.length) {
@@ -215,6 +218,7 @@ const CreateTask = () => {
                         helpersReq: 1,
                         date: "",
                         priority: "",
+                        credits: 1
                         credits: 1
                       })
                     }
