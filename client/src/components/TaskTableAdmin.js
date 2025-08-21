@@ -26,7 +26,7 @@ const TaskTableAdmin = ({
     <>
       <div className="card glass">
         <div className="table">
-          <div className="row head">
+          <div className="row header">
             <div>#</div>
             <div>Task Name</div>
             <div>Category</div>

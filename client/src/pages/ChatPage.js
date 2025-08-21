@@ -1,16 +1,13 @@
-// client/src/pages/ChatPage.js
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/socketProvider';
-import './ChatPage.css';
 
 const ChatPage = () => {
   const { taskId } = useParams();
   const socket = useSocket();
-  const { user, loading: authLoading } = useAuth(); // Get user and the loading state
+  const { user, loading: authLoading } = useAuth(); 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [taskCreatorId, setTaskCreatorId] = useState(null);
@@ -107,21 +104,29 @@ const ChatPage = () => {
 
   const isOwnMessage = (sender) => sender?._id === user?._id;
 
-  // --- RENDER LOGIC ---
-
-  // Show a loading message while the AuthContext is busy
   if (authLoading) {
     return <div>Loading chat...</div>;
   }
 
-  // Show an error if there's no user (e.g., not logged in)
   if (!user) {
     return <div>Please log in to view the chat.</div>;
   }
 
   return (
+    
     <div className="chat-container">
+      <div className="backdrop">
+      <div className="blob b1" />
+      <div className="blob b2" />
+      <div className="grid-overlay" />
+    </div>
       <div className="chat-messages">
+        <button
+          className="return-button"
+          onClick={() => window.history.back()} // or use navigate('/tasks')
+        >
+          ❌
+        </button>
         {messages.map((message) => (
           <div
             key={message._id}
@@ -134,8 +139,12 @@ const ChatPage = () => {
               </strong>
               <p>{message.content}</p>
               <small className="message-time">
-                {new Date(message.timestamp).toLocaleTimeString()}
+                {new Date(message.timestamp).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
               </small>
+
             </div>
           </div>
         ))}

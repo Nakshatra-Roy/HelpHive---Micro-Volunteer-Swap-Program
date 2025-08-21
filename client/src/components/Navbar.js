@@ -75,31 +75,8 @@ const Navbar = () => {
             </span>
             HELP HIVE
           </Link>
-
-          {isLoggedIn && !isLoggedInAdmin && (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 6 }}>
-              <NavLink to="/tasks" active={isActive("/tasks")}>
-                View Tasks
-              </NavLink>
-              <NavLink to="/offers/new" active={isActive("/offers/new")}>
-                Create Offer
-              </NavLink>
-              <NavLink to="/tasks/new" active={isActive("/tasks/new")}>
-                Create Task
-              </NavLink>
-            </div>
-
-            
-          )}
-          <NavLink to="/mytasks" active={isActive("/mytasks")}>
-                My Tasks
-              </NavLink>
-              <NavLink to="/swap-requests" active={isActive("/swap-requests")}>
-                Swap Requests
-              </NavLink>
-
           {isLoggedInAdmin && (
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 0 }}>
               <h3 style={{
               display: "inline-flex",
               alignItems: "center",
@@ -119,6 +96,36 @@ const Navbar = () => {
               </NavLink>
             </div>
           )}
+
+          {!isLoggedIn && !isLoggedInAdmin && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 6 }}>
+              <NavLink to="/tasks" active={isActive("/tasks")}>
+                    View Tasks
+              </NavLink>
+              <NavLink to="/offers" active={isActive("/offers")}>
+                    View Offers
+              </NavLink>
+          </div>
+          )}
+
+          {isLoggedIn && !isLoggedInAdmin && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 6 }}>
+              <NavLink to="/offers/new" active={isActive("/offers/new")}>
+                Create Offer
+              </NavLink>
+              <NavLink to="/tasks/new" active={isActive("/tasks/new")}>
+                Create Task
+              </NavLink>
+              <NavLink to="/mytasks" active={isActive("/mytasks")}>
+                My Tasks
+              </NavLink>
+              <NavLink to="/swap-requests" active={isActive("/swap-requests")}>
+                Swap Requests
+              </NavLink>
+            </div>
+
+          )}
+
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -178,7 +185,7 @@ const Navbar = () => {
                   transition: "all 0.3s",
                 }}
               >
-                Log In
+                Login
               </Link>
               <Link
                 to="/signup"
@@ -186,16 +193,16 @@ const Navbar = () => {
                 style={{
                   padding: "8px 16px",
                   borderRadius: "9999px",
-                  background: "linear-gradient(to right, #34d399, #10b981)",
+                  background: "linear-gradient(to right, #65daafff, #10b981)",
                   color: "#ffffff",
                   fontWeight: 700,
                   border: "none",
                   textDecoration: "none",
-                  transition: "all 0.3s",
+                  transition: "all 0.5s",
                   boxShadow: "0 4px 12px rgba(16,185,129,0.2)",
                 }}
               >
-                Sign Up
+                Get Started
               </Link>
             </>
           )}
@@ -217,7 +224,7 @@ function NavLink({ to, active, children }) {
         borderRadius: 10,
         border: active ? "1px solid #a7f3d0" : "1px solid transparent",
         background: active ? "linear-gradient(180deg, #d1fae5, #bbf7d0)" : "transparent",
-        transition: "all 0.3s ease",
+        transition: "all 0.5s ease",
       }}
     >
       {children}

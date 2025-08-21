@@ -20,7 +20,7 @@ import CreateOffer from "./pages/CreateOffer";
 import CreateTask from "./pages/CreateTask";
 import ViewTasks from "./pages/ViewTasks";
 import ViewOffers from "./pages/ViewOffers";
-import MyTasks from './components/MyTasks'; 
+import MyTasks from './pages/MyTasks'; 
 import SwapRequests from './pages/SwapRequests'; 
 
 function AppContent() {

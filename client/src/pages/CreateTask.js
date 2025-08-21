@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from '../context/AuthContext';
 import { useTaskStore } from "../store/taskStore";
 
 const CreateTask = () => {
@@ -12,7 +14,8 @@ const CreateTask = () => {
 		priority: "Medium",
 		credits: 1
 	});
-
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [notice, setNotice] = useState(null); // { type: 'success' | 'warning' | 'error', message }
   const [loading, setLoading] = useState(false);
   const { createTask } = useTaskStore();
@@ -77,6 +80,17 @@ const CreateTask = () => {
       : notice?.type === "error"
       ? "pill hard"
       : "pill";
+
+  useEffect(() => {
+		if (loading) {
+			return <div className="profile-loading"> Loading page...</div>;
+		}
+		if (!user) {
+			navigate("/login");
+			return;
+		}
+		}, [user, navigate]);
+		
 
   return (
     <>

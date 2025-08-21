@@ -1,6 +1,5 @@
 // src/components/SwapModal.js
 import React from 'react';
-import styles from './SwapModal.module.css';
 import { useTaskStore } from '../store/taskStore';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,18 +15,18 @@ const SwapModal = ({ myTaskToOffer, onClose, onConfirmSwap }) => {
   if (!myTaskToOffer) return null;
 
   return (
-    <div className={styles.modalBackdrop}>
-      <div className={styles.modalContent}>
+    <div className="modalBackdrop">
+      <div className="modalContent">
         <h2>Select a Task to Swap With</h2>
         <p>You are offering your task: <strong>{myTaskToOffer.taskName}</strong></p>
         
-        <div className={styles.taskList}>
+        <div className="taskList">
           {availableTasks.length > 0 ? (
             availableTasks.map(task => (
-              <div key={task._id} className={styles.taskItem}>
+              <div key={task._id} className="taskItem">
                 <span>{task.taskName} (Credits: {task.credits})</span>
                 <button 
-                  className={styles.swapButton}
+                  className="btn glossy primary"
                   onClick={() => onConfirmSwap(task._id)}
                 >
                   Request Swap
@@ -38,8 +37,9 @@ const SwapModal = ({ myTaskToOffer, onClose, onConfirmSwap }) => {
             <p>No other tasks are available to swap with right now.</p>
           )}
         </div>
+        <br/>
 
-        <button className={styles.closeButton} onClick={onClose}>
+        <button className="btn glossy" onClick={onClose}>
           Cancel
         </button>
       </div>

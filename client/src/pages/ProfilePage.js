@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
-import './ProfilePage.css';
 import ProfileHeader from '../components/ProfileHeader';
 import ProfileDetails from '../components/ProfileDetails';
 import ProfileStats from '../components/ProfileStats';
@@ -10,6 +10,7 @@ import UserTasks from '../components/UserTasks';
 
 
 function ProfilePage() {
+  const navigate = useNavigate();
   const { user, loading, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
@@ -20,25 +21,32 @@ function ProfilePage() {
 
   // Synchronize user data with form when user data is available
   useEffect(() => {
-    if (user) {
-      // Reset form with user data
-      reset({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        bio: user.bio || '',
-        location: user.location || '',
-        skills: Array.isArray(user.skills) ? user.skills.join(', ') : '',
-        following: Array.isArray(user.following) ? user.following.join(', ') : '',
-        availability: user.availability || '',
-        'contactInfo.phone': user.contactInfo?.phone || '',
-        'contactInfo.publicEmail': user.contactInfo?.publicEmail || '',
-        'socialLinks.github': user.socialLinks?.github || '',
-        'socialLinks.linkedin': user.socialLinks?.linkedin || '',
-        'socialLinks.twitter': user.socialLinks?.twitter || '',
-        'socialLinks.website': user.socialLinks?.website || ''
-      });
+    if (loading) {
+      return <div className="profile-loading"> Loading profile...</div>;
     }
-  }, [user, reset]);
+    if (!user) {
+      // Redirect to login if no user
+      navigate("/login");
+      return; // stop further execution
+    }
+
+    // Reset form with user data if logged in
+    reset({
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      bio: user.bio || '',
+      location: user.location || '',
+      skills: Array.isArray(user.skills) ? user.skills.join(', ') : '',
+      following: Array.isArray(user.following) ? user.following.join(', ') : '',
+      availability: user.availability || '',
+      'contactInfo.phone': user.contactInfo?.phone || '',
+      'contactInfo.publicEmail': user.contactInfo?.publicEmail || '',
+      'socialLinks.github': user.socialLinks?.github || '',
+      'socialLinks.linkedin': user.socialLinks?.linkedin || '',
+      'socialLinks.twitter': user.socialLinks?.twitter || '',
+      'socialLinks.website': user.socialLinks?.website || ''
+    });
+  }, [user, reset, navigate]);
 
   // Handle file selection for profile picture
   const handleFileChange = (e) => {
@@ -116,16 +124,17 @@ function ProfilePage() {
     }
   };
 
-  if (loading) {
-    return <div className="profile-loading">Loading profile...</div>;
-  }
-
-  if (!user) {
-    return <div className="profile-error">Please log in to view your profile</div>;
-  }
 
   return (
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+    <div className="backdrop">
+      <div className="blob b1" />
+      <div className="blob b2" />
+      <div className="grid-overlay" />
+    </div>
+    
     <div className="profile-container">
+      
       <ProfileHeader 
         user={user} 
         isEditing={isEditing} 
@@ -134,6 +143,8 @@ function ProfilePage() {
         handleFileChange={handleFileChange} 
       />
       
+
+      {/* EDIT PROFILE FORM BEGINS */}
       {isEditing ? (
         <form className="profile-edit-form" onSubmit={handleSubmit(handleSubmitForm)}>
           <div className="form-group">
@@ -263,8 +274,10 @@ function ProfilePage() {
         <div className="profile-view-mode">
           <div className="profile-content-grid">
             <div className="profile-main-content">
+
+               {/* EDIT PROFILE FORM ENDS */}
               {/* About Me Card */}
-              <div className="profile-card">
+              <div className="card">
                 <h2 className="card-title">About Me</h2>
                 <p className="profile-bio">{user.bio || 'No bio provided yet.'}</p>
                 <div className="profile-location">
@@ -278,18 +291,18 @@ function ProfilePage() {
               </div>
               
               {/* Skills Card */}
-              <div className="profile-card">
+              <div className="card">
                 <h2 className="card-title">Skills</h2>
                 <div className="skills-container">
                   <div className="skills-section">
-                    <h3 className="skills-subtitle">Skills I Can Offer</h3>
+                    <h3 className="skills-subtitle">Skills I'm Offering</h3>
                     <div className="skills-pills">
                       {Array.isArray(user.skills) && user.skills.length > 0 ? (
                         user.skills.map((skill, index) => (
                           <span key={`${skill}-${index}`} className="skill-pill">🔹 {skill}</span>
                         ))
                       ) : (
-                        <p className="empty-skills">No skills listed</p>
+                        <p className="empty-skills">No skills listed yet</p>
                       )}
                     </div>
                   </div>
@@ -302,7 +315,7 @@ function ProfilePage() {
                           <span key={`${following}-${index}`} className="skill-pill need-help">🔸 {following}</span>
                         ))
                       ) : (
-                        <p className="empty-skills">No skills listed</p>
+                        <p className="empty-skills">No skills listed yet</p>
                       )}
                     </div>
                   </div>
@@ -312,12 +325,12 @@ function ProfilePage() {
               {/* Activity Stats Card */}
               <ActivityStats user={user} />
               
-              {/* Volunteer History Card */}
+              {/* My Tasks History Card */}
               <UserTasks userId={user._id} />
             </div>
             {/* Summary Card (Right Column) */}
             <div className="profile-summary-column">
-              <div className="profile-card summary-card">
+              <div className="card">
                 <h2 className="card-title">Summary</h2>
                 <div className="summary-stats">
                   <div className="summary-stat-item">
@@ -366,6 +379,7 @@ function ProfilePage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

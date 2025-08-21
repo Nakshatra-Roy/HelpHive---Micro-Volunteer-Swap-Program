@@ -9,7 +9,7 @@ const ActivityStats = ({ user }) => {
   const creditBalance = (user.credits?.earned || 0) - (user.credits?.spent || 0);
 
   return (
-    <div className="activity-stats-card">
+    <div className="card">
       <h2 className="card-title">Activity Stats</h2>
       <div className="stats-grid">
         <div className="stat-card">

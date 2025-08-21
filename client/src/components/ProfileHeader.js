@@ -1,8 +1,6 @@
 import React from 'react';
-import './ProfileComponents.css';
 
 function ProfileHeader({ user, isEditing, setIsEditing, previewUrl, handleFileChange }) {
-  // Helper function to get user initials
   const getInitials = (firstName = '', lastName = '') => {
     const firstInitial = firstName ? firstName[0] : '';
     const lastInitial = lastName ? lastName[0] : '';
@@ -32,7 +30,7 @@ function ProfileHeader({ user, isEditing, setIsEditing, previewUrl, handleFileCh
   }
   console.log('Final computed imageUrl for <img> src:', imageUrl);
   return (
-    <div className="profile-header">
+    <div className="card">
       <div className="profile-cover">
         <div className="profile-avatar-container">
           <div className="profile-picture-container">
@@ -87,6 +85,15 @@ function ProfileHeader({ user, isEditing, setIsEditing, previewUrl, handleFileCh
           )}
         </div>
         <p className="profile-email">{user.email}</p>
+        <br/>
+        <p className="profile-email">Public Information</p>
+        <p className="profile-email">
+          Phone: {user.contactInfo?.phone || "Not set"}
+        </p>
+        <p className="profile-email">
+          Email: {user.contactInfo?.publicEmail || "Not set"}
+        </p>
+
       </div>
     </div>
   );

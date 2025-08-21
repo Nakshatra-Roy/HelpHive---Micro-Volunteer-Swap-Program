@@ -1,5 +1,4 @@
 import React from 'react';
-import './ProfileComponents.css';
 
 function ProfileDetails({ user }) {
   return (

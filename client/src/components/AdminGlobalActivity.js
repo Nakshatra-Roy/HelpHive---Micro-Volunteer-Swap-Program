@@ -8,14 +8,15 @@ const AdminGlobalActivity = ({ stats }) => {
     return (
         <div>
             <h2 className="card-title">Global Activity</h2>
-            <div className="activity-stat">
+            <div className="stat-card">
                 <span className="activity-label">Tasks Completion Rate:</span>
                 <span className="activity-value">{(tasksCompletionRate || 0).toFixed(2)}%</span>
                 <p className="activity-description">
                     The percentage of tasks that have been successfully completed by volunteers.
                 </p>
             </div>
-            <div className="activity-stat">
+            <br/>
+            <div className="stat-card">
                 <span className="activity-label">Average Tasks Per User:</span>
                 <span className="activity-value">{(averageTasksPerUser || 0).toFixed(2)}</span>
                 <p className="activity-description">

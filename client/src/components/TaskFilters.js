@@ -51,13 +51,13 @@ const TaskFilters = ({ onFilterChange, categories, locations, priorities }) => {
     userSelect: "none",
     outline: "none",
     marginRight: "10px",
-    transition: "all 0.3s ease",
+    transition: "all 0.5s ease",
   };
 
   const glassGreenFocus = {
     ...glassGreenStyle,
-    boxShadow: "0 0 10px rgba(158, 250, 166, 0.47)",
-    border: "1px solid rgba(187, 255, 0, 0.8)",
+    boxShadow: "0 0 12px rgba(158, 250, 166, 0.47)",
+    border: "1px solid rgba(19, 83, 0, 0.8)",
   };
 
   const [searchFocused, setSearchFocused] = useState(false);

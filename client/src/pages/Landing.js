@@ -68,7 +68,7 @@ function Landing() {
             </p>
             <div className="hero-actions">
               <Link to="/tasks" className="btn glossy primary">View Tasks</Link>
-              <Link to="/offers" className="btn glossy ghost">Make an Offer</Link>
+              <Link to="/tasks/new" className="btn glossy ghost">Ask for Help</Link>
             </div>
             <div className="hero-stats">
               <div className="stat">

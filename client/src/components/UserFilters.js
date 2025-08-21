@@ -45,13 +45,13 @@ const UserFilters = ({ onFilterChange, roles }) => {
     userSelect: "none",
     outline: "none",
     marginRight: "10px",
-    transition: "all 0.3s ease",
+    transition: "all 0.5s ease",
   };
 
   const glassGreenFocus = {
     ...glassGreenStyle,
     boxShadow: "0 0 10px rgba(158, 250, 166, 0.47)",
-    border: "1px solid rgba(187, 255, 0, 0.8)",
+    border: "1px solid rgba(0, 73, 16, 0.8)",
   };
 
   return (

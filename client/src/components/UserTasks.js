@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import './UserTasks.css'; // This CSS is already designed to handle the new field
 
 const UserTasks = ({ userId }) => {
   const [tasksCreated, setTasksCreated] = useState([]);
@@ -30,9 +29,8 @@ const UserTasks = ({ userId }) => {
     return <div className="loading-tasks">Loading tasks...</div>;
   }
 
-  // This is a reusable component to display a single task card
   const TaskCard = ({ task }) => (
-    <div className="task-card">
+    <div className="card">
       <div className="task-card-header">
         <h4 className="task-card-title">{task.taskName}</h4>
         <span className={`task-status status-${(task.status || 'unknown').toLowerCase()}`}>
@@ -45,7 +43,6 @@ const UserTasks = ({ userId }) => {
         <div><strong>Location:</strong> {task.location}</div>
         <div><strong>Priority:</strong> {task.priority}</div>
         <div><strong>Credits:</strong> {task.credits}</div>
-        {/* --- THIS IS THE NEWLY ADDED LINE --- */}
         <div><strong>Helpers:</strong> {task.curHelpers || 0} / {task.helpersReq}</div>
       </div>
       <div className="task-card-actions">
@@ -59,7 +56,7 @@ const UserTasks = ({ userId }) => {
   );
 
   return (
-    <div className="profile-card">
+    <div className="card">
       <h2 className="card-title">My Tasks</h2>
 
       {/* Section for tasks the user created */}
@@ -82,7 +79,7 @@ const UserTasks = ({ userId }) => {
             {tasksHelping.map(task => <TaskCard key={task._id} task={task} />)}
           </div>
         ) : (
-          <p className="empty-state">You haven't signed up to help with any tasks yet.</p>
+          <p className="empty-state">You haven't accepted any tasks yet.</p>
         )}
       </div>
     </div>

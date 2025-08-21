@@ -48,19 +48,18 @@ function AdminUsers() {
   const roles = useMemo(() => [...new Set((users || []).map(u => u.role).filter(Boolean))], [users]);
 
   const filteredUsers = useMemo(() => {
-  const s = filters.search.trim().toLowerCase();
-  return (list || []).filter(u => {
-    const matchSearch =
-      s === "" ||
-      (u.firstName + " " + u.lastName).toLowerCase().includes(s) ||
-      u.email.toLowerCase().includes(s);
-    const matchRole = filters.role ? u.role === filters.role : true;
-    const matchStatus =
-      filters.accountStatus ? u.accountStatus === filters.accountStatus : true;
-    return matchSearch && matchRole && matchStatus;
-  });
-}, [list, filters]);
-
+    const s = filters.search.trim().toLowerCase();
+    return (list || []).filter(u => {
+      const matchSearch =
+        s === "" ||
+        (u.firstName + " " + u.lastName).toLowerCase().includes(s) ||
+        u.email.toLowerCase().includes(s);
+      const matchRole = filters.role ? u.role === filters.role : true;
+      const matchStatus =
+        filters.accountStatus ? u.accountStatus === filters.accountStatus : true;
+      return matchSearch && matchRole && matchStatus;
+    });
+  }, [list, filters]);
 
   const handleToggleFlag = async (user) => {
     if (!user?._id) return;
@@ -234,14 +233,28 @@ function AdminUsers() {
                         {isStatusBusy ? "..." : isInactive ? "Activate" : "Deactivate"}
                       </button>
                     </div>
+
+                    <div className="user-hover-info">
+                      <p><strong>Name:</strong> {u?.firstName} {u?.lastName}</p>
+                      <p><strong>Bio:</strong> {u?.bio || "—"}</p>
+                      <p><strong>Location:</strong> {u?.location || "—"}</p>
+                      <p><strong>Phone:</strong> {u?.contactInfo?.phone || "—"}</p>
+                      <p><strong>Public Email:</strong> {u?.contactInfo?.publicEmail || "—"}</p>
+                      <p><strong>Skills:</strong> {u?.skills?.join(", ") || "—"}</p>
+                      <p><strong>Following:</strong> {u?.following?.join(", ") || "—"}</p>
+                      <p><strong>Availability:</strong> {u?.availability || "—"}</p>
+                      <p><strong>Credits Earned:</strong> {(u?.credits?.earned || 0)}</p>
+                      <p><strong>Credits Spent:</strong> {(u?.credits?.spent || 0)}</p>
+                      <p><strong>Credit Balance:</strong> {(u?.credits?.balance || 0)}</p>
+                    </div>
                   </div>
                 );
               })}
-                        {!loading && filteredUsers.length === 0 && (
-                    <p style={{ marginTop: 16, textAlign: "center", color: "#6b7280" }}>
-                      No users found.{" "}
-                    </p>
-                  )}
+              {!loading && filteredUsers.length === 0 && (
+                <p style={{ marginTop: 16, textAlign: "center", color: "#6b7280" }}>
+                  No users found.{" "}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -252,16 +265,20 @@ function AdminUsers() {
           .user-hover-info {
             display: none;
             position: absolute;
-            background: white;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             color: black;
-            padding: 10px;
+            padding: 12px 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            border-radius: 8px;
+            border-radius: 10px;
             top: 100%;
             left: 0;
             z-index: 10;
             width: max-content;
-            max-width: 300px;
+            max-width: 320px;
+            font-size: 0.85rem;
+            line-height: 1.4;
           }
           .btn[disabled] { opacity: 0.6; cursor: not-allowed; }
 
@@ -285,7 +302,6 @@ function AdminUsers() {
             box-shadow: var(--shadow);
             backdrop-filter: blur(8px);
           }
-          /* caret */
           .role-select-wrap::after {
             content: "▾";
             position: absolute;

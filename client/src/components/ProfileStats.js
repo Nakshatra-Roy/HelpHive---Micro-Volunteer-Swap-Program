@@ -1,5 +1,4 @@
 import React from 'react';
-import './ProfileComponents.css';
 
 function ProfileStats({ user }) {
   // Use actual user data where available, fallback to defaults

@@ -382,10 +382,14 @@ export const createSwapRequest = async (req, res) => {
  * @route   GET /api/tasks/swaps
  * @access  Private
  */
+
+
+
+
 export const getSwapRequests = async (req, res) => {
   try {
     const requests = await SwapRequest.find({ recipient: req.user._id })
-      .populate('requester', 'name')
+      .populate('requester', 'fullName')
       .populate('taskToGive', 'taskName')
       .populate('taskToReceive', 'taskName');
       
@@ -394,6 +398,10 @@ export const getSwapRequests = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
+
+
+
+
 
 export const respondToSwapRequest = async (req, res) => {
   const { swapRequestId } = req.params;
