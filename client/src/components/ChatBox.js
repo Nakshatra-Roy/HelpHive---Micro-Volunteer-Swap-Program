@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/socketProvider';
 
-const ChatPage = () => {
-  const { taskId } = useParams();
+const ChatBox = ({ taskId, onClose }) => {
   const socket = useSocket();
   const { user, loading: authLoading } = useAuth(); 
   const [messages, setMessages] = useState([]);
@@ -125,18 +123,8 @@ const ChatPage = () => {
 
   return (
     <div className="chat-container">
-      <div className="backdrop">
-      <div className="blob b1" />
-      <div className="blob b2" />
-      <div className="grid-overlay" />
-    </div>
       <div className="chat-messages">
-        <button
-          className="return-button"
-          onClick={() => window.history.back()} // or use navigate('/tasks')
-        >
-          ❌
-        </button>
+        <button className="return-button" onClick={onClose}>❌</button>
         {messages.map((message) => (
           <div
             key={message._id}
@@ -174,4 +162,4 @@ const ChatPage = () => {
   );
 };
 
-export default ChatPage;
+export default ChatBox;

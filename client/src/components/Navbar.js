@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -12,10 +11,14 @@ const Navbar = () => {
 
   const isActive = (to) => pathname === to;
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  const handleLogout = async () => {
+  try {
+    await logout();    
+    navigate("/login");      
+  } catch (err) {
+    console.error("Logout error:", err);
+  }
+};
 
   return (
     <nav

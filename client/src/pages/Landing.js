@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./style.css"
 
 const API_BASE =
@@ -134,11 +134,11 @@ function Landing() {
                 <div>Rating</div>
               </div>
               {(loadingHelpers ? Array.from({ length: 8 }) : topHelpers).map((h, i) => (
-                <div className={`row ${loadingHelpers ? "skeleton" : ""}`} key={h?.userId || h?.handle || i}>
+                <div className={`row ${loadingHelpers ? "skeleton" : ""}`} key={h?.userId || h?.fullName || i}>
                   <div>{i + 1}</div>
                   <div className="user">
-                    <div className="avatar">{(h?.handle || "U")[0]?.toUpperCase()}</div>
-                    <span>{h?.handle || h?.username || "Loading…"}</span>
+                    <div className="avatar">{(h?.fullName || "U")[0]?.toUpperCase()}</div>
+                    <span>{h?.fullName|| "Loading…"}</span>
                   </div>
                   <div>{h?.completedTasks ?? "—"}</div>
                   <div>{h?.rating ?? "—"}</div>

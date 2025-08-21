@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
+import axios from "axios";
 
 const TaskTableAdmin = ({
   tasks = [],
@@ -8,7 +9,9 @@ const TaskTableAdmin = ({
   onAccept, // (task) => void
   sortOrder = "desc", // ✅ new prop for sorting order
 }) => {
-  const placeholders = useMemo(() => Array.from({ length: 8 }), []);
+  const placeholders = useMemo(() => Array.from({ length: 8 }, (_, i) => ({ _id: `placeholder-${i}` })),[]);
+  const [userMap, setUserMap] = useState({});
+  const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
   // ✅ Sort tasks by credits according to sortOrder
   const sortedTasks = useMemo(() => {
@@ -18,9 +21,21 @@ const TaskTableAdmin = ({
       const creditB = b?.credits ?? 0;
       return sortOrder === "asc" ? creditA - creditB : creditB - creditA;
     });
-  }, [tasks, loading, sortOrder]);
+  }, [tasks, loading, sortOrder, placeholders]);
 
   const rows = loading ? placeholders : sortedTasks;
+  const getPostedByName = async (userId) => {
+    if (userMap[userId]) return userMap[userId];
+    try {
+      const res = await axios.get(`/api/users/${userId}`);
+      const fullName = res.data.fullName || "Unknown";
+      setUserMap((prev) => ({ ...prev, [userId]: fullName }));
+      return fullName;
+    } catch (err) {
+      console.error(`Error fetching user ${userId}:`, err);
+      return "Unknown";
+    }
+  };
 
   return (
     <>
@@ -45,11 +60,20 @@ const TaskTableAdmin = ({
             const isFull = !loading && cur >= req;
             const isBusy = !loading && t?._id ? busyIds.has(t._id) : false;
 
+            const posterName = userMap[t?.postedBy] || "Loading...";
+
             return (
               <div
-                className={`row ${loading ? "skeleton" : ""}`}
+                className="row"
                 key={id}
                 style={{ position: "relative" }}
+                onMouseEnter={async () => {
+                  setHoveredTaskId(t._id);
+                  if (!userMap[t?.postedBy]) {
+                    await getPostedByName(t.postedBy);
+                  }
+                }}
+                onMouseLeave={() => setHoveredTaskId(null)}
               >
                 <div>{i + 1}</div>
                 <div>{t?.taskName || "—"}</div>
@@ -79,12 +103,17 @@ const TaskTableAdmin = ({
                 >
                 </div>
 
-                <div className="task-hover-info">
-                  <p>
-                    <strong>Description:</strong>{" "}
-                    {t?.taskDescription || "—"}
-                  </p>
-                </div>
+                {hoveredTaskId === t._id && (
+                  <div className="task-hover-info">
+                    <p>
+                      <strong>Posted by:</strong> {posterName}
+                    </p>
+                    <p>
+                      <strong>Description:</strong>{" "}
+                      {t?.taskDescription || "—"}
+                    </p>
+                  </div>
+                )}
               </div>
             );
           })}

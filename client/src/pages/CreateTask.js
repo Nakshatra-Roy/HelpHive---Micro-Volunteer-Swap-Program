@@ -30,20 +30,6 @@ const CreateTask = () => {
   const handleAddTask = async (e) => {
     e?.preventDefault();
 
-    const required = [
-      ["taskName", newTask.taskName],
-      ["taskDescription", newTask.taskDescription],
-      ["category", newTask.category],
-      ["location", newTask.location],
-      ["date", newTask.date],
-      ["priority", newTask.priority],
-      ["helpersReq", newTask.helpersReq],
-      ["credits", newTask.credits]
-      ["helpersReq", newTask.helpersReq],
-      ["credits", newTask.credits]
-    ];
-
-
     /*const missing = required.filter(([, v]) => !String(v || "").trim()).map(([k]) => k);
     if (missing.length) {
       show("warning", `Please fill: ${missing.join(", ")}`);
@@ -89,7 +75,7 @@ const CreateTask = () => {
 			navigate("/login");
 			return;
 		}
-		}, [user, navigate]);
+		}, [user, navigate, loading]);
 		
 
   return (
@@ -119,7 +105,7 @@ const CreateTask = () => {
                   <label className="label">Task Name</label>
                   <input
                     className="input glass-input"
-                    placeholder="Enter task name"
+                    placeholder="Make it short and to the point"
                     value={newTask.taskName}
                     onChange={(e) => onChange("taskName", e.target.value)}
                   />
@@ -129,7 +115,7 @@ const CreateTask = () => {
                   <label className="label">Task Description</label>
                   <textarea
                     className="input glass-input textarea"
-                    placeholder="Describe the task in detail"
+                    placeholder="Describe the task in detail..."
                     value={newTask.taskDescription}
                     onChange={(e) => onChange("taskDescription", e.target.value)}
                   />
@@ -196,7 +182,6 @@ const CreateTask = () => {
                   </select>
                 </div>
 
-                <div className="grid cols-2 gap">
                   <div className="field">
                     <label className="label">Credits Awarded (each helper, per hour of work)*</label>
                     <input
@@ -209,7 +194,6 @@ const CreateTask = () => {
                   </div>
 				  <br/>
 				  <p>* Choose this field carefuly as it may affect the chances of a potential helper accepting your task!</p>
-                </div>
 
                 <div className="actions">
                   <button

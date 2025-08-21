@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import ChatBox from '../components/ChatBox';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import ProfileHeader from '../components/ProfileHeader';
-import ProfileDetails from '../components/ProfileDetails';
-import ProfileStats from '../components/ProfileStats';
 import ActivityStats from '../components/ActivityStats';
 import UserTasks from '../components/UserTasks';
 
@@ -15,6 +14,8 @@ function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [activeChatTaskId, setActiveChatTaskId] = useState(null);
+
   
   // Initialize react-hook-form
   const { register, handleSubmit, reset } = useForm();
@@ -32,21 +33,21 @@ function ProfilePage() {
 
     // Reset form with user data if logged in
     reset({
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
-      bio: user.bio || '',
-      location: user.location || '',
-      skills: Array.isArray(user.skills) ? user.skills.join(', ') : '',
-      following: Array.isArray(user.following) ? user.following.join(', ') : '',
-      availability: user.availability || '',
-      'contactInfo.phone': user.contactInfo?.phone || '',
-      'contactInfo.publicEmail': user.contactInfo?.publicEmail || '',
-      'socialLinks.github': user.socialLinks?.github || '',
-      'socialLinks.linkedin': user.socialLinks?.linkedin || '',
-      'socialLinks.twitter': user.socialLinks?.twitter || '',
-      'socialLinks.website': user.socialLinks?.website || ''
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      bio: user?.bio || '',
+      location: user?.location || '',
+      skills: Array.isArray(user?.skills) ? user?.skills.join(', ') : '',
+      following: Array.isArray(user?.following) ? user?.following.join(', ') : '',
+      availability: user?.availability || '',
+      'contactInfo.phone': user?.contactInfo?.phone || '',
+      'contactInfo.publicEmail': user?.contactInfo?.publicEmail || '',
+      'socialLinks.github': user?.socialLinks?.github || '',
+      'socialLinks.linkedin': user?.socialLinks?.linkedin || '',
+      'socialLinks.twitter': user?.socialLinks?.twitter || '',
+      'socialLinks.website': user?.socialLinks?.website || ''
     });
-  }, [user, reset, navigate]);
+  }, [user, reset, loading, navigate]);
 
   // Handle file selection for profile picture
   const handleFileChange = (e) => {
@@ -109,21 +110,29 @@ function ProfilePage() {
       reset({
         firstName: user.firstName || '',
         lastName: user.lastName || '',
-        bio: user.bio || '',
-        location: user.location || '',
-        skills: Array.isArray(user.skills) ? user.skills.join(', ') : '',
-        following: Array.isArray(user.following) ? user.following.join(', ') : '',
-        availability: user.availability || '',
-        'contactInfo.phone': user.contactInfo?.phone || '',
-        'contactInfo.publicEmail': user.contactInfo?.publicEmail || '',
-        'socialLinks.github': user.socialLinks?.github || '',
-        'socialLinks.linkedin': user.socialLinks?.linkedin || '',
-        'socialLinks.twitter': user.socialLinks?.twitter || '',
-        'socialLinks.website': user.socialLinks?.website || ''
+        bio: user?.bio || '',
+        location: user?.location || '',
+        skills: Array.isArray(user?.skills) ? user?.skills.join(', ') : '',
+        following: Array.isArray(user.following) ? user?.following.join(', ') : '',
+        availability: user?.availability || '',
+        'contactInfo.phone': user?.contactInfo?.phone || '',
+        'contactInfo.publicEmail': user?.contactInfo?.publicEmail || '',
+        'socialLinks.github': user?.socialLinks?.github || '',
+        'socialLinks.linkedin': user?.socialLinks?.linkedin || '',
+        'socialLinks.twitter': user?.socialLinks?.twitter || '',
+        'socialLinks.website': user?.socialLinks?.website || ''
       });
     }
   };
 
+
+  if (loading) {
+    return <div className="profile-loading">Loading profile...</div>;
+  }
+
+  if (!user) {
+    return null; // Or navigate("/login") safely
+  }
 
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
@@ -279,14 +288,14 @@ function ProfilePage() {
               {/* About Me Card */}
               <div className="card">
                 <h2 className="card-title">About Me</h2>
-                <p className="profile-bio">{user.bio || 'No bio provided yet.'}</p>
+                <p className="profile-bio">{user?.bio || 'No bio provided yet.'}</p>
                 <div className="profile-location">
                   <span className="location-icon">📍</span>
-                  <span>{user.location || 'Location not specified'}</span>
+                  <span>{user?.location || 'Location not specified'}</span>
                 </div>
                 <div className="profile-member-since">
                   <span className="member-icon">🗓️</span>
-                  <span>Member since {new Date(user.createdAt).toLocaleDateString()}</span>
+                  <span>Member since {new Date(user?.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
               
@@ -297,8 +306,8 @@ function ProfilePage() {
                   <div className="skills-section">
                     <h3 className="skills-subtitle">Skills I'm Offering</h3>
                     <div className="skills-pills">
-                      {Array.isArray(user.skills) && user.skills.length > 0 ? (
-                        user.skills.map((skill, index) => (
+                      {Array.isArray(user?.skills) && user?.skills?.length > 0 ? (
+                        user?.skills.map((skill, index) => (
                           <span key={`${skill}-${index}`} className="skill-pill">🔹 {skill}</span>
                         ))
                       ) : (
@@ -310,8 +319,8 @@ function ProfilePage() {
                   <div className="skills-section">
                     <h3 className="skills-subtitle">Skills I Need Help With</h3>
                     <div className="skills-pills">
-                      {Array.isArray(user.following) && user.following.length > 0 ? (
-                        user.following.map((following, index) => (
+                      {Array.isArray(user?.following) && user?.following.length > 0 ? (
+                        user?.following.map((following, index) => (
                           <span key={`${following}-${index}`} className="skill-pill need-help">🔸 {following}</span>
                         ))
                       ) : (
@@ -326,7 +335,14 @@ function ProfilePage() {
               <ActivityStats user={user} />
               
               {/* My Tasks History Card */}
-              <UserTasks userId={user._id} />
+              <UserTasks userId={user?._id} onStartChat={setActiveChatTaskId} />
+              {activeChatTaskId && (
+                <div className="chat-overlay">
+                  <ChatBox taskId={activeChatTaskId} onClose={() => setActiveChatTaskId(null)} />
+                </div>
+              )}
+
+
             </div>
             {/* Summary Card (Right Column) */}
             <div className="profile-summary-column">
@@ -337,7 +353,7 @@ function ProfilePage() {
                     <div className="stat-icon earned-icon">💰</div>
                     <div className="stat-details">
                       <div className="stat-label">Credits Earned</div>
-                      <div className="stat-value">{user.credits?.earned || 0}</div>
+                      <div className="stat-value">{user?.credits?.earned || 0}</div>
                     </div>
                   </div>
                   
@@ -345,7 +361,7 @@ function ProfilePage() {
                     <div className="stat-icon spent-icon">🛒</div>
                     <div className="stat-details">
                       <div className="stat-label">Credits Spent</div>
-                      <div className="stat-value">{user.credits?.spent || 0}</div>
+                      <div className="stat-value">{user?.credits?.spent || 0}</div>
                     </div>
                   </div>
                   
@@ -353,25 +369,25 @@ function ProfilePage() {
                     <div className="stat-icon rating-icon">⭐</div>
                     <div className="stat-details">
                       <div className="stat-label">Average Rating</div>
-                      <div className="stat-value">{user.ratingSummary?.average || 0}/5 ({user.ratingSummary?.count || 0})</div>
+                      <div className="stat-value">{user?.ratingSummary?.average || 0}/5 ({user?.ratingSummary?.count || 0})</div>
                     </div>
                   </div>
                 </div>
                 
                 <div className="credit-balance">
                   <div className="balance-label">Credits Balance</div>
-                  <div className="balance-value">{(user.credits?.earned || 0) - (user.credits?.spent || 0)}</div>
+                  <div className="balance-value">{(user?.credits?.balance|| 0)}</div>
                 </div>
                 
                 <div className="social-links-container">
-                  {user.socialLinks?.github && (
-                    <a href={user.socialLinks.github} target="_blank" rel="noopener noreferrer" className="social-link">GitHub</a>
+                  {user?.socialLinks?.github && (
+                    <a href={user?.socialLinks.github} target="_blank" rel="noopener noreferrer" className="social-link">GitHub</a>
                   )}
-                  {user.socialLinks?.linkedin && (
-                    <a href={user.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="social-link">LinkedIn</a>
+                  {user?.socialLinks?.linkedin && (
+                    <a href={user?.socialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="social-link">LinkedIn</a>
                   )}
-                  {user.socialLinks?.twitter && (
-                    <a href={user.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="social-link">Twitter</a>
+                  {user?.socialLinks?.twitter && (
+                    <a href={user?.socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="social-link">Twitter</a>
                   )}
                 </div>
               </div>

@@ -1724,3 +1724,18 @@ body {
   margin-bottom: 5px;
   color: rgba(255, 255, 255, 0.767);
 }
+
+
+
+.chat-overlay {
+  position: fixed;
+  bottom: 0;
+  right: 20px;
+  width: 400px;
+  max-height: 100vh;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  overflow: hidden;
+}

@@ -6,7 +6,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { login, user, loading, error } = useAuth();
+  const { login, user, error } = useAuth();
   
   // This hook now correctly handles navigation after a successful login
   useEffect(() => {
@@ -23,7 +23,7 @@ function Login() {
     e.preventDefault();
     await login(email, password);
   };
-  
+
 return (
   <div style={{ position: "relative", minHeight: "100vh" }}>
     <div className="backdrop">

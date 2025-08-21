@@ -1,16 +1,18 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
+import axios from "axios";
 
 const TaskTable = ({
   tasks = [],
   loading = false,
   userId,
   busyIds = new Set(),
-  onAccept, // (task) => void
-  sortOrder = "desc", // ✅ new prop for sorting order
+  onAccept,
+  sortOrder = "desc",
 }) => {
-  const placeholders = useMemo(() => Array.from({ length: 8 }), []);
+  const placeholders = useMemo(() => Array.from({ length: 8 }, (_, i) => ({ _id: `placeholder-${i}` })),[]);
+  const [userMap, setUserMap] = useState({});
+  const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
-  // ✅ Sort tasks by credits according to sortOrder
   const sortedTasks = useMemo(() => {
     if (loading) return placeholders;
     return [...tasks].sort((a, b) => {
@@ -18,9 +20,22 @@ const TaskTable = ({
       const creditB = b?.credits ?? 0;
       return sortOrder === "asc" ? creditA - creditB : creditB - creditA;
     });
-  }, [tasks, loading, sortOrder]);
+  }, [tasks, loading, sortOrder, placeholders]);
 
   const rows = loading ? placeholders : sortedTasks;
+
+  const getPostedByName = async (userId) => {
+    if (userMap[userId]) return userMap[userId];
+    try {
+      const res = await axios.get(`/api/users/${userId}`);
+      const fullName = res.data.fullName || "Unknown";
+      setUserMap((prev) => ({ ...prev, [userId]: fullName }));
+      return fullName;
+    } catch (err) {
+      console.error(`Error fetching user ${userId}:`, err);
+      return "Unknown";
+    }
+  };
 
   return (
     <>
@@ -46,11 +61,20 @@ const TaskTable = ({
             const isFull = !loading && cur >= req;
             const isBusy = !loading && t?._id ? busyIds.has(t._id) : false;
 
+            const posterName = userMap[t?.postedBy] || "Loading...";
+
             return (
               <div
-                className= "row"
+                className="row"
                 key={id}
                 style={{ position: "relative" }}
+                onMouseEnter={async () => {
+                  setHoveredTaskId(t._id);
+                  if (!userMap[t?.postedBy]) {
+                    await getPostedByName(t.postedBy);
+                  }
+                }}
+                onMouseLeave={() => setHoveredTaskId(null)}
               >
                 <div>{i + 1}</div>
                 <div>{t?.taskName || "—"}</div>
@@ -104,12 +128,17 @@ const TaskTable = ({
                   )}
                 </div>
 
-                <div className="task-hover-info">
-                  <p>
-                    <strong>Description:</strong>{" "}
-                    {t?.taskDescription || "—"}
-                  </p>
-                </div>
+                {hoveredTaskId === t._id && (
+                  <div className="task-hover-info">
+                    <p>
+                      <strong>Posted by:</strong> {posterName}
+                    </p>
+                    <p>
+                      <strong>Description:</strong>{" "}
+                      {t?.taskDescription || "—"}
+                    </p>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -132,7 +161,7 @@ const TaskTable = ({
         }
         .row {
           display: grid;
-          grid-template-columns: 40px 1.5fr 1fr 1fr 1fr 1fr 1.2fr 1fr 1fr 120px; /* 10 columns */
+          grid-template-columns: 40px 1.5fr 1fr 1fr 1fr 1fr 1.2fr 1fr 1fr 120px;
           align-items: center;
           gap: 8px;
           padding: 8px 12px;
@@ -147,11 +176,8 @@ const TaskTable = ({
           border-radius: 999px;
           background: rgba(255,255,255,0.1);
         }
-        .row:hover .task-hover-info {
-          display: block;
-        }
         .task-hover-info {
-          display: none;
+          display: block;
           position: absolute;
           background: white;
           color: black;
@@ -168,7 +194,6 @@ const TaskTable = ({
           opacity: .6;
           cursor: not-allowed;
         }
-        /* ✅ Align credits column to the right */
         .credits-cell {
           text-align: right;
           font-weight: 500;

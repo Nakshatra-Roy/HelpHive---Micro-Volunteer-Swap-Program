@@ -1,8 +1,6 @@
 import Navbar from './components/Navbar';
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from './context/AuthContext';
-import { Toaster } from "react-hot-toast";
 import { SocketProvider } from "./context/socketProvider";
 
 import "./App.css";
@@ -11,7 +9,6 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProfilePage from "./pages/ProfilePage";
 import AdminDashboard from './pages/AdminDashboard';
-import TaskFilters from './components/TaskFilters';
 import AdminRoute from './components/AdminRoute';
 import ChatPage from './pages/ChatPage';
 
