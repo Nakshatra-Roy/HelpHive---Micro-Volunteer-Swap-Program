@@ -1,6 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import "./style.css"
+import { useAuth } from "../context/AuthContext";
+import { useTaskStore } from "../store/taskStore";
+import TaskTableLanding from "../components/TaskTableLanding";
+import "./style.css";
 
 const API_BASE =
   process.env.REACT_APP_API_BASE?.replace(/\/+$/, "") || "";
@@ -20,7 +23,7 @@ function useFetch(url, initial = []) {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`Failed (${res.status})`);
         const json = await res.json();
-        if (alive) setData(json?.items || json || []);
+        if (alive) setData(json);
       } catch (e) {
         if (alive) setError(e.message);
       } finally {
@@ -35,18 +38,59 @@ function useFetch(url, initial = []) {
   return { data, loading, error };
 }
 
-function Landing() {
-  const { data: tasks, loading: loadingTasks } = useFetch(
-    API_BASE ? `${API_BASE}/api/tasks?limit=6` : null,
-    []
-  );
-  const { data: helpers, loading: loadingHelpers } = useFetch(
-    API_BASE ? `${API_BASE}/api/helpers?limit=8` : null,
-    []
-  );
+const Landing = () => {
+  const { tasks, loading, fetchTask, acceptTask } = useTaskStore();
+  const { user } = useAuth();
+  const [acceptPending, setAcceptPending] = useState(new Set());
 
-  const topTasks = useMemo(() => Array.isArray(tasks) ? tasks.slice(0, 6) : [], [tasks]);
-  const topHelpers = useMemo(() => Array.isArray(helpers) ? helpers.slice(0, 8) : [], [helpers]);
+  useEffect(() => {
+    fetchTask();
+  }, [fetchTask]);
+  const { data: helpers, loading: loadingHelpers } = useFetch(`/api/users`, []);
+
+  const topHelpers = useMemo(() => {
+    if (!Array.isArray(helpers)) return [];
+    return [...helpers]
+      .sort(
+        (a, b) =>
+          (b?.volunteerHistory?.length || 0) -
+          (a?.volunteerHistory?.length || 0)
+      )
+      .slice(0, 5);
+  }, [helpers]);
+
+  const recentTasks = useMemo(() => {
+    if (!Array.isArray(tasks)) return [];
+    const sorted = [...tasks].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    return sorted.slice(0, 5);
+  }, [tasks]);
+
+  const handleAcceptTask = async (task) => {
+    if (!task?._id || !user?._id) return;
+    const cur = task.curHelpers || 0;
+    const req = task.helpersReq || 0;
+    if (cur >= req) {
+      alert("This task is already full.");
+      return;
+    }
+
+    setAcceptPending((prev) => new Set(prev).add(task._id));
+    try {
+      const { success, message } = await acceptTask(task, user._id);
+      if (!success) alert(`Error: ${message}`);
+      else alert("Task accepted successfully!");
+    } catch {
+      alert("Error accepting task");
+    } finally {
+      setAcceptPending((prev) => {
+        const s = new Set(prev);
+        s.delete(task._id);
+        return s;
+      });
+    }
+  };
 
   return (
     <>
@@ -88,63 +132,72 @@ function Landing() {
         </div>
       </section>
 
-      {/* Tasks preview */}
+      {/* Recent Tasks */}
       <section className="section">
-        <div className="container">
           <div className="section-head">
             <h2>Recent Tasks</h2>
-            <Link to="/tasks" className="btn tiny ghost">View all →</Link>
+            <Link to="/tasks" className="btn glossy ghost">
+              View all →
+            </Link>
           </div>
-          <div className="grid cards cols-3">
-            {(loadingTasks ? Array.from({ length: 6 }) : topTasks).map((t, i) => (
-              <Link
-                to={`/tasks/${t?.slug || t?._id || "#"}`}
-                className={`card glass hover-lift ${loadingTasks ? "skeleton" : ""}`}
-                key={t?._id || i}
-              >
-                <div className="card-head">
-                  <span className="badge code">{(t?.category || "Task").toUpperCase()}</span>
-                  <span className="pill">{t?.location || "Nearby"}</span>
-                </div>
-                <h3 className="card-title">{t?.title || "Loading…"}</h3>
-                <p className="card-sub">
-                  {(t?.tags || ["urgent", "outdoor", "friendly"]).slice(0, 3).map((tag, j) => (
-                    <span className="tag" key={tag}>#{tag}</span>
-                  ))}
-                </p>
+
+          <TaskTableLanding
+            tasks={recentTasks}
+            loading={loading}
+            userId={user?._id}
+            busyIds={acceptPending}
+            onAccept={handleAcceptTask}
+            sortOrder="desc"
+          />
+
+          {!loading && recentTasks.length === 0 && (
+            <p style={{ marginTop: 16, textAlign: "center", color: "#6b7280" }}>
+              No tasks found 😢{" "}
+              <Link to="/createTask" className="btn tiny under">
+                Create a task
               </Link>
-            ))}
-          </div>
-        </div>
+            </p>
+          )}
       </section>
 
-      {/* Helpers preview */}
-      <section className="section alt">
-        <div className="container">
+      {/* Top Helpers */}
+      <section className="section">
           <div className="section-head">
             <h2>Top Helpers</h2>
-            <Link to="/profile" className="btn tiny ghost">Your profile →</Link>
           </div>
           <div className="card glass">
-            <div className="table">
-              <div className="row head">
-                <div>#</div>
-                <div>User</div>
-                <div>Tasks Completed</div>
-                <div>Rating</div>
-              </div>
-              {(loadingHelpers ? Array.from({ length: 8 }) : topHelpers).map((h, i) => (
-                <div className={`row ${loadingHelpers ? "skeleton" : ""}`} key={h?.userId || h?.fullName || i}>
+          <div className="table">
+            <div className="row head">
+              <div>#</div>
+              <div>Name</div>
+              <div>Tasks Completed</div>
+              <div>Rating</div>
+            </div>
+          {/* ***row spacing needs fixing */}
+            {(loadingHelpers ? Array.from({ length: 8 }) : topHelpers).map(
+              (h, i) => (
+                <div
+                  className={`row ${loadingHelpers ? "skeleton" : ""}`}
+                  key={h?._id || i}
+                >
                   <div>{i + 1}</div>
                   <div className="user">
-                    <div className="avatar">{(h?.fullName || "U")[0]?.toUpperCase()}</div>
-                    <span>{h?.fullName|| "Loading…"}</span>
+                    <div className="avatar">
+                      {(h?.fullName || "U")[0]?.toUpperCase()}
+                    </div>
+                    <span>{h?.fullName || "Loading…"}</span>
                   </div>
-                  <div>{h?.completedTasks ?? "—"}</div>
-                  <div>{h?.rating ?? "—"}</div>
+                  <div>{h?.volunteerHistory?.length ?? "—"}</div>
+                  <div>{h?.ratingSummary.average ?? "—"}</div>
                 </div>
-              ))}
-            </div>
+              )
+            )}
+
+            {!loadingHelpers && topHelpers.length === 0 && (
+              <p style={{ marginTop: 16, textAlign: "center", color: "#6b7280" }}>
+                No helpers found.
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -166,8 +219,8 @@ function Landing() {
                 <div>💬 Chat & coordinate safely</div>
               </div>
               <div style={{ marginTop: 16 }}>
-                <Link to="/tasks" className="btn glossy primary">Find Help</Link>
-                <Link to="/offers" className="btn glossy ghost" style={{ marginLeft: 8 }}>Offer Help</Link>
+                <Link to="/tasks/new" className="btn glossy primary">Find Help</Link>
+                <Link to="/tasks" className="btn glossy ghost" style={{ marginLeft: 8 }}>Offer Help</Link>
               </div>
             </div>
             <div className="card glass highlight">
@@ -189,7 +242,7 @@ function Landing() {
       <footer className="footer">
         <div className="container">
           <div className="foot-inner">
-            <div className="brand">HelpHive</div>
+            <div className="brand">HELP HIVE</div>
             <div className="muted">Neighbors helping neighbors</div>
           </div>
         </div>

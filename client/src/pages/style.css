@@ -122,6 +122,7 @@ body {
   gap: 18px;
   flex-wrap: wrap;
 }
+
 .stat {
   display: flex;
   align-items: center;
@@ -131,6 +132,11 @@ body {
   background: rgba(16, 185, 129, 0.08);
   border: 1px solid var(--border);
   color: #065f46;
+  transition: all 0.5s ease;
+}
+
+.stat:hover {
+  transform: translateY(-6px) scale(1.05);
 }
 
 .grid { display: grid; gap: 14px; }
@@ -266,6 +272,54 @@ body {
 }
 
 /* Landing.css */
+.footer {
+  background: rgba(255, 255, 255, 0.61);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+
+  padding: 1.5rem 0;
+  color: #f5f5f5;
+  font-size: 0.95rem;
+}
+
+.footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.footer .foot-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.footer .brand {
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #005e05; /* accent color */
+}
+
+.footer .muted {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  color: #616161;
+}
+
+/* Responsive tweak: center stays but spacing adjusts */
+@media (min-width: 600px) {
+  .footer .foot-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
 
 .section {
   padding: 40px 20px;
@@ -340,6 +394,14 @@ body {
 .row.header {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
+  align-items: center;
+  font-weight: bold;
+  background: #d9f99d;
+}
+
+.row.headerLanding {
+  display: grid;
+  grid-template-columns: repeat(6.5, 1fr);
   align-items: center;
   font-weight: bold;
   background: #d9f99d;

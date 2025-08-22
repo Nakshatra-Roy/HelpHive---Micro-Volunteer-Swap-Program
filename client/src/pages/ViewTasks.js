@@ -21,6 +21,7 @@ const ViewTasks = () => {
   const [matchSkill, setMatchSkill] = useState(true);     // NEW
   const [matchLocation, setMatchLocation] = useState(true); // NEW
   const isLoggedInAdmin = user && user.role === "admin";
+  const isLoggedIn = user && (user.role === "user" || user.role === "volunteer");
 
   useEffect(() => {
     fetchTask();
@@ -118,7 +119,7 @@ const ViewTasks = () => {
         <br />
         <h2 className="tasks-header">
           <span>{showSuggested ? "Suggested Tasks" : "All Tasks"}</span>
-          {!isLoggedInAdmin && (
+          {!isLoggedInAdmin && isLoggedIn && (
             <button
               className="btn glossy primary ai"
               onClick={() => setShowSuggested((prev) => !prev)}
