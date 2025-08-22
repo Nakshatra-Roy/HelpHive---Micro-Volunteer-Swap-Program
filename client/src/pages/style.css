@@ -155,7 +155,7 @@ body {
 }
 .card:hover {
   box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(1.01);
 }
 .card-title { margin: 4px 0 6px; font-size: 18px; }
 .card-sub { margin: 0; color: var(--muted); }
@@ -201,30 +201,49 @@ body {
   border: 1px solid rgba(0,0,0,0.1);
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.5s ease;
 }
 .btn.tiny {
   padding: 8px 12px;
   font-size: 14px;
+  transition: all 0.5s;
 }
+
+.btn.glossy.tiny:hover {
+  transform: translateY(-6px) scale(1.02);
+}
+
 .btn.tiny.under {
   padding: 8px 12px;
   color: #15803d;
   font-size: 14px;
 }
+
 .btn.glossy.primary {
   background: linear-gradient(135deg, #10b981, #34d399);
   color: #fff;
   border: none;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 6px 18px rgba(16,185,129,0.3);
+  transition: all 0.5s;
 }
+
+.btn.glossy.primary:hover {
+  transform: translateY(-6px) scale(1.02);
+}
+
 .btn.glossy.ghost {
   background: #f0fdf4;
   color: #065f46;
   border: 1px solid rgba(16,185,129,0.3);
+  transition: all 0.5s;
 }
+
+.btn.glossy.ghost:hover {
+  transform: translateY(-6px) scale(1.02);
+}
+
 .btn:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px);
   box-shadow: 0 10px 24px rgba(16,185,129,0.25);
 }
 .btn:active {
@@ -351,6 +370,7 @@ body {
   outline: none;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(5px);
+  box-shadow: 0px 0px 0px 2px rgba(0, 158, 40, 0.274);
   color: #000000;
   font-size: 1rem;
   transition: all 0.5s ease;
@@ -735,7 +755,7 @@ body {
 
 .skill-pill:hover {
   box-shadow: 0 10px 10px rgba(0,0,0,0.1);
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(1.05);
 }
 
 .skill-pill.need-help {
@@ -1430,13 +1450,15 @@ body {
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  transition: background-color 0.2s;
+  transition: all 0.5s;
   border: none;
   cursor: pointer;
 }
 
 .chat-button:hover {
-  background-color: #3182ce;
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: 4px 4px 10px rgba(161, 146, 255, 0.363);
+  background-color: #84a5ff;
 }
 
 .empty-state {
@@ -1513,27 +1535,21 @@ body {
 
 .return-button {
   align-self: flex-start;
-  padding: 0.6rem 1.2rem;
+  padding: 0.5rem 2rem;
   font-weight: 500;
   font-size: 0.95rem;
   cursor: pointer;
   border: none;
-  border-radius: 10px;
-
-
-  background: rgb(217, 255, 219);
+  background: rgb(255, 255, 255);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #333;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-
   transition: all 0.5s ease;
 }
 
 .return-button:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px) scale(1.2);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  background: rgb(255, 255, 255);
+  transform: scale(1.2);
 }
 
 .return-button:active {
@@ -1589,7 +1605,12 @@ body {
   padding: 12px 18px;
   border-radius: 20px;
   position: relative;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.5s ease;
+}
+
+.message-content:hover{
+  transform: scale(1.05);
 }
 
 .message-content p {
@@ -1600,7 +1621,7 @@ body {
 
 .message-time {
   font-size: 0.7rem;
-  color: #999;
+  color: #000000;
   margin-top: 8px;
   display: block;
 }
@@ -1643,7 +1664,7 @@ body {
   margin-right: 15px;
   font-size: 1rem;
 
-  background: rgba(228, 228, 228, 0.521);
+  background: rgba(212, 212, 212, 0.521);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 
@@ -1652,13 +1673,14 @@ body {
 }
 
 .chat-input::placeholder {
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(0, 0, 0, 0.459);
 }
 
 .chat-input:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 0 0 2px rgba(0, 109, 27, 0.4);
+  background: rgb(255, 255, 255);
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px rgba(0, 109, 27, 0.4);
 }
 
 
@@ -1738,4 +1760,84 @@ body {
   box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   overflow: hidden;
+}
+
+/* Profile Header */
+.profile-section-title {
+  font-weight: bold;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+}
+
+.profile-pill-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.profile-pill {
+  background: rgba(0, 255, 115, 0.192);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  color: var(--text-color, #000000);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+  transition: all 0.5s;
+}
+.profile-pill:hover {
+  background: rgb(255, 255, 255);
+  transform: scale(1.05);
+}
+
+/* CREATE TASKS PAGE SUGGESTION SECTION */
+.tasks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.btn.glossy.primary.ai {
+  background: linear-gradient(135deg, #1eff00, #00ffbf);
+  color: #023f00;
+  border:2px rgb(0, 109, 27);
+  box-shadow: 2px 2px 0px 2px #00ff73;
+  transition: all 0.5s ease;
+  /* Font styling */
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem; 
+  font-weight: 800; 
+}
+
+.btn.glossy.primary.ai:hover {
+  box-shadow: 2px 2px 12px 2px #00ff15;
+  transform: translateY(-6px) scale(1.1);
+}
+
+.suggest-toggles {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  transition: all 0.5s ease;
+}
+
+.suggest-toggles:hover {
+  transform: scale(1.05);
+}
+
+.suggest-toggles label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.suggest-toggles input[type="checkbox"] {
+  transform: scale(1.1);
+  cursor: pointer;
 }

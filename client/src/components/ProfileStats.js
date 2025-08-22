@@ -1,14 +1,12 @@
 import React from 'react';
 
 function ProfileStats({ user }) {
-  // Use actual user data where available, fallback to defaults
   const stats = {
     tasksCompleted: 0,
     tasksPosted: 0,
     rating: user.ratingSummary?.average || 0,
     joinedDate: new Date(user.createdAt).toLocaleDateString(),
-    creditsEarned: user.credits.earned || 0,
-    creditsSpent: user.credits.spent || 0
+    creditsBalance: user.credits.balance || 0
   };
 
   return (
@@ -32,7 +30,7 @@ function ProfileStats({ user }) {
         </div>
         
         <div className="stat-card">
-          <div className="stat-value">{stats.creditsEarned - stats.creditsSpent}</div>
+          <div className="stat-value">{stats.creditsBalance}</div>
           <div className="stat-label">Credit Balance</div>
         </div>
       </div>

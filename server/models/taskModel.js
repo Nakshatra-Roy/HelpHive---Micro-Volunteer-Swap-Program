@@ -17,7 +17,7 @@ const taskSchema = new mongoose.Schema({
     swapInterest: { type: Boolean, default: false },
     date: { type: Date, default: Date.now },
     priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
-    credits: { type: Number, default: 10 },
+    credits: { type: Number, default: 1 },
 });
 
 export default mongoose.model('Task', taskSchema);

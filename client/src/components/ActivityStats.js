@@ -1,12 +1,11 @@
-// client/src/components/ActivityStats.js
 import React from 'react';
 
 const ActivityStats = ({ user }) => {
-  const tasksCompleted = user.volunteerHistory?.length || 0;
-  const tasksPosted = 0; // Placeholder as specified in requirements
-  const averageRating = user.ratingSummary?.average || 0;
-  const ratingCount = user.ratingSummary?.count || 0;
-  const creditBalance = (user.credits?.earned || 0) - (user.credits?.spent || 0);
+  const tasksCompleted = user?.volunteerHistory?.length || 0;
+  const tasksPosted = user?.myTasks?.length || 0;;
+  const averageRating = user?.ratingSummary?.average || 0;
+  const ratingCount = user?.ratingSummary?.count || 0;
+  const creditBalance = (user?.credits?.balance || 0);
 
   return (
     <div className="card">

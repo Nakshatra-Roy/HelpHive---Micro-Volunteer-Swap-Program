@@ -14,14 +14,12 @@ export const updateProfile = async (req, res) => {
     console.log('Update Profile Request Body:', req.body);
     console.log('Request Content-Type:', req.headers['content-type']);
     
-    const { firstName, lastName, bio, location, skills, availability } = req.body;
-    let { contactInfo, socialLinks } = req.body;
-
+    const { firstName, lastName, bio, location, skills, following, availability, contactInfo, socialLinks } = req.body;
     console.log('Raw contactInfo:', contactInfo);
     console.log('Raw socialLinks:', socialLinks);
 
     // Create the base profile fields object
-    const profileFields = { firstName, lastName, bio, location, skills, availability };
+    const profileFields = { firstName, lastName, bio, location, skills, following, availability, contactInfo, socialLinks };
 
     // Process contactInfo - handle both string (from FormData) and object formats
     if (contactInfo) {
@@ -35,20 +33,16 @@ export const updateProfile = async (req, res) => {
                     profileFields.contactInfo = {};
                 }
             } else {
-                // It's already an object
                 profileFields.contactInfo = contactInfo;
             }
         } catch (err) {
             console.error('Error processing contactInfo:', err);
-            // Initialize as empty object on any error
             profileFields.contactInfo = {};
         }
     } else {
-        // Ensure contactInfo exists even if not provided
         profileFields.contactInfo = {};
     }
 
-    // Process socialLinks - handle both string (from FormData) and object formats
     if (socialLinks) {
         try {
             if (typeof socialLinks === 'string') {
@@ -56,20 +50,16 @@ export const updateProfile = async (req, res) => {
                     profileFields.socialLinks = JSON.parse(socialLinks);
                 } catch (parseErr) {
                     console.error('Error parsing socialLinks as JSON:', parseErr);
-                    // If it's a string but not valid JSON, initialize as empty object
                     profileFields.socialLinks = {};
                 }
             } else {
-                // It's already an object
                 profileFields.socialLinks = socialLinks;
             }
         } catch (err) {
             console.error('Error processing socialLinks:', err);
-            // Initialize as empty object on any error
             profileFields.socialLinks = {};
         }
     } else {
-        // Ensure socialLinks exists even if not provided
         profileFields.socialLinks = {};
     }
     
@@ -88,10 +78,8 @@ export const updateProfile = async (req, res) => {
             });
             profileFields.profilePicture = result.secure_url;
         }
-        // Explicitly ensure contactInfo and socialLinks are included in the update
         console.log('Final profileFields before DB update:', JSON.stringify(profileFields, null, 2));
         
-        // Make sure these fields are explicitly set in the update operation
         const updateOperation = {
             $set: {
                 firstName: profileFields.firstName,
@@ -99,13 +87,14 @@ export const updateProfile = async (req, res) => {
                 bio: profileFields.bio,
                 location: profileFields.location,
                 skills: profileFields.skills,
+                following: profileFields.following,
                 availability: profileFields.availability,
-                'contactInfo.phone': profileFields.contactInfo?.phone || '',
-                'contactInfo.publicEmail': profileFields.contactInfo?.publicEmail || '',
-                'socialLinks.github': profileFields.socialLinks?.github || '',
-                'socialLinks.linkedin': profileFields.socialLinks?.linkedin || '',
-                'socialLinks.twitter': profileFields.socialLinks?.twitter || '',
-                'socialLinks.website': profileFields.socialLinks?.website || ''
+                'contactInfo.phone': profileFields.contactInfo.phone || '',
+                'contactInfo.publicEmail': profileFields.contactInfo.publicEmail || '',
+                'socialLinks.github': profileFields.socialLinks.github || '',
+                'socialLinks.linkedin': profileFields.socialLinks.linkedin || '',
+                'socialLinks.twitter': profileFields.socialLinks.twitter || '',
+                'socialLinks.website': profileFields.socialLinks.website || ''
             }
         };
         

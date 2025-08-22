@@ -17,39 +17,29 @@ function ProfilePage() {
   const [activeChatTaskId, setActiveChatTaskId] = useState(null);
 
   
-  // Initialize react-hook-form
   const { register, handleSubmit, reset } = useForm();
 
-  // Synchronize user data with form when user data is available
   useEffect(() => {
-    if (loading) {
-      return <div className="profile-loading"> Loading profile...</div>;
-    }
-    if (!user) {
-      // Redirect to login if no user
-      navigate("/login");
-      return; // stop further execution
-    }
+  if (loading || !user) return;
 
-    // Reset form with user data if logged in
-    reset({
-      firstName: user?.firstName || '',
-      lastName: user?.lastName || '',
-      bio: user?.bio || '',
-      location: user?.location || '',
-      skills: Array.isArray(user?.skills) ? user?.skills.join(', ') : '',
-      following: Array.isArray(user?.following) ? user?.following.join(', ') : '',
-      availability: user?.availability || '',
-      'contactInfo.phone': user?.contactInfo?.phone || '',
-      'contactInfo.publicEmail': user?.contactInfo?.publicEmail || '',
-      'socialLinks.github': user?.socialLinks?.github || '',
-      'socialLinks.linkedin': user?.socialLinks?.linkedin || '',
-      'socialLinks.twitter': user?.socialLinks?.twitter || '',
-      'socialLinks.website': user?.socialLinks?.website || ''
-    });
-  }, [user, reset, loading, navigate]);
+  reset({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    bio: user?.bio || '',
+    location: user?.location || '',
+    skills: Array.isArray(user?.skills) ? user?.skills.join(', ') : '',
+    following: Array.isArray(user?.following) ? user?.following.join(', ') : '',
+    availability: user?.availability || '',
+    'contactInfo_phone': user?.contactInfo?.phone || '',
+    'contactInfo_publicEmail': user?.contactInfo?.publicEmail || '',
+    'socialLinks_github': user?.socialLinks?.github || '',
+    'socialLinks_linkedin': user?.socialLinks?.linkedin || '',
+    'socialLinks_twitter': user?.socialLinks?.twitter || '',
+    'socialLinks_website': user?.socialLinks?.website || '',
+  });
+}, [user, loading, reset]);
 
-  // Handle file selection for profile picture
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -58,47 +48,46 @@ function ProfilePage() {
     }
   };
 
-  // Handle form submission
   const handleSubmitForm = async (formData) => {
-    // Format the data for the API
-    const formattedData = {
-      ...formData,
-      // Convert comma-separated strings to arrays
-      skills: formData.skills.split(',').map(skill => skill.trim()).filter(Boolean),
-      following: formData.following.split(',').map(following => following.trim()).filter(Boolean),
-      // Reconstruct nested objects
-      contactInfo: {
-        phone: formData['contactInfo.phone'] || '',
-        publicEmail: formData['contactInfo.publicEmail'] || ''
-      },
-      socialLinks: {
-        github: formData['socialLinks.github'] || '',
-        linkedin: formData['socialLinks.linkedin'] || '',
-        twitter: formData['socialLinks.twitter'] || '',
-        website: formData['socialLinks.website'] || ''
-      }
+    const contactInfo = {
+      phone: formData['contactInfo_phone'] || '',
+      publicEmail: formData['contactInfo_publicEmail'] || ''
     };
-    
-    // Remove the flattened properties
-    delete formattedData['contactInfo.phone'];
-    delete formattedData['contactInfo.publicEmail'];
-    delete formattedData['socialLinks.github'];
-    delete formattedData['socialLinks.linkedin'];
-    delete formattedData['socialLinks.twitter'];
-    delete formattedData['socialLinks.website'];
-    
-    // Add more detailed logging
-    console.log('Submitting profile data:', formattedData);
-    console.log('Contact Info:', formattedData.contactInfo);
-    console.log('Social Links:', formattedData.socialLinks);
-    
+
+    const socialLinks = {
+      github: formData['socialLinks_github'] || '',
+      linkedin: formData['socialLinks_linkedin'] || '',
+      twitter: formData['socialLinks_twitter'] || '',
+      website: formData['socialLinks_website'] || ''
+    };
+
+    const {
+      ['contactInfo_phone']: _1,
+      ['contactInfo_publicEmail']: _2,
+      ['socialLinks_github']: _3,
+      ['socialLinks_linkedin']: _4,
+      ['socialLinks_twitter']: _5,
+      ['socialLinks_website']: _6,
+      ...rest
+    } = formData;
+
+    const formattedData = {
+      ...rest,
+      skills: rest.skills.split(',').map(skill => skill.trim()).filter(Boolean),
+      following: rest.following.split(',').map(following => following.trim()).filter(Boolean),
+      contactInfo,
+      socialLinks
+    };
+
     const success = await updateProfile(formattedData, profilePicture);
+
     if (success) {
       handleCancel();
     } else {
       console.error('Failed to update profile');
     }
   };
+
 
   // Handle canceling edit mode
   const handleCancel = () => {
@@ -108,30 +97,40 @@ function ProfilePage() {
     // Reset form to original user data
     if (user) {
       reset({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
         bio: user?.bio || '',
         location: user?.location || '',
         skills: Array.isArray(user?.skills) ? user?.skills.join(', ') : '',
-        following: Array.isArray(user.following) ? user?.following.join(', ') : '',
+        following: Array.isArray(user?.following) ? user?.following.join(', ') : '',
         availability: user?.availability || '',
-        'contactInfo.phone': user?.contactInfo?.phone || '',
-        'contactInfo.publicEmail': user?.contactInfo?.publicEmail || '',
-        'socialLinks.github': user?.socialLinks?.github || '',
-        'socialLinks.linkedin': user?.socialLinks?.linkedin || '',
-        'socialLinks.twitter': user?.socialLinks?.twitter || '',
-        'socialLinks.website': user?.socialLinks?.website || ''
+        'contactInfo_phone': user?.contactInfo?.phone || '',
+        'contactInfo_publicEmail': user?.contactInfo?.publicEmail || '',
+        'socialLinks_github': user?.socialLinks?.github || '',
+        'socialLinks_linkedin': user?.socialLinks?.linkedin || '',
+        'socialLinks_twitter': user?.socialLinks?.twitter || '',
+        'socialLinks_website': user?.socialLinks?.website || ''
       });
     }
   };
 
 
   if (loading) {
-    return <div className="profile-loading">Loading profile...</div>;
+    return (
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+    <div className="backdrop">
+      <div className="blob b1" />
+      <div className="blob b2" />
+      <div className="grid-overlay" />
+    </div>  
+    <div className="card glass">Loading profile. Please wait...</div>
+    </div>
+    )
   }
 
   if (!user) {
-    return null; // Or navigate("/login") safely
+    navigate("/login");
+    return;
   }
 
   return (
@@ -156,78 +155,87 @@ function ProfilePage() {
       {/* EDIT PROFILE FORM BEGINS */}
       {isEditing ? (
         <form className="profile-edit-form" onSubmit={handleSubmit(handleSubmitForm)}>
-          <div className="form-group">
-            <label>First Name</label>
+          <div className="card">
+            <p>First Name</p>
             <input 
               type="text" 
+              className = "card input-full"
               {...register('firstName', { required: true })} 
             />
           </div>
           
-          <div className="form-group">
-            <label>Last Name</label>
+          <div className="card">
+            <p>Last Name</p>
             <input 
               type="text" 
+              className = "card input-full"
               {...register('lastName', { required: true })} 
             />
           </div>
           
-          <div className="form-group">
-            <label>Bio</label>
+          <div className="card">
+            <p>Bio</p>
             <textarea 
+              className = "card input-full"
               {...register('bio')} 
               rows={4} 
             />
           </div>
           
-          <div className="form-group">
-            <label>Location</label>
+          <div className="card">
+            <p>Location</p>
             <input 
+              className = "card input-full"
               type="text" 
               {...register('location')} 
             />
           </div>
           
-          <div className="form-group">
-            <label>Skills (comma separated)</label>
+          <div className="card">
+            <p>Skills (comma separated)</p>
             <input 
+              className = "card input-full"
               type="text" 
               {...register('skills')} 
             />
           </div>
           
-          <div className="form-group">
-            <label>Following (comma separated)</label>
+          <div className="card">
+            <p>Skills Following (comma separated)</p>
             <input 
+              className = "card input-full"
               type="text" 
               {...register('following')} 
             />
           </div>
           
-          <div className="form-group">
-            <label>Availability</label>
+          <div className="card">
+            <p>Availability</p>
             <input 
+              className = "card input-full"
               type="text" 
               {...register('availability')} 
             />
           </div>
 
           <div className="section-wrapper">
-            <h3>Contact Information</h3>
+            <h3>Contact Information (visible to everyone)</h3>
             <div className="contact-info-grid">
-              <div className="form-group">
-                <label>Phone</label>
+              <div className="card">
+                <p>Phone</p>
                 <input 
+                  className = "card input-full"
                   type="text" 
-                  {...register('contactInfo.phone')} 
+                  {...register('contactInfo_phone')} 
                 />
               </div>
               
-              <div className="form-group">
-                <label>Public Email</label>
+              <div className="card">
+                <p>Email</p>
                 <input 
+                  className = "card input-full"
                   type="email" 
-                  {...register('contactInfo.publicEmail')} 
+                  {...register('contactInfo_publicEmail')} 
                 />
               </div>
             </div>
@@ -236,38 +244,42 @@ function ProfilePage() {
           <div className="section-wrapper">
             <h3>Social Links</h3>
             <div className="social-links-grid">
-              <div className="form-group">
-                <label>GitHub</label>
+              <div className="card">
+                <p>GitHub</p>
                 <input 
+                  className = "card input-full"
                   type="url" 
-                  {...register('socialLinks.github')} 
+                  {...register('socialLinks_github')} 
                   placeholder="https://github.com/username"
                 />
               </div>
               
-              <div className="form-group">
-                <label>LinkedIn</label>
+              <div className="card">
+                <p>LinkedIn</p>
                 <input 
+                  className = "card input-full"
                   type="url" 
-                  {...register('socialLinks.linkedin')} 
+                  {...register('socialLinks_linkedin')} 
                   placeholder="https://linkedin.com/in/username"
                 />
               </div>
               
-              <div className="form-group">
-                <label>Twitter</label>
+              <div className="card">
+                <p>Twitter</p>
                 <input 
+                  className = "card input-full"
                   type="url" 
-                  {...register('socialLinks.twitter')} 
+                  {...register('socialLinks_twitter')} 
                   placeholder="https://twitter.com/username"
                 />
               </div>
               
-              <div className="form-group">
-                <label>Website</label>
+              <div className="card">
+                <p>Website</p>
                 <input 
+                  className = "card input-full"
                   type="url" 
-                  {...register('socialLinks.website')} 
+                  {...register('socialLinks_website')} 
                   placeholder="https://yourwebsite.com"
                 />
               </div>
@@ -275,8 +287,8 @@ function ProfilePage() {
           </div>
           
           <div className="form-actions">
-            <button type="submit" className="btn primary">Save Changes</button>
-            <button type="button" className="btn secondary" onClick={handleCancel}>Cancel</button>
+            <button type="submit" className="btn glossy primary">Save Changes</button>
+            <button type="button" className="btn glossy tiny" onClick={handleCancel}>Cancel</button>
           </div>
         </form>
       ) : (
@@ -285,6 +297,7 @@ function ProfilePage() {
             <div className="profile-main-content">
 
                {/* EDIT PROFILE FORM ENDS */}
+
               {/* About Me Card */}
               <div className="card">
                 <h2 className="card-title">About Me</h2>

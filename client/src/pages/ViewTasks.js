@@ -14,16 +14,18 @@ const ViewTasks = () => {
     category: "",
     location: "",
     priority: "",
-    sortCredits: "desc", //default
+    sortCredits: "desc",
   });
   const [acceptPending, setAcceptPending] = useState(new Set());
+  const [showSuggested, setShowSuggested] = useState(false);
+  const [matchSkill, setMatchSkill] = useState(true);     // NEW
+  const [matchLocation, setMatchLocation] = useState(true); // NEW
   const isLoggedInAdmin = user && user.role === "admin";
 
   useEffect(() => {
     fetchTask();
   }, [fetchTask]);
 
-  // Unique dropdown values
   const categories = useMemo(
     () => [...new Set((tasks || []).map((t) => t.category).filter(Boolean))],
     [tasks]
@@ -37,7 +39,6 @@ const ViewTasks = () => {
     [tasks]
   );
 
-  // Apply filters (excluding sorting here)
   const filteredTasks = useMemo(() => {
     const s = filters.search.trim().toLowerCase();
     return (tasks || []).filter((t) => {
@@ -49,7 +50,36 @@ const ViewTasks = () => {
     });
   }, [tasks, filters]);
 
-  // Accept handler
+  const suggestedTasks = useMemo(() => {
+	if (!user) return [];
+	const userSkills = (user.skills || []).map((s) => s.toLowerCase());
+	const userLocation = (user.location || "").toLowerCase();
+
+	return (tasks || []).filter((t) => {
+		const categoryMatch = matchSkill
+		? userSkills.includes((t.category || "").toLowerCase())
+		: false;
+		const locationMatch = matchLocation
+		? (t.location || "").toLowerCase() === userLocation
+		: false;
+
+		if (!matchSkill && !matchLocation) return false;
+		if (matchSkill && matchLocation) return categoryMatch && locationMatch;
+		return categoryMatch || locationMatch;
+	});
+	}, [tasks, user, matchSkill, matchLocation]);
+
+	const filteredSuggestedTasks = useMemo(() => {
+	const s = filters.search.trim().toLowerCase();
+	return (suggestedTasks || []).filter((t) => {
+		const bySearch = s ? (t.taskName || "").toLowerCase().includes(s) : true;
+		const byCategory = filters.category ? t.category === filters.category : true;
+		const byLocation = filters.location ? t.location === filters.location : true;
+		const byPriority = filters.priority ? t.priority === filters.priority : true;
+		return bySearch && byCategory && byLocation && byPriority;
+	});
+	}, [suggestedTasks, filters]);
+
   const handleAcceptTask = async (task) => {
     if (!task?._id || !user?._id) return;
     const cur = task.curHelpers || 0;
@@ -78,7 +108,6 @@ const ViewTasks = () => {
   return (
     <section className="section">
       <div className="container">
-        {/* Filters */}
         <TaskFilters
           onFilterChange={setFilters}
           categories={categories}
@@ -86,37 +115,73 @@ const ViewTasks = () => {
           priorities={priorities}
         />
 
-        <h2>All Tasks</h2>
+        <br />
+        <h2 className="tasks-header">
+          <span>{showSuggested ? "Suggested Tasks" : "All Tasks"}</span>
+          {!isLoggedInAdmin && (
+            <button
+              className="btn glossy primary ai"
+              onClick={() => setShowSuggested((prev) => !prev)}
+            >
+              <span className="ai-icon">✨</span>
+              {showSuggested ? "Show All Tasks" : "Suggest Tasks"}
+            </button>
+          )}
+        </h2>
 
-		{!isLoggedInAdmin && (
-        <TaskTable
-          tasks={filteredTasks}
-          loading={loading}
-          userId={user?._id}
-          busyIds={acceptPending}
-          onAccept={handleAcceptTask}
-          sortOrder={filters.sortCredits} // ✅ pass sort order
-        />
-		)}
-
-		{isLoggedInAdmin && (
-        <TaskTableAdmin
-          tasks={filteredTasks}
-          loading={loading}
-          userId={user?._id}
-          busyIds={acceptPending}
-          sortOrder={filters.sortCredits} // ✅ pass sort order
-        />
-		)}
-
-        {!loading && filteredTasks.length === 0 && (
-          <p style={{ marginTop: 16, textAlign: "center", color: "#6b7280" }}>
-            No tasks found 😢{" "}
-            <Link to="/createTask" className="btn tiny under">
-              Create a task
-            </Link>
-          </p>
+        {showSuggested && !isLoggedInAdmin && (
+          <div className="suggest-toggles">
+            <label>
+              <input
+                type="checkbox"
+                checked={matchSkill}
+                onChange={(e) => setMatchSkill(e.target.checked)}
+              />
+              Match my Skills
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={matchLocation}
+                onChange={(e) => setMatchLocation(e.target.checked)}
+              />
+              Show Tasks Nearby
+            </label>
+          </div>
         )}
+
+        <br />
+
+        {!isLoggedInAdmin && (
+          <TaskTable
+            tasks={showSuggested ? filteredSuggestedTasks : filteredTasks}
+            loading={loading}
+            userId={user?._id}
+            busyIds={acceptPending}
+            onAccept={handleAcceptTask}
+            sortOrder={filters.sortCredits}
+          />
+        )}
+
+        {isLoggedInAdmin && (
+          <TaskTableAdmin
+            tasks={showSuggested ? filteredSuggestedTasks : filteredTasks}
+            loading={loading}
+            userId={user?._id}
+            busyIds={acceptPending}
+            sortOrder={filters.sortCredits}
+          />
+        )}
+
+        {!loading &&
+          (showSuggested ? suggestedTasks.length === 0 : filteredTasks.length === 0) && (
+            <p style={{ marginTop: 16, textAlign: "center", color: "#6b7280" }}>
+              No tasks found 😢{" "}
+              <Link to="/createTask" className="btn tiny under">
+                Create a task
+              </Link>
+            </p>
+          )}
       </div>
     </section>
   );

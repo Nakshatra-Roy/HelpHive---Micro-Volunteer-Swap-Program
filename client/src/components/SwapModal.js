@@ -39,7 +39,7 @@ const SwapModal = ({ myTaskToOffer, onClose, onConfirmSwap }) => {
         </div>
         <br/>
 
-        <button className="btn glossy" onClick={onClose}>
+        <button className="btn glossy tiny" onClick={onClose}>
           Cancel
         </button>
       </div>

@@ -17,48 +17,48 @@ export const getTasks = async (req, res) => {
 };
 
 export const createTask = async (req, res) => {
-  const taskData = req.body;
-  console.log("Received task on backend:", taskData);
+    const taskData = req.body;
+    console.log("Received task on backend:", taskData);
 
-  const userId = req.user?._id || req.user?.id;
-  const user = await User.findById(userId);
+    const userId = req.user?._id || req.user?.id;
+    const user = await User.findById(userId);
 
-  if (!userId) {
-    return res.status(401).json({ success: false, message: "You have to be logged in to create a task" });
-  }
-
-  if (user.credits.earned - user.credits.spent < taskData.credits) {
-    return res.status(403).json({ success: false, message: "Insufficient Credits" });
-  }
-
-  try {
-    const newTask = new Task({
-      ...taskData,
-      postedBy: userId,
-    });
-
-    user.credits.spent += taskData.credits;
-    await user.save();
-    await user.save();
-    await newTask.save();
-
-    const notifiedCount = await sendNotifications?.(newTask, req.io) || 0;
-
-    res.status(201).json({
-      success: true,
-      data: newTask,
-      notifiedUsers: notifiedCount,
-    });
-  } catch (error) {
-    console.error("Error creating task:", error.message);
-
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({ success: false, message: "Please provide all fields" });
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "You have to be logged in to create a task" });
     }
 
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
-};
+    if (user.credits.earned - user.credits.spent < taskData.credits) {
+      return res.status(403).json({ success: false, message: "Insufficient Credits" });
+    }
+
+    try {
+      const newTask = new Task({
+        ...taskData,
+        postedBy: userId,
+      });
+
+      await newTask.save();
+      user.credits.spent += taskData.credits;
+      user.myTasks.push(newTask._id);
+      await user.save();
+
+      const notifiedCount = await sendNotifications?.(newTask, req.io) || 0;
+
+      res.status(201).json({
+        success: true,
+        data: newTask,
+        notifiedUsers: notifiedCount,
+      });
+    } catch (error) {
+      console.error("Error creating task:", error.message);
+
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({ success: false, message: "Please provide all fields" });
+      }
+
+      res.status(500).json({ success: false, message: "Server Error" });
+    }
+  };
 
 export const updateTask = async (req, res) => {
 	const { id } = req.params;
@@ -218,7 +218,7 @@ export const completeTask = async (req, res) => {
 
         const now = new Date();
 
-        // Award credits to each helper based on time spent
+        // Award credits to each helper based on time spent + add to volunteerHistory
         for (const helper of task.helpersArray) {
             const acceptedAt = new Date(helper.acceptedAt);
             const hoursWorked = Math.max((now - acceptedAt) / (1000 * 60 * 60), 0);
@@ -226,7 +226,10 @@ export const completeTask = async (req, res) => {
 
             await User.findByIdAndUpdate(
                 helper.user,
-                { $inc: { 'credits.earned': creditsToAward } },
+                {
+                    $inc: { 'credits.earned': creditsToAward },
+                    $addToSet: { volunteerHistory: task._id }
+                },
                 { session }
             );
         }
@@ -398,8 +401,6 @@ export const getSwapRequests = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
-
-
 
 
 

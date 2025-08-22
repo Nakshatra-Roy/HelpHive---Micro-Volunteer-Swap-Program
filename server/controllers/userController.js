@@ -17,28 +17,37 @@ export const loginUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    
+
+    // Check account status
+    if (user.accountStatus === "inactive") {
+      return res.status(403).json({ message: "Account deactivated. Contact support." });
+    }
+
+    // Check password (NOTE: In production, use bcrypt.compare)
     if (user.password !== password) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     // Create JWT payload
     const payload = { user: { id: user.id } };
-    
+
     // Sign JWT token
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: '2h' },
+      { expiresIn: "2h" },
       (err, token) => {
         if (err) {
-          console.error('JWT Sign Error:', err);
-          return res.status(500).json({ message: "Error generating authentication token" });
+          console.error("JWT Sign Error:", err);
+          return res
+            .status(500)
+            .json({ message: "Error generating authentication token" });
         }
         res.status(200).json({ token });
       }
     );
   } catch (error) {
+    console.error("Login Error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -94,13 +103,35 @@ export const createUser = async (req, res) => {
     res.status(500).json({ message: 'Internal server error', error });
   }
 }
-
 export const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const { firstName, lastName, email, password, role, profilePicture, bio, location, skills, following, availability, socialLinks, flag, accountStatus } = req.body;
-  try {
-    // Create update object
-    const updateData = {
+    const { id } = req.params;
+    let {
+      firstName,
+      lastName,
+      email,
+      password,
+      role,
+      profilePicture,
+      bio,
+      location,
+      skills,
+      following,
+      availability,
+      socialLinks,
+      contactInfo,
+      flag,
+      accountStatus
+    } = req.body;
+
+    try {
+      if (typeof contactInfo === 'string') {
+        contactInfo = JSON.parse(contactInfo);
+      }
+      if (typeof socialLinks === 'string') {
+        socialLinks = JSON.parse(socialLinks);
+      }
+
+      const updateData = {
         firstName,
         lastName,
         email,
@@ -112,25 +143,29 @@ export const updateUser = async (req, res) => {
         following,
         availability,
         socialLinks,
+        contactInfo,
         flag,
         accountStatus
-    };
-    
-    // If password is provided, use it directly
-    if (password) {
-      updateData.password = password;
+      };
+
+      if (password) {
+        updateData.password = password;
+      }
+
+      const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found!' });
+      }
+
+      res.status(200).json({ message: 'User updated successfully', updatedUser });
+
+    } catch (error) {
+      console.error('Update error:', error);
+      res.status(500).json({ message: 'Internal server error', error });
     }
-    
-    const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
-    
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found!' });
-    }
-    res.status(200).json({ message: 'Internal server error', updatedUser });
-  } catch (error) {
-    res.status(500).json({ message: 'Internal server error', error });
-  }
-}
+  };
+
 
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
@@ -148,15 +183,9 @@ export const deleteUser = async (req, res) => {
 export const getUserTasks = async (req, res) => {
   try {
     const userId = req.params.userId;
-
-    // Find tasks created by the user
     const created = await Task.find({ postedBy: userId }).sort({ createdAt: -1 });
-
-    // Find tasks where the user is a helper (based on nested user field in helpersArray)
     const helping = await Task.find({ "helpersArray.user": userId }).sort({ createdAt: -1 });
-
     res.status(200).json({ created, helping });
-
   } catch (error) {
     console.error("Error in getUserTasks:", error);
     res.status(500).json({ message: 'Error fetching user tasks', error: error.message });

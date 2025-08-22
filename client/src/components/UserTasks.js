@@ -85,7 +85,15 @@ const UserTasks = ({ userId, onStartChat }) => {
   };
 
   if (loading) {
-    return <div className="loading-tasks">Loading tasks...</div>;
+    return (
+      <div style={{ position: "relative", minHeight: "100vh" }}>
+      <div className="backdrop">
+        <div className="blob b1" />
+        <div className="blob b2" />
+        <div className="grid-overlay" />
+      </div>  
+      <div className="loading-tasks">Loading tasks. Please wait...</div>;
+      </div>)
   }
 
   return (

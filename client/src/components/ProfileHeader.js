@@ -9,26 +9,22 @@ function ProfileHeader({ user, isEditing, setIsEditing, previewUrl, handleFileCh
 
   const userInitials = getInitials(user?.firstName, user?.lastName);
   
-  // Construct the correct image URL
   let imageUrl = '';
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   if (previewUrl) {
-    // If there's a preview URL (during image upload), use it
     imageUrl = previewUrl;
   } else if (user?.profilePicture) {
-    // Check if the profilePicture is a full URL
-    if (user.profilePicture.startsWith('http')) {
-      // If yes, it's from Cloudinary. Use it directly.
-      imageUrl = user.profilePicture;
+    if (user?.profilePicture.startsWith('http')) {
+      imageUrl = user?.profilePicture;
     } else {
-      // If no, it's the default avatar filename. Construct the full URL.
-      imageUrl = `${backendUrl}/images/${user.profilePicture}`;
+      imageUrl = `${backendUrl}/images/${user?.profilePicture}`;
     }
   } else {
-    // A final fallback in case profilePicture is missing entirely
-    imageUrl = `${backendUrl}/images/${user.profilePicture}`;
+    imageUrl = `${backendUrl}/images/${user?.profilePicture}`;
   }
   console.log('Final computed imageUrl for <img> src:', imageUrl);
+
+
   return (
     <div className="card">
       <div className="profile-cover">
@@ -63,36 +59,39 @@ function ProfileHeader({ user, isEditing, setIsEditing, previewUrl, handleFileCh
       <div className="profile-header-content">
         <div className="profile-name-container">
           <div className="profile-name-info">
-            <h1 className="profile-name">{`${user.firstName} ${user.lastName}`}</h1>
+            <h1 className="profile-name">{`${user?.fullName}`}</h1>
             <div className="profile-details-row">
               <div className="profile-location-header">
                 <span className="location-icon">📍</span>
-                <span>{user.location || 'Location not specified'}</span>
+                <span>{user?.location || 'Location not specified'}</span>
               </div>
               <div className="profile-member-since-header">
                 <span className="member-icon">🗓️</span>
-                <span>Member since {new Date(user.createdAt).toLocaleDateString()}</span>
+                <span>Member since {new Date(user?.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
           {!isEditing && (
             <button 
-              className="btn edit-profile-btn" 
+              className="btn glossy primary" 
               onClick={() => setIsEditing(true)}
             >
               Edit Profile
             </button>
           )}
         </div>
-        <p className="profile-email">{user.email}</p>
+        <p className="profile-email">{user?.email}</p>
         <br/>
-        <p className="profile-email">Public Information</p>
-        <p className="profile-email">
-          Phone: {user.contactInfo?.phone || "Not set"}
-        </p>
-        <p className="profile-email">
-          Email: {user.contactInfo?.publicEmail || "Not set"}
-        </p>
+        <p className="profile-section-title">Public Information</p>
+        <div className="profile-pill-container">
+          <div className="profile-pill">📞 Phone: {user?.contactInfo?.phone || "Not set"}</div>
+          <div className="profile-pill">📧 Email: {user?.contactInfo?.publicEmail || "Not set"}</div>
+          <div style={{ flexBasis: '100%', height: 0 }} />
+          <div className="profile-pill">🐙 GitHub: {user?.socialLinks?.github || "Not set"}</div>
+          <div className="profile-pill">💼 LinkedIn: {user?.socialLinks?.linkedin || "Not set"}</div>
+          <div className="profile-pill">🐦 Twitter: {user?.socialLinks?.twitter || "Not set"}</div>
+          <div className="profile-pill">🌐 Website: {user?.socialLinks?.website || "Not set"}</div>
+        </div>
 
       </div>
     </div>

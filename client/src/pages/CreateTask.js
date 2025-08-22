@@ -16,7 +16,7 @@ const CreateTask = () => {
 	});
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [notice, setNotice] = useState(null); // { type: 'success' | 'warning' | 'error', message }
+  const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(false);
   const { createTask } = useTaskStore();
 
@@ -30,12 +30,22 @@ const CreateTask = () => {
   const handleAddTask = async (e) => {
     e?.preventDefault();
 
-    /*const missing = required.filter(([, v]) => !String(v || "").trim()).map(([k]) => k);
+	const required = Object.entries({
+		taskName: newTask.taskName,
+		taskDescription: newTask.taskDescription,
+		category: newTask.category,
+		location: newTask.location,
+		date: newTask.date,
+		priority: newTask.priority,
+		credits: newTask.credits
+		});
+
+    const missing = required.filter(([, v]) => !String(v || "").trim()).map(([k]) => k);
     if (missing.length) {
       show("warning", `Please fill: ${missing.join(", ")}`);
       return;
     }
-*/
+
     try {
       setLoading(true);
       const { success, message } = await createTask(newTask);
@@ -68,14 +78,23 @@ const CreateTask = () => {
       : "pill";
 
   useEffect(() => {
-		if (loading) {
-			return <div className="profile-loading"> Loading page...</div>;
-		}
-		if (!user) {
-			navigate("/login");
-			return;
-		}
-		}, [user, navigate, loading]);
+	if (!user) {
+		navigate("/login");
+	}
+	}, [user, navigate]);
+
+	if (loading) {
+	return (
+		<div>
+	<div className="backdrop">
+        <div className="blob b1" />
+        <div className="blob b2" />
+        <div className="grid-overlay" />
+    </div>
+	<div className="profile-loading">Loading page. Please wait...</div>
+	</div>
+	);
+	}
 		
 
   return (

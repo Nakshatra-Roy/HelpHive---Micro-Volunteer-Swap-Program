@@ -86,7 +86,6 @@ const ChatBox = ({ taskId, onClose }) => {
     if (!newMessage.trim() || !user) return;
 
     const messageData = {
-      // We send the user's _id as the sender
       sender: user._id, 
       content: newMessage.trim(),
       timestamp: new Date()
@@ -123,8 +122,9 @@ const ChatBox = ({ taskId, onClose }) => {
 
   return (
     <div className="chat-container">
+      <button className="return-button" onClick={onClose}>❌</button>
+
       <div className="chat-messages">
-        <button className="return-button" onClick={onClose}>❌</button>
         {messages.map((message) => (
           <div
             key={message._id}
@@ -133,7 +133,7 @@ const ChatBox = ({ taskId, onClose }) => {
             <div className="message-content">
               {/* Show sender name for all messages */}
               <strong className="sender-name">
-                {isOwnMessage(message.sender) ? user.fullName || 'You' : message.sender?.fullName || 'User'}
+                {isOwnMessage(message.sender) ? 'You' : message.sender?.fullName || 'User'}
               </strong>
               <p>{message.content}</p>
               <small className="message-time">

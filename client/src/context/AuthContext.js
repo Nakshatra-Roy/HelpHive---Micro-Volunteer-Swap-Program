@@ -112,47 +112,47 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateProfile = async (profileData, profilePicture) => {
-    try {
-      setLoading(true);
-      
-      let data;
-      let headers = {};
-      
-      if (profilePicture) {
-        // With profile picture: use FormData
-        data = new FormData();
-        for (const key in profileData) {
-          if (key === 'contactInfo' || key === 'socialLinks') {
-            data.append(key, JSON.stringify(profileData[key]));
-          } else {
-            data.append(key, profileData[key]);
-          }
+  try {
+    setLoading(true);
+
+    let data;
+    let headers = {};
+
+    if (profilePicture) {
+      data = new FormData();
+      for (const key in profileData) {
+        if (key === 'contactInfo' || key === 'socialLinks') {
+          data.append(key, JSON.stringify(profileData[key]));
+        } else {
+          data.append(key, profileData[key]);
         }
-        data.append('profilePicture', profilePicture);
-        headers = { 'Content-Type': 'multipart/form-data' };
-      } else {
-        // Without profile picture: use JSON but ensure nested objects are properly handled
-        data = {
-          ...profileData,
-          contactInfo: profileData.contactInfo || {},
-          socialLinks: profileData.socialLinks || {}
-        };
-        headers = { 'Content-Type': 'application/json' };
       }
-      
-      const res = await axios.put('http://localhost:5001/api/profile', data, { headers });
-      
-      setUser(res.data);
-      setError(null);
-      return true;
-    } catch (err) {
-      console.error('Update profile error:', err);
-      setError(err.response?.data?.message || 'Failed to update profile');
-      return false;
-    } finally {
-      setLoading(false);
+      data.append('profilePicture', profilePicture);
+      headers = { 'Content-Type': 'multipart/form-data' };
+    } else {
+      // Without profile picture: send stringified JSON
+      data = JSON.stringify({
+        ...profileData,
+        contactInfo: profileData.contactInfo || {},
+        socialLinks: profileData.socialLinks || {}
+      });
+      headers = { 'Content-Type': 'application/json' };
     }
-  };
+
+    const res = await axios.put('http://localhost:5001/api/profile', data, { headers });
+
+    setUser(res.data);
+    setError(null);
+    return true;
+  } catch (err) {
+    console.error('Update profile error:', err);
+    setError(err.response?.data?.message || 'Failed to update profile');
+    return false;
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const value = {
     user,

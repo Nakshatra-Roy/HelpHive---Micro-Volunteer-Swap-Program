@@ -28,9 +28,9 @@ export const useTaskStore = create((set) => ({
     try {
       const response = await axios.post('/api/tasks', taskData);
       set((state) => ({
-  tasks: [...state.tasks, response.data.data],
-  loading: false
-}));
+    tasks: [...state.tasks, response.data.data],
+    loading: false
+  }));
       return { success: true, message: 'Task created successfully' };
     } catch (error) {
       set({ 
