@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
-const UserTasks = ({ userId, onStartChat }) => {
+const UserTasks = ({ userId, onStartChat, onLeaveReview, onSeeReview, refetchTrigger}) => {
   const [tasksCreated, setTasksCreated] = useState([]);
   const [tasksHelping, setTasksHelping] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userMap, setUserMap] = useState({}); // Cache of userId → fullName
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!userId) return;
 
     const fetchUserTasks = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(`/api/users/${userId}/tasks`);
+        console.log("RAW DATA RECEIVED ON FRONTEND:", response.data);
         setTasksCreated(response.data.created);
         setTasksHelping(response.data.helping);
       } catch (error) {
@@ -23,7 +27,7 @@ const UserTasks = ({ userId, onStartChat }) => {
     };
 
     fetchUserTasks();
-  }, [userId]);
+  }, [userId, refetchTrigger]);
 
   const getPostedByName = async (userId) => {
     if (userMap[userId]) return userMap[userId];
@@ -40,19 +44,16 @@ const UserTasks = ({ userId, onStartChat }) => {
   };
 
   const TaskCard = ({ task, showPostedBy }) => {
-    const [posterName, setPosterName] = useState('');
+    const posterName = task.postedBy?.fullName || 'A User';
+    
+    const isCreator = user?._id === task.postedBy._id;
+    const reviewableParticipants = isCreator 
+      ? task.helpersArray.map(h => h.user).filter(Boolean)
+      : [task.postedBy];
 
-    useEffect(() => {
-      if (showPostedBy && task.postedBy) {
-        const fetchName = async () => {
-          const name = await getPostedByName(task.postedBy);
-          setPosterName(name);
-        };
-        fetchName();
-      }
-    }, [task.postedBy, showPostedBy]);
-
-    return (
+    const allReviewsDone = task.reviewsSubmittedByMe?.length >= reviewableParticipants.length;
+    
+        return (
       <div className="card">
         <div className="task-card-header">
           <h4 className="task-card-title">{task.taskName}</h4>
@@ -71,15 +72,47 @@ const UserTasks = ({ userId, onStartChat }) => {
           <div><strong>Helpers:</strong> {task.curHelpers || 0} / {task.helpersReq}</div>
         </div>
         <div className="task-card-actions">
-        {task.status === 'in-progress' && (
-          <button
-            onClick={() => onStartChat(task._id)}
-            className="chat-button"
+  {task.status === 'in-progress' && (
+    <button
+      onClick={() => onStartChat(task._id)}
+      className="chat-button"
+    >
+      Open Chat
+    </button>
+  )}
+
+  {task.status === 'completed' && (
+    <>
+      {/* First, we list all the "See Review" buttons for reviews that are done */}
+      {reviewableParticipants
+        .filter(p => task.reviewsSubmittedByMe?.includes(p._id))
+        .map(p => (
+          <button 
+            key={p._id} 
+            className="btn glossy ghost tiny" 
+            onClick={() => onSeeReview(task, p)}
+            disabled={loading} // <-- THIS IS THE FIX: Disable button while loading
           >
-            Open Chat
+            {/* Show a loading indicator on the button text */}
+            {loading ? '...' : `See Review for ${p.fullName}`} 
           </button>
-        )}
-      </div>
+        ))
+      }
+
+      {/* Second, we check if there are ANY unreviewed participants */}
+      {reviewableParticipants.some(p => !task.reviewsSubmittedByMe?.includes(p._id)) && (
+        // If there are, we show ONE "Leave Review" button
+        <button 
+          className="btn glossy primary tiny" 
+          onClick={() => onLeaveReview(task)}
+          disabled={loading} // <-- ALSO DISABLE THIS BUTTON while loading
+        >
+          {loading ? '...' : 'Leave a Review'}
+        </button>
+      )}
+    </>
+  )}
+</div>
       </div>
     );
   };

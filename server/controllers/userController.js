@@ -2,6 +2,7 @@ import Task from '../models/taskModel.js';
 import User from '../models/userModel.js';
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import Review from '../models/reviewModel.js';
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -70,6 +71,7 @@ export const getUserById = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
+    console.error("THE REAL ERROR in getUserById is:", error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 }
@@ -183,11 +185,66 @@ export const deleteUser = async (req, res) => {
 export const getUserTasks = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const created = await Task.find({ postedBy: userId }).sort({ createdAt: -1 });
-    const helping = await Task.find({ "helpersArray.user": userId }).sort({ createdAt: -1 });
-    res.status(200).json({ created, helping });
+
+    // --- THIS IS THE FINAL FIX ---
+    // The key is to select the fields the virtual property depends on.
+
+    // Find tasks created by the user
+    let created = await Task.find({ postedBy: userId })
+      .populate('postedBy', 'firstName lastName _id') // Select the fields the virtual depends on
+      .populate({ 
+          path: 'helpersArray.user', 
+          model: 'User', 
+          select: 'firstName lastName _id' 
+      })
+      .sort({ createdAt: -1 });
+
+    let helping = await Task.find({ 'helpersArray.user': userId })
+      .populate('postedBy', 'firstName lastName _id')
+      .populate({ 
+          path: 'helpersArray.user', 
+          model: 'User', 
+          select: 'firstName lastName _id' 
+      })
+      .sort({ createdAt: -1 });
+
+    // --- The review logic below is correct and can remain as is ---
+    const allTasks = [...created, ...helping];
+    const taskIds = allTasks.map(t => t._id);
+
+    const reviewsSubmitted = await Review.find({ task: { $in: taskIds }, reviewer: userId });
+    const reviewMap = reviewsSubmitted.reduce((acc, review) => {
+      const taskIdStr = review.task.toString();
+      if (!acc[taskIdStr]) acc[taskIdStr] = [];
+      acc[taskIdStr].push(review.reviewee.toString());
+      return acc;
+    }, {});
+
+    const finalCreated = created.map(task => {
+      const taskObject = task.toJSON();
+      return {
+        ...taskObject,
+        reviewsSubmittedByMe: reviewMap[taskObject._id.toString()] || []
+      };
+    });
+
+    const finalHelping = helping.map(task => {
+      const taskObject = task.toJSON();
+      return {
+        ...taskObject,
+        reviewsSubmittedByMe: reviewMap[taskObject._id.toString()] || []
+      };
+    });
+
+    console.log(
+      "FINAL DATA BEING SENT FROM SERVER:", 
+      JSON.stringify({ created: finalCreated, helping: finalHelping }, null, 2)
+    );
+
+    res.status(200).json({ created: finalCreated, helping: finalHelping });
+     
   } catch (error) {
-    console.error("Error in getUserTasks:", error);
+    console.error("Error fetching user tasks:", error);
     res.status(500).json({ message: 'Error fetching user tasks', error: error.message });
   }
 };

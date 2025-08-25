@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import ChatBox from '../components/ChatBox';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from "react-router-dom";
@@ -6,6 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import ProfileHeader from '../components/ProfileHeader';
 import ActivityStats from '../components/ActivityStats';
 import UserTasks from '../components/UserTasks';
+import LeaveReviewModal from '../components/LeaveReviewModal';
+import SeeReviewModal from '../components/SeeReviewModal';
 
 
 function ProfilePage() {
@@ -15,10 +18,12 @@ function ProfilePage() {
   const [profilePicture, setProfilePicture] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [activeChatTaskId, setActiveChatTaskId] = useState(null);
+  const [reviewTask, setReviewTask] = useState(null);
+  const [viewingReview, setViewingReview] = useState(null);
+  const { register, handleSubmit, reset } = useForm();
+  const [refetchTrigger, setRefetchTrigger] = useState(0);
 
   
-  const { register, handleSubmit, reset } = useForm();
-
   useEffect(() => {
   if (loading || !user) return;
 
@@ -39,6 +44,18 @@ function ProfilePage() {
   });
 }, [user, loading, reset]);
 
+  const handleReviewSubmitted = (reviewedUsers) => { // Now expects an array
+    // Check if the reviewedUsers is an array and not empty
+    if (Array.isArray(reviewedUsers) && reviewedUsers.length > 0) {
+        alert(`Your reviews for ${reviewedUsers.map(u => u.fullName).join(', ')} have been submitted successfully!`);
+    } else if (reviewedUsers && reviewedUsers.fullName) {
+        // Handle the single review case
+        alert(`Your review for ${reviewedUsers.fullName} has been submitted successfully!`);
+    }
+
+    // Trigger the refetch in UserTasks.js
+    setRefetchTrigger(prev => prev + 1); 
+};
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -46,6 +63,10 @@ function ProfilePage() {
       setProfilePicture(file);
       setPreviewUrl(URL.createObjectURL(file));
     }
+  };
+
+  const handleSeeReviewClick = async (task) => {
+    setViewingReview({ taskId: task._id });
   };
 
   const handleSubmitForm = async (formData) => {
@@ -134,7 +155,8 @@ function ProfilePage() {
   }
 
   return (
-    <div style={{ position: "relative", minHeight: "100vh" }}>
+    <>
+      <div style={{ position: "relative", minHeight: "100vh" }}>
     <div className="backdrop">
       <div className="blob b1" />
       <div className="blob b2" />
@@ -348,13 +370,18 @@ function ProfilePage() {
               <ActivityStats user={user} />
               
               {/* My Tasks History Card */}
-              <UserTasks userId={user?._id} onStartChat={setActiveChatTaskId} />
+              <UserTasks 
+                userId={user?._id} 
+                onStartChat={setActiveChatTaskId} 
+                onLeaveReview={setReviewTask}
+                onSeeReview={handleSeeReviewClick}
+                refetchTrigger={refetchTrigger}
+              />
               {activeChatTaskId && (
                 <div className="chat-overlay">
                   <ChatBox taskId={activeChatTaskId} onClose={() => setActiveChatTaskId(null)} />
                 </div>
               )}
-
 
             </div>
             {/* Summary Card (Right Column) */}
@@ -407,9 +434,25 @@ function ProfilePage() {
             </div>
           </div>
         </div>
+      )}    
+    </div>
+    </div>
+
+      {/* LeaveReviewModal */}
+      {reviewTask && (
+        <LeaveReviewModal
+          task={reviewTask}
+          onClose={() => setReviewTask(null)}
+          onReviewSubmitted={handleReviewSubmitted}
+        />
       )}
-    </div>
-    </div>
+      {viewingReview && (
+        <SeeReviewModal 
+          task={reviewTask /* Pass the original task object */ || { _id: viewingReview.taskId, taskName: 'Loading...' }} 
+          onClose={() => setViewingReview(null)} 
+        />
+      )}
+    </>
   );
 }
 

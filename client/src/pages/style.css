@@ -1903,3 +1903,145 @@ body {
   transform: scale(1.1);
   cursor: pointer;
 }
+
+.review-target-text {
+  background-color: var(--bg);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  color: var(--text);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.user-selection-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rating-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: var(--panel-2);
+  border-radius: 8px;
+}
+
+.rating-group label {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.star-rating {
+  display: flex;
+  /* flex-direction: row-reverse;  <-- REMOVE THIS LINE */
+  font-size: 2rem;
+  color: #d1d5db; /* Grey for unselected stars */
+}
+
+.star-rating .star {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+/* --- THIS IS THE NEW HOVER LOGIC --- */
+/* When you hover over the container, it styles the stars */
+.star-rating:hover .star {
+  color: var(--warn); /* Light up all stars on hover */
+}
+/* This "un-lights" the stars that come AFTER the one you're currently hovering */
+.star-rating .star:hover ~ .star {
+  color: #d1d5db;
+}
+/* ------------------------------------ */
+
+.star-rating .star.selected {
+  color: var(--warn);
+}
+
+.star-rating.read-only {
+  pointer-events: none;
+}
+
+.review-comment-display {
+  background-color: var(--panel-2);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  white-space: pre-wrap; /* Preserves line breaks */
+  color: var(--text);
+}
+
+.task-card-actions {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  align-items: flex-end; /* Align to the right */
+  gap: 0.5rem;
+}
+
+.review-form-section {
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background-color: var(--panel);
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.review-display-card { /* Reusing 'card' but adding specific styles */
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.review-display-card .card-title {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh; /* Prevents the modal from being taller than the screen */
+  height: 800px; /* Or a fixed height you prefer */
+}
+
+/* 2. Target the form itself to be the flex container */
+.modalContent form {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allow the form to fill the space */
+  min-height: 0; /* Important for flexbox scrolling */
+}
+
+/* 3. This new class will wrap the list of review forms */
+.review-forms-container {
+  flex-grow: 1; /* This is the key: it makes this area grow and shrink */
+  overflow-y: auto; /* This adds the scrollbar ONLY when the content overflows */
+  padding: 0.25rem;
+  margin-bottom: 1rem; /* Space before the action buttons */
+}
+
+/* 4. Ensure the action buttons stay at the bottom */
+.modal-actions {
+  flex-shrink: 0; /* Prevents the button area from shrinking */
+}
+
+/* 2. This new class will wrap the list of user buttons */
+.scrollable-user-list {
+  flex-shrink: 1; /* Allows this container to shrink if needed */
+  overflow-y: auto; /* ADDS THE VERTICAL SCROLLBAR only when the list is too long */
+  padding: 0.5rem; /* A little space inside the scrollable area */
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--bg);
+}
