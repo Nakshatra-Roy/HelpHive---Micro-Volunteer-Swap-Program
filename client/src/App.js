@@ -19,6 +19,7 @@ import ViewTasks from "./pages/ViewTasks";
 import ViewOffers from "./pages/ViewOffers";
 import MyTasks from './pages/MyTasks'; 
 import SwapRequests from './pages/SwapRequests'; 
+import CalendarView from './pages/CalendarView';
 
 function AppContent() {
   return (
@@ -48,6 +49,7 @@ function AppContent() {
             </div>
           } 
         />
+        <Route path="/calendarview" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><CalendarView /></div>} />
         
         
         {/* Admin Routes */}

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useTaskStore } from "../store/taskStore";
 import { useAuth } from "../context/AuthContext";
 import SwapModal from "../components/SwapModal";
+import { Link } from "react-router-dom";
 
 const MyTasks = () => {
   const { tasks, fetchTask, completeTask, requestTaskSwap, initiateHelperSwap } = useTaskStore();
@@ -79,7 +80,12 @@ const MyTasks = () => {
     <>
       {/* --- POSTED TASKS --- */}
       <div className="card glass">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ marginBottom: 16 }}>My Posted Tasks</h2>
+        <Link to="/calendarview" className="btn glossy primary">
+            Calendar View
+          </Link>
+        </div>
         <div className="table">
           <div className="row headed">
             <div>Task Name</div>
