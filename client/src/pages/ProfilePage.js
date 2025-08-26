@@ -421,7 +421,12 @@ function ProfilePage() {
                     <div className="stat-icon rating-icon">⭐</div>
                     <div className="stat-details">
                       <div className="stat-label">Average Rating</div>
-                      <div className="stat-value">{user?.ratingSummary?.average || 0}/5 ({user?.ratingSummary?.count || 0})</div>
+                          
+                      <div className="stat-value">
+                        {(user?.ratingSummary?.average || 0).toFixed(2)}/5 ({user?.ratingSummary?.count || 0})
+                      </div>
+
+  
                     </div>
                   </div>
                 </div>

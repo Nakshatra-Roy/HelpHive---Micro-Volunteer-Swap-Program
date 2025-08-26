@@ -71,13 +71,16 @@ function ProfileHeader({ user, isEditing, setIsEditing, previewUrl, handleFileCh
               </div>
             </div>
           </div>
-          {!isEditing && (
-            <button 
-              className="btn glossy primary" 
-              onClick={() => setIsEditing(true)}
-            >
-              Edit Profile
-            </button>
+          {/* This button will now only render if the setIsEditing function exists */}
+          {typeof setIsEditing === 'function' && (
+            !isEditing && (
+              <button 
+                className="btn glossy primary" 
+                onClick={() => setIsEditing(true)}
+              >
+                Edit Profile
+              </button>
+            )
           )}
         </div>
         <p className="profile-email">{user?.email}</p>

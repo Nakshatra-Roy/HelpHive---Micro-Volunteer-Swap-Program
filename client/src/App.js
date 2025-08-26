@@ -8,6 +8,7 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProfilePage from "./pages/ProfilePage";
+import PublicProfilePage from './pages/PublicProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminRoute from './components/AdminRoute';
 import ChatPage from './pages/ChatPage';
@@ -51,6 +52,7 @@ function AppContent() {
           } 
         />
         <Route path="/calendarview" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><CalendarView /></div>} />
+        <Route path="/users/:id" element={<PublicProfilePage />} />
         
         
         {/* Admin Routes */}

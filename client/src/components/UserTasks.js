@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const UserTasks = ({ userId, onStartChat, onLeaveReview, onSeeReview, refetchTrigger}) => {
   const [tasksCreated, setTasksCreated] = useState([]);
@@ -61,7 +62,7 @@ const UserTasks = ({ userId, onStartChat, onLeaveReview, onSeeReview, refetchTri
             {task.status || 'Unknown'}
           </span>
         </div>
-        {showPostedBy && <span className="task-status status-open">by {posterName}</span>}
+        {showPostedBy && <span className="task-status status-open">by <Link to={`/users/${task.postedBy?._id}`} className="user-link">{posterName}</Link></span>}
         <p></p>
         <p className="task-card-description">{task.taskDescription}</p>
         <div className="task-card-details">

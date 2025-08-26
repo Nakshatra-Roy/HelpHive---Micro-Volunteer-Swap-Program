@@ -20,7 +20,7 @@ const ActivityStats = ({ user }) => {
           <div className="stat-label">Tasks Posted</div>
         </div>
         <div className="stat-card">
-          <div className="stat-value">{averageRating > 0 ? averageRating : '—'}</div>
+          <div className="stat-value">{averageRating > 0 ? averageRating.toFixed(2) : '—'}</div>
           <div className="stat-label">Rating ({ratingCount})</div>
         </div>
         <div className="stat-card">

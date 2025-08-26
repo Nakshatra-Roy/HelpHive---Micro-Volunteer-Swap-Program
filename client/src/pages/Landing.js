@@ -188,7 +188,7 @@ const Landing = () => {
                     <span>{h?.fullName || "Loading…"}</span>
                   </div>
                   <div>{h?.volunteerHistory?.length ?? "—"}</div>
-                  <div>{h?.ratingSummary.average ?? "—"}</div>
+                  <div>{(h?.ratingSummary?.average || 0).toFixed(2)}</div>
                 </div>
               )
             )}
