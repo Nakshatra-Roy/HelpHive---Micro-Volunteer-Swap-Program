@@ -2136,6 +2136,8 @@ body {
 .logbook-row td:first-child {
   font-weight: 600;
   color: var(--accent);
+}
+
 .user-link {
   color: var(--accent); /* Uses your theme's accent color */
   font-weight: 600;
