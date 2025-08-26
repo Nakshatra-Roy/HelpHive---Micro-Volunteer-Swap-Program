@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import axios from "axios";
+import { Link } from 'react-router-dom';
 
 const TaskTable = ({
   tasks = [],
@@ -61,23 +62,26 @@ const TaskTable = ({
             const isFull = !loading && cur >= req;
             const isBusy = !loading && t?._id ? busyIds.has(t._id) : false;
 
-            const posterName = userMap[t?.postedBy] || "Loading...";
 
             return (
               <div
                 className="row"
                 key={id}
                 style={{ position: "relative" }}
-                onMouseEnter={async () => {
-                  setHoveredTaskId(t._id);
-                  if (!userMap[t?.postedBy]) {
-                    await getPostedByName(t.postedBy);
-                  }
-                }}
+                onMouseEnter={() => setHoveredTaskId(t._id)}
                 onMouseLeave={() => setHoveredTaskId(null)}
               >
                 <div>{i + 1}</div>
-                <div>{t?.taskName || "—"}</div>
+                 <div>
+                  {loading ? (
+                    <span>—</span>
+                  ) : (
+                    // We wrap the task name in a Link to the user's public profile
+                    <Link to={`/users/${t.postedBy?._id}`} className="user-link">
+                      {t?.taskName || "—"}
+                    </Link>
+                  )}
+                </div>
                 <div>{t?.category || "—"}</div>
                 <div>{t?.location || "—"}</div>
                 <div>{t?.helpersReq ?? "—"}</div>
@@ -131,7 +135,7 @@ const TaskTable = ({
                 {hoveredTaskId === t._id && (
                   <div className="task-hover-info">
                     <p>
-                      <strong>Posted by:</strong> {posterName}
+                      <strong>Posted by:</strong> {t.postedBy?.fullName || "Unknown"}
                     </p>
                     <p>
                       <strong>Description:</strong>{" "}

@@ -248,3 +248,78 @@ export const getUserTasks = async (req, res) => {
     res.status(500).json({ message: 'Error fetching user tasks', error: error.message });
   }
 };
+
+
+export const getUserTrustScore = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // --- 1. GATHER ALL RAW DATA ---
+    
+    // Get all reviews where this user was the one being reviewed
+    const reviewsReceived = await Review.find({ reviewee: userId }).sort({ createdAt: 'desc' });
+
+    // Get all tasks where this user was a helper
+    const tasksAsHelper = await Task.find({ 'helpersArray.user': userId });
+
+    // --- 2. CALCULATE THE COMPONENTS OF THE TRUST SCORE ---
+
+    // a) Task Completion Rate
+    const completedTasksCount = tasksAsHelper.filter(t => t.status === 'completed').length;
+    const totalTasksCount = tasksAsHelper.length;
+    const completionRate = totalTasksCount > 0 ? (completedTasksCount / totalTasksCount) : 1; // Default to 100% if no tasks
+
+    // b) Rating Analysis (Weighted by Recency)
+    let totalWeightedScore = 0;
+    let totalWeight = 0;
+    const allRatingValues = [];
+    const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+    for (const review of reviewsReceived) {
+      const avgRating = (review.ratings.punctuality + review.ratings.friendliness + review.ratings.quality) / 3;
+      const roundedRating = Math.round(avgRating);
+      if (ratingDistribution[roundedRating] !== undefined) {
+        ratingDistribution[roundedRating]++;
+      }
+      allRatingValues.push(avgRating);
+
+      // Recency Weighting Logic
+      const daysOld = (new Date() - new Date(review.createdAt)) / (1000 * 60 * 60 * 24);
+      let weight = 1.0;
+      if (daysOld <= 30) weight = 1.5; // Reviews in the last month are 50% more important
+      else if (daysOld <= 90) weight = 1.2; // Reviews in the last 3 months are 20% more important
+
+      totalWeightedScore += avgRating * weight;
+      totalWeight += weight;
+    }
+
+    const weightedAverageRating = totalWeight > 0 ? (totalWeightedScore / totalWeight) : 0;
+
+    // --- 3. CALCULATE THE FINAL TRUST SCORE (out of 100) ---
+    // This is a sample algorithm. You can adjust the weights!
+    // 50% from Rating, 40% from Completion Rate, 10% from Volume
+    const scoreFromRating = (weightedAverageRating / 5) * 50; // Max 50 points
+    const scoreFromCompletion = completionRate * 40; // Max 40 points
+    const scoreFromVolume = Math.min(10, Math.log10(totalTasksCount + 1) * 10); // Max 10 points, logarithmic scale
+
+    const finalTrustScore = Math.round(scoreFromRating + scoreFromCompletion + scoreFromVolume);
+
+    // --- 4. PREPARE DATA FOR FRONTEND GRAPHS ---
+    const responseData = {
+      trustScore: finalTrustScore,
+      totalReviews: reviewsReceived.length,
+      completionRate: completionRate,
+      ratingDistribution: ratingDistribution, // For a bar chart
+      ratingHistory: reviewsReceived.map(r => ({ // For a line chart
+        date: r.createdAt,
+        rating: (r.ratings.punctuality + r.ratings.friendliness + r.ratings.quality) / 3
+      })).reverse() // Show oldest to newest
+    };
+
+    res.status(200).json({ success: true, data: responseData });
+
+  } catch (error) {
+    console.error("Error calculating trust score:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};

@@ -6,6 +6,7 @@ import { useParams, useNavigate } from "react-router-dom"; // Also includes useN
 import { useAuth } from '../context/AuthContext';
 import ProfileHeader from '../components/ProfileHeader';
 import ActivityStats from '../components/ActivityStats';
+import TrustDashboard from '../components/TrustDashboard';
 import UserTasks from '../components/UserTasks';
 import LeaveReviewModal from '../components/LeaveReviewModal';
 import SeeReviewModal from '../components/SeeReviewModal';
@@ -79,6 +80,8 @@ if (!profileUser) {
         <div className="profile-view-mode">
           <div className="profile-content-grid">
             <div className="profile-main-content">
+
+                <TrustDashboard userId={profileUser._id} />
                 
               {/* About Me Card */}
               <div className="card">
@@ -154,7 +157,9 @@ if (!profileUser) {
                     <div className="stat-icon rating-icon">⭐</div>
                     <div className="stat-details">
                       <div className="stat-label">Average Rating</div>
-                      <div className="stat-value">{profileUser?.ratingSummary?.average || 0}/5 ({profileUser?.ratingSummary?.count || 0})</div>
+                      <div className="stat-value">
+                        {(profileUser?.ratingSummary?.average || 0).toFixed(2)}/5 ({profileUser?.ratingSummary?.count || 0})
+                        </div>
                     </div>
                   </div>
                 </div>

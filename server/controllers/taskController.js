@@ -8,7 +8,9 @@ import SwapRequest from '../models/swapRequestModel.js';
 
 export const getTasks = async (req, res) => {
 	try {
-		const tasks = await Task.find({});
+		const tasks = await Task.find({})
+			.populate('postedBy', 'firstName lastName fullName _id') // This adds the user's details
+			.sort({ createdAt: -1 }); // It's also good practice to sort the tasks
 		res.status(200).json({ success: true, data: tasks });
 	} catch (error) {
 		console.log("Error in fetching tasks:", error.message);

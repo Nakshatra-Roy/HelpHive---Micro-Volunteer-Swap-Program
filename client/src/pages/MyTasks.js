@@ -69,7 +69,7 @@ const MyTasks = () => {
     }
   };
 
-  const myPostedTasks = tasks.filter((task) => task.postedBy === user?._id);
+  const myPostedTasks = tasks.filter((task) => task.postedBy?._id === user?._id);
   const myHelperTasks = tasks.filter((task) =>
     task.helpersArray?.some(
       (helper) => helper.user === user?._id || helper.user?._id === user?._id
