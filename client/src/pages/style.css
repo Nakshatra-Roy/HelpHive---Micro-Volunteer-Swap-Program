@@ -2045,3 +2045,95 @@ body {
   border-radius: 8px;
   background-color: var(--bg);
 }
+
+/* ==================== Admin Logbook ==================== */
+.admin-logbook-container {
+  padding: 2rem;
+  background: var(--glass-bg);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+  overflow-x: auto;
+}
+
+.logbook-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: var(--primary);
+}
+
+.logbook-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+}
+
+.logbook-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: var(--card-bg);
+}
+
+.logbook-table th,
+.logbook-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logbook-table th {
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.logbook-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.2s;
+}
+
+.log-action {
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+/* Different action types with colors */
+.log-action.flagged {
+  background: #facc15;
+  color: #111;
+}
+
+.log-action.activated {
+  background: #22c55e;
+  color: white;
+}
+
+.log-action.deactivated {
+  background: #ef4444;
+  color: white;
+}
+
+.log-action.role {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Skeleton for logbook loading */
+.logbook-skeleton {
+  width: 100%;
+  height: 300px;
+  border-radius: 1rem;
+}
+
+/* Completed task badge */
+.logbook-row td:first-child {
+  font-weight: 600;
+  color: var(--accent);
+}

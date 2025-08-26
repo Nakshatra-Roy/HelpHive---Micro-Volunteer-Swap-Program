@@ -13,6 +13,7 @@ import AdminRoute from './components/AdminRoute';
 import ChatPage from './pages/ChatPage';
 
 import AdminUsers from "./pages/AdminUsers";
+import AdminLogbook from "./pages/AdminLogbook";
 import CreateOffer from "./pages/CreateOffer";
 import CreateTask from "./pages/CreateTask";
 import ViewTasks from "./pages/ViewTasks";
@@ -55,6 +56,7 @@ function AppContent() {
         {/* Admin Routes */}
         <Route path="/admin/dashboard" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><AdminRoute><AdminDashboard /></AdminRoute></div>} />
         <Route path="/admin/users" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><AdminRoute><AdminUsers /></AdminRoute></div>} />
+        <Route path="/admin/logbook" element={<div className="container" style={{ padding: "1rem", position: "relative", zIndex: 1 }}><AdminRoute><AdminLogbook /></AdminRoute></div>} />
       </Routes>
     </>
   );

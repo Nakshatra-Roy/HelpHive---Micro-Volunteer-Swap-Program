@@ -506,3 +506,16 @@ export const helperSwap = async (req, res) => {
     res.status(500).json({ success: false, message: error.message || 'Server Error' });
   }
 };
+// controllers/taskController.js
+export const getCompletedTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find({ status: "completed" })
+      .populate("postedBy", "firstName lastName fullName")
+      .populate("helpersArray.user", "firstName lastName fullName"); // populate helpers too
+
+    res.json(tasks);
+  } catch (err) {
+    console.error("Error fetching completed tasks:", err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
