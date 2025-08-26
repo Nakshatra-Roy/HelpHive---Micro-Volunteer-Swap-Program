@@ -65,9 +65,21 @@ function ProfilePage() {
     }
   };
 
-  const handleSeeReviewClick = async (task) => {
-    setViewingReview({ taskId: task._id });
-  };
+  const handleSeeReviewClick = async (task, reviewee) => {
+  try {
+    const token = localStorage.getItem('token');
+    // This now correctly uses BOTH the task and the reviewee to find the specific review
+    const response = await axios.get(
+      `/api/reviews/task/${task._id}/for/${reviewee._id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    // This sets the FULL review object into state
+    setViewingReview(response.data.data);
+  } catch (error) {
+    console.error("Error fetching review:", error);
+    alert('Could not load the review.');
+  }
+};
 
   const handleSubmitForm = async (formData) => {
     const contactInfo = {
@@ -447,11 +459,11 @@ function ProfilePage() {
         />
       )}
       {viewingReview && (
-        <SeeReviewModal 
-          task={reviewTask /* Pass the original task object */ || { _id: viewingReview.taskId, taskName: 'Loading...' }} 
-          onClose={() => setViewingReview(null)} 
-        />
-      )}
+      <SeeReviewModal 
+        review={viewingReview} // Pass the 'viewingReview' state as the 'review' prop
+        onClose={() => setViewingReview(null)} 
+      />
+    )}
     </>
   );
 }
