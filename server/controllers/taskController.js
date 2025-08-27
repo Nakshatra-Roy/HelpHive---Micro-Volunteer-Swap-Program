@@ -367,7 +367,10 @@ export const createSwapRequest = async (req, res) => {
     if (!taskToReceive) {
       return res.status(404).json({ message: 'Task to receive not found.' });
     }
-    
+    if (taskToReceive.curHelpers == taskToReceive.helpersReq){
+      return res.status(400).json({ message: 'The task you want to receive is already full.' });
+    }
+
     const swapRequest = new SwapRequest({
       requester: requesterId,
       recipient: taskToReceive.postedBy,
