@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toast, { Toaster } from 'react-hot-toast';
 
 const CreateOffer = () => {
   const [form, setForm] = useState({
@@ -13,14 +14,7 @@ const CreateOffer = () => {
     contactInfo: "",
   });
 
-  const [notice, setNotice] = useState(null); // { type: 'success' | 'warning' | 'error', message }
   const [loading, setLoading] = useState(false);
-
-  const show = (type, message) => {
-    setNotice({ type, message });
-    setTimeout(() => setNotice(null), 3000);
-  };
-
   const onChange = (key, value) => setForm((p) => ({ ...p, [key]: value }));
 
   const handleSubmit = async (e) => {
@@ -35,7 +29,7 @@ const CreateOffer = () => {
     ];
     const missing = required.filter(([, v]) => !String(v || "").trim()).map(([k]) => k);
     if (missing.length) {
-      show("warning", `Please fill: ${missing.join(", ")}`);
+      toast.error(`Please fill: ${missing.join(", ")}`);
       return;
     }
 
@@ -64,7 +58,7 @@ const CreateOffer = () => {
         throw new Error(data?.message || "Failed to create offer");
       }
 
-      show("success", data?.message || "Offer created successfully");
+      toast.success(data?.message || "Offer created successfully");
       setForm({
         offerTitle: "",
         offerDescription: "",
@@ -77,20 +71,12 @@ const CreateOffer = () => {
         contactInfo: "",
       });
     } catch (err) {
-      show("error", err.message || "Network error");
+      toast.error(err.message || "Network error");
     } finally {
       setLoading(false);
     }
   };
 
-  const pillClass =
-    notice?.type === "success"
-      ? "pill easy"
-      : notice?.type === "warning"
-      ? "pill medium"
-      : notice?.type === "error"
-      ? "pill hard"
-      : "pill";
 
   return (
     <>
@@ -105,12 +91,6 @@ const CreateOffer = () => {
           <div className="section-head">
             <h2>Create New Offer</h2>
           </div>
-
-          {notice && (
-            <div className={pillClass} role="status" aria-live="polite" style={{ marginBottom: 14, display: "inline-block" }}>
-              {notice.message}
-            </div>
-          )}
 
           <div className="card glass">
             <form onSubmit={handleSubmit} className="offer-form">
@@ -230,19 +210,18 @@ const CreateOffer = () => {
                   <button
                     type="button"
                     className="btn glossy ghost"
-                    onClick={() =>
+                    onClick={() => {
                       setForm({
                         offerTitle: "",
-                        offerDescription: "",
-                        offerDuration: "",
-                        offerCategory: "",
+                        offerDescription: "", 
                         availability: "",
                         location: "",
                         helpersRequired: 1,
                         skillsRequiredInput: "",
                         contactInfo: "",
-                      })
-                    }
+                      });
+                      toast.success("Form has been reset!");
+                    }}
                   >
                     Reset
                   </button>
@@ -250,6 +229,10 @@ const CreateOffer = () => {
               </div>
             </form>
           </div>
+          <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+          />
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 // src/pages/SwapRequests.js
 import React, { useEffect, useState } from "react";
 import { useTaskStore } from "../store/taskStore";
+import toast, { Toaster } from 'react-hot-toast';
 
 const SwapRequests = () => {
   const { swapRequests, fetchSwapRequests, respondToSwapRequest } = useTaskStore();
@@ -61,6 +62,10 @@ const SwapRequests = () => {
           </div>
         ))}
       </div>
+      <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+          />
     </div>
   );
 };

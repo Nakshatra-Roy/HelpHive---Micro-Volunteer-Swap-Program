@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useTaskStore } from "../store/taskStore";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-
-// Import everything for the calendar
+import { useNavigate, Link } from "react-router-dom";
 import { Calendar, dateFnsLocalizer, Views } from "react-big-calendar";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import toast, { Toaster } from 'react-hot-toast';
 
 const locales = { "en-US": require("date-fns/locale/en-US") }; 
 // mm.dd.yyyy
@@ -101,7 +100,10 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="p-4">
+    <div className="card glass">
+      <Link to="/mytasks" className="btn glossy primary" style={{ marginBottom: 24 }}>
+            ← My Tasks
+          </Link>
       <h2 className="text-xl font-bold mb-4">My Task Calendar</h2>
       <Calendar
         localizer={localizer}
@@ -115,7 +117,12 @@ export default function CalendarPage() {
         defaultView={Views.MONTH}
          onNavigate={(newDate) => console.log("Navigated to:", newDate)}
       />
+      <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+          />
     </div>
+    
     // events: myTasks
     // eventStyleGetter: for color coding
   );

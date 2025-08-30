@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import toast, { Toaster } from 'react-hot-toast';
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -8,9 +9,9 @@ function Login() {
   const navigate = useNavigate();
   const { login, user, error } = useAuth();
   
-  // This hook now correctly handles navigation after a successful login
   useEffect(() => {
     if (user) {
+      toast.success("Successfully logged in!");
       if (user.role === 'admin') {
         navigate('/admin/dashboard');
       } else {
@@ -79,6 +80,10 @@ return (
         </div>
       </div>
     </div>
+    <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+      />
   </div>
 );
 };

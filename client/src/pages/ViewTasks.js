@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import TaskFilters from "../components/TaskFilters";
 import TaskTable from "../components/TaskTable";
 import TaskTableAdmin from "../components/TaskTableAdmin";
+import toast, { Toaster } from 'react-hot-toast';
 
 const ViewTasks = () => {
   const { tasks, loading, fetchTask, acceptTask } = useTaskStore();
@@ -18,8 +19,8 @@ const ViewTasks = () => {
   });
   const [acceptPending, setAcceptPending] = useState(new Set());
   const [showSuggested, setShowSuggested] = useState(false);
-  const [matchSkill, setMatchSkill] = useState(true);     // NEW
-  const [matchLocation, setMatchLocation] = useState(true); // NEW
+  const [matchSkill, setMatchSkill] = useState(true);  
+  const [matchLocation, setMatchLocation] = useState(false); 
   const isLoggedInAdmin = user && user.role === "admin";
   const isLoggedIn = user && (user.role === "user" || user.role === "volunteer");
 
@@ -52,23 +53,23 @@ const ViewTasks = () => {
   }, [tasks, filters]);
 
   const suggestedTasks = useMemo(() => {
-	if (!user) return [];
-	const userSkills = (user.skills || []).map((s) => s.toLowerCase());
-	const userLocation = (user.location || "").toLowerCase();
+    if (!user) return [];
+    const userSkills = (user.skills || []).map((s) => s.toLowerCase());
+    const userLocation = (user.location || "").toLowerCase();
 
-	return (tasks || []).filter((t) => {
-		const categoryMatch = matchSkill
-		? userSkills.includes((t.category || "").toLowerCase())
-		: false;
-		const locationMatch = matchLocation
-		? (t.location || "").toLowerCase() === userLocation
-		: false;
+    return (tasks || []).filter((t) => {
+      const categoryMatch = matchSkill
+      ? userSkills.includes((t.category || "").toLowerCase())
+      : false;
+      const locationMatch = matchLocation
+      ? (t.location || "").toLowerCase() === userLocation
+      : false;
 
-		if (!matchSkill && !matchLocation) return false;
-		if (matchSkill && matchLocation) return categoryMatch && locationMatch;
-		return categoryMatch || locationMatch;
-	});
-	}, [tasks, user, matchSkill, matchLocation]);
+      if (!matchSkill && !matchLocation) return false;
+      if (matchSkill && matchLocation) return categoryMatch && locationMatch;
+      return categoryMatch || locationMatch;
+    });
+    }, [tasks, user, matchSkill, matchLocation]);
 
 	const filteredSuggestedTasks = useMemo(() => {
 	const s = filters.search.trim().toLowerCase();
@@ -86,17 +87,17 @@ const ViewTasks = () => {
     const cur = task.curHelpers || 0;
     const req = task.helpersReq || 0;
     if (cur >= req) {
-      alert("This task is already full.");
+      toast.error("This task is already full.");
       return;
     }
 
     setAcceptPending((prev) => new Set(prev).add(task._id));
     try {
       const { success, message } = await acceptTask(task, user._id);
-      if (!success) alert(`Error: ${message}`);
-      else alert("Task accepted successfully!");
+      if (!success) toast.error(`Error: ${message}`);
+      else toast.success("Task accepted successfully!");
     } catch {
-      alert("Error accepting task");
+      toast.error("Error accepting task");
     } finally {
       setAcceptPending((prev) => {
         const s = new Set(prev);
@@ -122,7 +123,11 @@ const ViewTasks = () => {
           {!isLoggedInAdmin && isLoggedIn && (
             <button
               className="btn glossy primary ai"
-              onClick={() => setShowSuggested((prev) => !prev)}
+              onClick={() =>  {
+                const next = !showSuggested;
+                setShowSuggested(next);
+                toast.success(next ? "Showing tasks that match your skills!" : "Showing all tasks.");
+              }}
             >
               <span className="ai-icon">✨</span>
               {showSuggested ? "Show All Tasks" : "Suggest Tasks"}
@@ -184,6 +189,10 @@ const ViewTasks = () => {
             </p>
           )}
       </div>
+      <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+          />
     </section>
   );
 };

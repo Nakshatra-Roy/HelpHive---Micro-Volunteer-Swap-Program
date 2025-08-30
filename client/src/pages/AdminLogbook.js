@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+  import toast, { Toaster } from 'react-hot-toast';
 
 const AdminLogbook = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
-  // Create placeholder rows like in TaskTable
   const placeholders = useMemo(
     () => Array.from({ length: 8 }, (_, i) => ({ _id: `placeholder-${i}` })),
     []
@@ -67,7 +67,7 @@ const AdminLogbook = () => {
               {loading
                 ? "—"
                 : t.helpersArray?.length > 0
-                ? t.helpersArray.map((h) => h.user?.firstName).join(", ")
+                ? t.helpersArray.map((h) => h.user?.fullName).join(", ")
                 : "No Helpers"}
             </div>
             <div className="credits-cell">{loading ? "—" : t.credits ?? "—"}</div>
@@ -102,6 +102,10 @@ const AdminLogbook = () => {
           </div>
         )}
       </div>
+      <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+          />
 
       <style>{`
         .table {

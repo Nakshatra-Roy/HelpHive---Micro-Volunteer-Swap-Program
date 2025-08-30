@@ -1,10 +1,5 @@
-// client/src/components/SeeReviewModal.js
-
 import React from 'react';
-// No more need for useState, useEffect, axios, or useAuth
 
-// This is a "dumb" component. It only displays data.
-// A reusable Star Display component (read-only)
 const StarDisplay = ({ rating }) => (
   <div className="star-rating read-only">
     {[...Array(5)].map((_, index) => (
@@ -14,15 +9,13 @@ const StarDisplay = ({ rating }) => (
 );
 
 const SeeReviewModal = ({ review, onClose }) => {
-  // If there's no review object, don't render anything.
   if (!review) {
     return null;
   }
 
   return (
     <div className="modalBackdrop" onClick={onClose}>
-      <div className="modalContent card" onClick={(e) => e.stopPropagation()}>
-        {/* The title now correctly uses the reviewee's name from the prop */}
+      <div className="card glass" onClick={(e) => e.stopPropagation()}>
         <h2 className="section-title">Your Review for {review.reviewee.fullName}</h2>
         
         <div className="rating-group">

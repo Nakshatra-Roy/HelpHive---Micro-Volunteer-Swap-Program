@@ -9,6 +9,7 @@ import ActivityStats from '../components/ActivityStats';
 import UserTasks from '../components/UserTasks';
 import LeaveReviewModal from '../components/LeaveReviewModal';
 import SeeReviewModal from '../components/SeeReviewModal';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 function ProfilePage() {
@@ -44,16 +45,13 @@ function ProfilePage() {
   });
 }, [user, loading, reset]);
 
-  const handleReviewSubmitted = (reviewedUsers) => { // Now expects an array
-    // Check if the reviewedUsers is an array and not empty
+  const handleReviewSubmitted = (reviewedUsers) => { 
     if (Array.isArray(reviewedUsers) && reviewedUsers.length > 0) {
-        alert(`Your reviews for ${reviewedUsers.map(u => u.fullName).join(', ')} have been submitted successfully!`);
+        toast.success(`Your reviews for ${reviewedUsers.map(u => u.fullName).join(', ')} have been submitted successfully!`);
     } else if (reviewedUsers && reviewedUsers.fullName) {
-        // Handle the single review case
-        alert(`Your review for ${reviewedUsers.fullName} has been submitted successfully!`);
+        toast.success(`Your review for ${reviewedUsers.fullName} has been submitted successfully!`);
     }
 
-    // Trigger the refetch in UserTasks.js
     setRefetchTrigger(prev => prev + 1); 
 };
 
@@ -68,16 +66,14 @@ function ProfilePage() {
   const handleSeeReviewClick = async (task, reviewee) => {
   try {
     const token = localStorage.getItem('token');
-    // This now correctly uses BOTH the task and the reviewee to find the specific review
     const response = await axios.get(
       `/api/reviews/task/${task._id}/for/${reviewee._id}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    // This sets the FULL review object into state
     setViewingReview(response.data.data);
   } catch (error) {
     console.error("Error fetching review:", error);
-    alert('Could not load the review.');
+    toast.error('Could not load the review.');
   }
 };
 
@@ -113,21 +109,20 @@ function ProfilePage() {
     };
 
     const success = await updateProfile(formattedData, profilePicture);
+    toast.success('Profile updated successfully!')
 
     if (success) {
       handleCancel();
     } else {
-      console.error('Failed to update profile');
+      toast.error('Failed to update profile.');
     }
   };
 
 
-  // Handle canceling edit mode
   const handleCancel = () => {
     setIsEditing(false);
     setProfilePicture(null);
     setPreviewUrl('');
-    // Reset form to original user data
     if (user) {
       reset({
         firstName: user?.firstName || '',
@@ -324,7 +319,12 @@ function ProfilePage() {
             <button type="submit" className="btn glossy primary">Save Changes</button>
             <button type="button" className="btn glossy tiny" onClick={handleCancel}>Cancel</button>
           </div>
+          <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+          />
         </form>
+        
       ) : (
         <div className="profile-view-mode">
           <div className="profile-content-grid">
@@ -453,6 +453,10 @@ function ProfilePage() {
         </div>
       )}    
     </div>
+    <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+      />
     </div>
 
       {/* LeaveReviewModal */}

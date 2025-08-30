@@ -2,7 +2,6 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -11,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Check if user is already logged in (token exists)
     const token = localStorage.getItem('token');
     if (token) {
       loadUser(token);
@@ -20,40 +18,35 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const loadUser = async (token) => {
+  const loadUser = async (token = localStorage.getItem('token')) => {
+    if (!token) throw new Error('No authentication token found');
+    
     try {
       setLoading(true);
-      // Set the auth token in headers
       if (!token) {
         throw new Error('No authentication token found');
       }
       
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
-      // Get user data
       const res = await axios.get('http://localhost:5001/api/profile');
       setUser(res.data);
       setError(null);
     } catch (err) {
       console.error('Error loading user:', err);
       
-      // Handle specific error cases
       if (err.response) {
-        // Server responded with an error status
         if (err.response.status === 401) {
           setError('Authentication failed. Please log in again.');
         } else {
           setError(err.response.data?.message || 'Failed to load user data');
         }
       } else if (err.request) {
-        // Request was made but no response received
         setError('Server not responding. Please try again later.');
       } else {
-        // Error in setting up the request
         setError(err.message || 'Failed to load user data');
       }
       
-      // Clear authentication data
       localStorage.removeItem('token');
       delete axios.defaults.headers.common['Authorization'];
     } finally {
@@ -63,40 +56,31 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      // Validate inputs
       if (!email || !password) {
         setError('Please provide both email and password');
         return false;
       }
       
       setLoading(true);
-      setError(null); // Clear previous errors
-      
+      setError(null); 
       const res = await axios.post('http://localhost:5001/api/users/login', { email, password });
       
-      // Verify token exists in response
       if (!res.data.token) {
         throw new Error('No authentication token received');
       }
-      
-      // Save token to localStorage
+
       localStorage.setItem('token', res.data.token);
       
-      // Load user data
       await loadUser(res.data.token);
       return true;
     } catch (err) {
       console.error('Login error:', err);
-      
-      // Handle different error scenarios
+
       if (err.response) {
-        // Server responded with error
         setError(err.response.data?.message || 'Login failed. Please check your credentials.');
       } else if (err.request) {
-        // Request made but no response
         setError('Server not responding. Please try again later.');
       } else {
-        // Error setting up request
         setError(err.message || 'Login failed');
       }
       return false;

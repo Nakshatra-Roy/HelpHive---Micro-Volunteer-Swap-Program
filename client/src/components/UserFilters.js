@@ -1,5 +1,6 @@
 // client/src/components/UserFilters.js
 import React, { useState } from "react";
+import toast, { Toaster } from 'react-hot-toast';
 
 const UserFilters = ({ onFilterChange, roles }) => {
   const [search, setSearch] = useState("");
@@ -20,7 +21,7 @@ const UserFilters = ({ onFilterChange, roles }) => {
     setRole(newFilters.role);
     setAccountStatus(newFilters.accountStatus);
 
-    onFilterChange(newFilters); // notify parent
+    onFilterChange(newFilters);
   };
 
   const handleReset = () => {
@@ -28,6 +29,7 @@ const UserFilters = ({ onFilterChange, roles }) => {
     setRole("");
     setAccountStatus("");
     onFilterChange({ search: "", role: "", status: "" });
+    toast.success("All filters reset!")
   };
 
   const glassGreenStyle = {

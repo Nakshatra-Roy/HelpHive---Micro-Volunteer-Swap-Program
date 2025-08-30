@@ -167,7 +167,7 @@ const Landing = () => {
           </div>
           <div className="card glass">
           <div className="table">
-            <div className="row head">
+            <div className="row lead head">
               <div>#</div>
               <div>Name</div>
               <div>Tasks Completed</div>
@@ -177,7 +177,7 @@ const Landing = () => {
             {(loadingHelpers ? Array.from({ length: 8 }) : topHelpers).map(
               (h, i) => (
                 <div
-                  className={`row ${loadingHelpers ? "skeleton" : ""}`}
+                  className={`row lead ${loadingHelpers ? "skeleton" : ""}`}
                   key={h?._id || i}
                 >
                   <div>{i + 1}</div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 // import { Link } from "react-router-dom";
-import UserFilters from "../components/UserFilters"; // Ensure this exists
+import UserFilters from "../components/UserFilters";
+import toast, { Toaster } from 'react-hot-toast';
 
 function useFetch(url, initial = []) {
   const [data, setData] = useState(initial);
@@ -75,9 +76,9 @@ function AdminUsers() {
       });
       if (!res.ok) throw new Error(`Failed (${res.status})`);
       setList(prev => prev.map(u => (u._id === id ? { ...u, flag: nextFlag } : u)));
-      alert(nextFlag ? "User flagged successfully" : "User unflagged successfully");
+      toast.success(nextFlag ? "User flagged successfully." : "User unflagged successfully.");
     } catch {
-      alert("Error toggling flag");
+      toast.error("Error toggling flag.");
     } finally {
       setFlagPending(prev => {
         const s = new Set(prev);
@@ -102,9 +103,9 @@ function AdminUsers() {
       });
       if (!res.ok) throw new Error(`Failed (${res.status})`);
       setList(prev => prev.map(u => (u._id === id ? { ...u, accountStatus: nextStatus } : u)));
-      alert(nextStatus === "inactive" ? "User deactivated successfully" : "User activated successfully");
+      toast.success(nextStatus === "inactive" ? "User deactivated successfully." : "User activated successfully.");
     } catch {
-      alert("Error updating account status");
+      toast.error("Error updating account status");
     } finally {
       setStatusPending(prev => {
         const s = new Set(prev);
@@ -132,10 +133,10 @@ function AdminUsers() {
         body: JSON.stringify({ role: newRole }),
       });
       if (!res.ok) throw new Error(`Failed (${res.status})`);
-      alert(`Role updated to ${newRole}`);
+      toast.success(`Role updated to ${newRole}.`);
     } catch {
       setList(prev => prev.map(u => (u._id === id ? { ...u, role: prevRole } : u)));
-      alert("Error updating role");
+      toast.error("Error updating role");
     } finally {
       setRolePending(prev => {
         const s = new Set(prev);
@@ -257,6 +258,10 @@ function AdminUsers() {
               )}
             </div>
           </div>
+          <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+          />
         </div>
       </section>
       <style>

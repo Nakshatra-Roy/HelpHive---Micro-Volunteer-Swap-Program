@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import { useTaskStore } from "../store/taskStore";
+import toast, { Toaster } from 'react-hot-toast';
 
 const CreateTask = () => {
 	const [newTask, setNewTask] = useState({
@@ -16,14 +17,9 @@ const CreateTask = () => {
 	});
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [notice, setNotice] = useState(null);
   const [loading, setLoading] = useState(false);
   const { createTask } = useTaskStore();
 
-  const show = (type, message) => {
-    setNotice({ type, message });
-    setTimeout(() => setNotice(null), 3000);
-  };
 
   const onChange = (key, value) => setNewTask((prev) => ({ ...prev, [key]: value }));
 
@@ -42,7 +38,7 @@ const CreateTask = () => {
 
     const missing = required.filter(([, v]) => !String(v || "").trim()).map(([k]) => k);
     if (missing.length) {
-      show("warning", `Please fill: ${missing.join(", ")}`);
+      toast.error(`Please fill: ${missing.join(", ")}`);
       return;
     }
 
@@ -50,7 +46,7 @@ const CreateTask = () => {
       setLoading(true);
       const { success, message } = await createTask(newTask);
       if (!success) throw new Error(message || "Task creation failed");
-      show("success", "Task created successfully!");
+      toast.success("Task created successfully!");
       setNewTask({
         taskName: "",
         taskDescription: "",
@@ -62,20 +58,13 @@ const CreateTask = () => {
         credits: 1
       });
     } catch (err) {
-      show("error", err.message || "An error occurred");
+      toast.error(err.message || "An error occurred");
     } finally {
       setLoading(false);
+      navigate("/mytasks");
     }
   };
 
-  const pillClass =
-    notice?.type === "success"
-      ? "pill easy"
-      : notice?.type === "warning"
-      ? "pill medium"
-      : notice?.type === "error"
-      ? "pill hard"
-      : "pill";
 
   useEffect(() => {
 	if (!user) {
@@ -110,12 +99,6 @@ const CreateTask = () => {
           <div className="section-head">
             <h2>Create New Task</h2>
           </div>
-
-          {notice && (
-            <div className={pillClass} role="status" aria-live="polite" style={{ marginBottom: 14, display: "inline-block" }}>
-              {notice.message}
-            </div>
-          )}
 
           <div className="card glass">
             <form onSubmit={handleAddTask} className="offer-form">
@@ -226,7 +209,7 @@ const CreateTask = () => {
                   <button
                     type="button"
                     className="btn glossy ghost"
-                    onClick={() =>
+                    onClick={() => {
                       setNewTask({
                         taskName: "",
                         taskDescription: "",
@@ -236,7 +219,9 @@ const CreateTask = () => {
                         date: "",
                         priority: "",
                         credits: 1
-                      })
+                      });
+                      toast.success("Form has been reset!");
+                    }
                     }
                   >
                     Reset
@@ -246,6 +231,11 @@ const CreateTask = () => {
             </form>
           </div>
         </div>
+        <Toaster
+                    position="bottom-right"
+                    reverseOrder={false}
+                  />
+        
       </section>
 
       <style>

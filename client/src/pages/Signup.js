@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import toast, { Toaster } from 'react-hot-toast';
 
 function Signup() {
   const [firstName, setFirstName] = useState("");
@@ -43,11 +44,11 @@ function Signup() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      window.alert("User created successfully!");
+      toast.success("Account created successfully!");
       navigate("/login");
     } catch (err) {
       console.error(err);
-      window.alert("Error creating user. Check console for details.");
+      toast.error("Error creating account. Check console for details.");
     }
   };
 
@@ -196,6 +197,10 @@ function Signup() {
           </div>
         </div>
       </div>
+      <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import AdminSummary from '../components/AdminSummary';
 import AdminGlobalActivity from '../components/AdminGlobalActivity';
 import ShowAdmins from '../components/ShowAdmins';
 import AdminRecentActivity from '../components/AdminRecentActivity';
+  import toast, { Toaster } from 'react-hot-toast';
 
 
 const AdminDashboard = () => {
@@ -20,10 +21,6 @@ const AdminDashboard = () => {
                     axios.get('/api/admin/my-activity'),
                     axios.get('/api/admin/all-admins')
                 ]);
-                // --- THIS IS THE FIX --- 
-                // This REPLACES the state, it doesn't add to it. 
-                // Even if this function runs 100 times, the state will always be 
-                // just the 4 unique admins from the last API call. 
                 setStats(statsRes.data); 
                 setActivity(activityRes.data); 
                 setAdmins(adminsRes.data); 
@@ -82,6 +79,10 @@ const AdminDashboard = () => {
                     <ShowAdmins admins={admins} loading={loading} />
                 </div>
             </div>
+            <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+          />
         </div>
     );
 };

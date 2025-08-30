@@ -1,5 +1,6 @@
 // client/src/components/TaskFilters.js
 import React, { useState } from "react";
+import toast, { Toaster } from 'react-hot-toast';
 
 const TaskFilters = ({ onFilterChange, categories, locations, priorities }) => {
   const [search, setSearch] = useState("");
@@ -24,7 +25,7 @@ const TaskFilters = ({ onFilterChange, categories, locations, priorities }) => {
     setPriority(newFilters.priority);
     setSortCredits(newFilters.sortCredits);
 
-    onFilterChange(newFilters); // update parent
+    onFilterChange(newFilters);
   };
 
   const handleReset = () => {
@@ -33,7 +34,8 @@ const TaskFilters = ({ onFilterChange, categories, locations, priorities }) => {
     setLocation("");
     setPriority("");
     setSortCredits("");
-    onFilterChange({ search: "", category: "", location: "", priority: "", sortCredits: ""})
+    onFilterChange({ search: "", category: "", location: "", priority: "", sortCredits: ""});
+    toast.success("All fields reset!")
   };
 
   const glassGreenStyle = {

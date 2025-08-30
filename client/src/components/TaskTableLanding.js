@@ -24,18 +24,18 @@ const TaskTableLanding = ({
 
   const rows = loading ? placeholders : sortedTasks;
 
-  const getPostedByName = async (userId) => {
-    if (userMap[userId]) return userMap[userId];
-    try {
-      const res = await axios.get(`/api/users/${userId}`);
-      const fullName = res.data.fullName || "Unknown";
-      setUserMap((prev) => ({ ...prev, [userId]: fullName }));
-      return fullName;
-    } catch (err) {
-      console.error(`Error fetching user ${userId}:`, err);
-      return "Unknown";
-    }
-  };
+  // const getPostedByName = async (userId) => {
+  //   if (userMap[userId]) return userMap[userId];
+  //   try {
+  //     const res = await axios.get(`/api/users/${userId}`);
+  //     const fullName = res.data.fullName || "Unknown";
+  //     setUserMap((prev) => ({ ...prev, [userId]: fullName }));
+  //     return fullName;
+  //   } catch (err) {
+  //     console.error(`Error fetching user ${userId}:`, err);
+  //     return "Unknown";
+  //   }
+  // };
 
   return (
     <>
@@ -53,7 +53,6 @@ const TaskTableLanding = ({
 
           {rows.map((t, i) => {
             const id = loading ? i : t?._id || i;
-            const posterName = userMap[t?.postedBy] || "Loading...";
 
             return (
               <div
@@ -62,9 +61,9 @@ const TaskTableLanding = ({
                 style={{ position: "relative" }}
                 onMouseEnter={async () => {
                   setHoveredTaskId(t._id);
-                  if (!userMap[t?.postedBy]) {
-                    await getPostedByName(t.postedBy);
-                  }
+                  // if (!userMap[t?.postedBy]) {
+                  //   await getPostedByName(t.postedBy);
+                  // }
                 }}
                 onMouseLeave={() => setHoveredTaskId(null)}
               >
@@ -87,7 +86,7 @@ const TaskTableLanding = ({
                 {hoveredTaskId === t._id && (
                   <div className="task-hover-info">
                     <p>
-                      <strong>Posted by:</strong> {posterName}
+                      <strong>Posted by:</strong> {t?.postedBy?.fullName}
                     </p>
                     <p>
                       <strong>Description:</strong>{" "}

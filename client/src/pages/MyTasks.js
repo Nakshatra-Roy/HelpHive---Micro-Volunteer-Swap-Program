@@ -4,6 +4,7 @@ import { useTaskStore } from "../store/taskStore";
 import { useAuth } from "../context/AuthContext";
 import SwapModal from "../components/SwapModal";
 import { Link } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast';
 
 const MyTasks = () => {
   const { tasks, fetchTask, completeTask, requestTaskSwap, initiateHelperSwap } = useTaskStore();
@@ -21,7 +22,8 @@ const MyTasks = () => {
   const handleCompleteTask = async (taskId) => {
     setLoadingTaskId(taskId);
     const { success, message } = await completeTask(taskId);
-    if (!success) alert(`Error: ${message}`);
+    if (success) toast.success("Task marked as complete!");
+    if (!success) toast.error(`Error: ${message}`);
     setLoadingTaskId(null);
   };
 
@@ -48,26 +50,26 @@ const MyTasks = () => {
     }
 
     if (result.success) {
-      alert(result.message || "Action successful!");
+      toast.success(result.message || "Action successful!");
     } else {
-      alert(`Error: ${result.message}`);
+      toast.error(`Error: ${result.message}`);
     }
     handleCloseModal();
   };
 
-  const getPostedByName = async (userId) => {
-    if (userMap[userId]) return userMap[userId];
+  // const getPostedByName = async (userId) => {
+  //   if (userMap[userId]) return userMap[userId];
 
-    try {
-      const res = await axios.get(`/api/users/${userId}`);
-      const fullName = res.data.fullName || 'Unknown';
-      setUserMap((prev) => ({ ...prev, [userId]: fullName }));
-      return fullName;
-    } catch (err) {
-      console.error(`Error fetching user ${userId}:`, err);
-      return 'Unknown';
-    }
-  };
+  //   try {
+  //     const res = await axios.get(`/api/users/${userId}`);
+  //     const fullName = res.data.fullName || 'Unknown';
+  //     setUserMap((prev) => ({ ...prev, [userId]: fullName }));
+  //     return fullName;
+  //   } catch (err) {
+  //     console.error(`Error fetching user ${userId}:`, err);
+  //     return 'Unknown';
+  //   }
+  // };
 
   const myPostedTasks = tasks.filter((task) => task.postedBy?._id === user?._id);
   const myHelperTasks = tasks.filter((task) =>
@@ -160,7 +162,7 @@ const MyTasks = () => {
               <HelperTaskRow
                 key={task._id}
                 task={task}
-                getPostedByName={getPostedByName}
+                // getPostedByName={getPostedByName}
                 handleOpenModal={handleOpenModal}
               />
             ))
@@ -173,6 +175,10 @@ const MyTasks = () => {
           )}
         </div>
       </div>
+      <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+          />
 
       {/* --- MODAL --- */}
       {isModalOpen && (
@@ -209,17 +215,16 @@ const MyTasks = () => {
   );
 };
 
-// ✅ New Component to avoid Hook violation
 const HelperTaskRow = ({ task, getPostedByName, handleOpenModal }) => {
   const [posterName, setPosterName] = useState("Loading...");
 
-  useEffect(() => {
-    const fetchName = async () => {
-      const name = await getPostedByName(task.postedBy);
-      setPosterName(name);
-    };
-    fetchName();
-  }, [task.postedBy, getPostedByName]);
+  // useEffect(() => {
+  //   const fetchName = async () => {
+  //     const name = await getPostedByName(task.postedBy);
+  //     setPosterName(name);
+  //   };
+  //   fetchName();
+  // }, [task.postedBy, getPostedByName]);
 
   return (
     <div className="row tasks" style={{ position: "relative" }}>
@@ -239,7 +244,7 @@ const HelperTaskRow = ({ task, getPostedByName, handleOpenModal }) => {
         )}
       </div>
       <div className="task-hover-info">
-        <p><strong>Posted by:</strong> {posterName}</p>
+        <p><strong>Posted by:</strong> {task.postedBy.fullName}</p>
         <p><strong>Description:</strong> {task.taskDescription}</p>
         <p><strong>Category:</strong> {task.category}</p>
         <p><strong>Location:</strong> {task.location}</p>

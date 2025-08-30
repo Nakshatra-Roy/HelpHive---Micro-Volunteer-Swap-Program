@@ -1,10 +1,8 @@
-// client/src/components/LeaveReviewModal.js
-
 import React, {useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
 
-// Star Rating is a small, self-contained component.
 const StarRating = ({ rating, setRating }) => {
   return (
     <div className="star-rating">
@@ -24,27 +22,25 @@ const StarRating = ({ rating, setRating }) => {
 
 const LeaveReviewModal = ({ task, onClose, onReviewSubmitted }) => {
   const { user } = useAuth();
-  const [targetUser, setTargetUser] = useState(null); // The user being reviewed
+  const [targetUser, setTargetUser] = useState(null); 
   const [ratings, setRatings] = useState({ punctuality: 0, friendliness: 0, quality: 0 });
   const [comment, setComment] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Determine who the user can review
   const taskCreator = task.postedBy;
   const helpers = task.helpersArray.map(h => h.user).filter(Boolean);
   const isCreator = user._id === taskCreator._id;
   const reviewableUsers = isCreator ? helpers : [taskCreator];
 
-  // Filter out users who have already been reviewed for this task
+
+
   const unreviewedUsers = reviewableUsers.filter(u => !task.reviewsSubmittedByMe?.includes(u._id));
   
-  // If there's only one person left to review, select them automatically
   useEffect(() => {
     if (unreviewedUsers.length === 1) {
       setTargetUser(unreviewedUsers[0]);
     }
-  }, [task]); // Reruns if the task prop changes
+  }, [task]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,23 +51,21 @@ const LeaveReviewModal = ({ task, onClose, onReviewSubmitted }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post( // <-- Capture the response
+      const response = await axios.post(
         '/api/reviews',
         { taskId: task._id, revieweeId: targetUser._id, ratings, comment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      // Check for a successful status code
       if (response.status === 201) {
         onReviewSubmitted(targetUser);
         onClose();
       } else {
-        // Handle unexpected success codes
-        setError('Received an unexpected response from the server.');
+        toast.error('Received an unexpected response from the server.');
       }
 
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to submit review.');
+      toast.error(err.response?.data?.message || 'Failed to submit review.');
     } finally {
       setLoading(false);
     }
@@ -81,7 +75,7 @@ const LeaveReviewModal = ({ task, onClose, onReviewSubmitted }) => {
   if (unreviewedUsers.length === 0) {
     return (
       <div className="modalBackdrop" onClick={onClose}>
-        <div className="modalContent card" onClick={(e) => e.stopPropagation()}>
+        <div className="card glass" onClick={(e) => e.stopPropagation()}>
           <h2 className="section-title">Leave a Review</h2>
           <p className="empty-state">You have already reviewed all participants for this task.</p>
           <div className="modal-actions">
@@ -94,14 +88,12 @@ const LeaveReviewModal = ({ task, onClose, onReviewSubmitted }) => {
 
   return (
     <div className="modalBackdrop" onClick={onClose}>
-      <div className="modalContent card" onClick={(e) => e.stopPropagation()}>
+      <div className="card glass" onClick={(e) => e.stopPropagation()}>
         <h2 className="section-title">Leave a Review for: "{task.taskName}"</h2>
         
-        {/* User Selection: Only show this screen if a target hasn't been chosen yet */}
         {!targetUser && (
           <div className="form-group">
             <label>Who would you like to review?</label>
-            {/* --- WRAP THIS DIV... --- */}
             <div className="scrollable-user-list">
               <div className="user-selection-pills">
                 {unreviewedUsers.map(u => (
@@ -115,11 +107,9 @@ const LeaveReviewModal = ({ task, onClose, onReviewSubmitted }) => {
                 ))}
               </div>
             </div>
-            {/* --- ...IN OUR NEW SCROLLABLE CONTAINER --- */}
           </div>
         )}
 
-        {/* The Review Form: Only show this screen AFTER a target user has been chosen */}
         {targetUser && (
           <form onSubmit={handleSubmit}>
             <p className="review-target-text">
@@ -152,11 +142,12 @@ const LeaveReviewModal = ({ task, onClose, onReviewSubmitted }) => {
             {error && <p className="error-message">{error}</p>}
             
             <div className="modal-actions">
-              <button type="button" className="btn glossy ghost" onClick={onClose} disabled={loading}>
-                Cancel
-              </button>
               <button type="submit" className="btn glossy primary" disabled={loading}>
                 {loading ? 'Submitting...' : 'Submit Review'}
+              </button>
+              
+              <button type="button" className="btn glossy ghost" onClick={onClose} disabled={loading}>
+                Cancel
               </button>
             </div>
           </form>

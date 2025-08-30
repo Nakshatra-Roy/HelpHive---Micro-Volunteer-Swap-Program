@@ -354,7 +354,7 @@ body {
 
 .row {
   display: grid;
-  grid-template-columns: 40px 1.5fr 1fr 1fr 1fr 1fr 1.2fr 1fr 1fr 1.2fr 120px; 
+  grid-template-columns: 40px 1.5fr 2fr 1fr 1fr;
   align-items: center;
   gap: 10px;
   padding: 10px 15px;
@@ -390,6 +390,26 @@ body {
   font-weight: bold;
   background: #d9f99d;
 }
+
+.row.lead.head {
+  grid-template-columns: 40px 1.5fr 2fr 1fr 1fr;
+  font-weight: bold;
+  background: #d9f99d;
+}
+
+.row.lead {
+  display: grid;
+  grid-template-columns: 40px 1.5fr 2fr 1fr 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15);
+  transition: background 0.5s ease;
+  position: relative;
+}
+
 
 .row.header {
   display: grid;
@@ -1551,17 +1571,17 @@ body {
   background: rgb(255, 255, 255);
   padding: 2rem;
   border-radius: 12px;
-  width: 90%;
+  width: 100%;
   max-width: 600px;
   box-shadow: 0 12px 24px rgba(0,0,0,0.3);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .taskList {
-  max-height: 300px;
+  max-height: 600px;
   overflow-y: auto;
-  border: 1px solid #eee;
-  border-radius: 8px;
+  border: 1px solid #008d1f;
+  border-radius: 12px;
   margin-top: 1rem;
   padding: 0.5rem;
 }
@@ -1571,7 +1591,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 3px solid #dbdbdb;
 }
 .taskItem:last-child {
   border-bottom: none;

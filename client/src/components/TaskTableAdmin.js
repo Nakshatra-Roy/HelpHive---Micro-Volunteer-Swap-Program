@@ -6,14 +6,13 @@ const TaskTableAdmin = ({
   loading = false,
   userId,
   busyIds = new Set(),
-  onAccept, // (task) => void
-  sortOrder = "desc", // ✅ new prop for sorting order
+  onAccept,
+  sortOrder = "desc", 
 }) => {
   const placeholders = useMemo(() => Array.from({ length: 8 }, (_, i) => ({ _id: `placeholder-${i}` })),[]);
   const [userMap, setUserMap] = useState({});
   const [hoveredTaskId, setHoveredTaskId] = useState(null);
 
-  // ✅ Sort tasks by credits according to sortOrder
   const sortedTasks = useMemo(() => {
     if (loading) return placeholders;
     return [...tasks].sort((a, b) => {
@@ -24,18 +23,18 @@ const TaskTableAdmin = ({
   }, [tasks, loading, sortOrder, placeholders]);
 
   const rows = loading ? placeholders : sortedTasks;
-  const getPostedByName = async (userId) => {
-    if (userMap[userId]) return userMap[userId];
-    try {
-      const res = await axios.get(`/api/users/${userId}`);
-      const fullName = res.data.fullName || "Unknown";
-      setUserMap((prev) => ({ ...prev, [userId]: fullName }));
-      return fullName;
-    } catch (err) {
-      console.error(`Error fetching user ${userId}:`, err);
-      return "Unknown";
-    }
-  };
+  // const getPostedByName = async (userId) => {
+  //   if (userMap[userId]) return userMap[userId];
+  //   try {
+  //     const res = await axios.get(`/api/users/${userId}`);
+  //     const fullName = res.data.fullName || "Unknown";
+  //     setUserMap((prev) => ({ ...prev, [userId]: fullName }));
+  //     return fullName;
+  //   } catch (err) {
+  //     console.error(`Error fetching user ${userId}:`, err);
+  //     return "Unknown";
+  //   }
+  // };
 
   return (
     <>
@@ -69,9 +68,6 @@ const TaskTableAdmin = ({
                 style={{ position: "relative" }}
                 onMouseEnter={async () => {
                   setHoveredTaskId(t._id);
-                  if (!userMap[t?.postedBy]) {
-                    await getPostedByName(t.postedBy);
-                  }
                 }}
                 onMouseLeave={() => setHoveredTaskId(null)}
               >
@@ -106,7 +102,7 @@ const TaskTableAdmin = ({
                 {hoveredTaskId === t._id && (
                   <div className="task-hover-info">
                     <p>
-                      <strong>Posted by:</strong> {posterName}
+                      <strong>Posted by:</strong> {t.postedBy.fullName}
                     </p>
                     <p>
                       <strong>Description:</strong>{" "}

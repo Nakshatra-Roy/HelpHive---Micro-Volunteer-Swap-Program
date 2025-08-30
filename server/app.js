@@ -22,24 +22,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files from the public directory
+
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// Importing routes:
-// This is where we will define the routes for our application
-// For example, if we have a problem and user routes, we can import them like this
-// const problemRoutes = require('./routes/problemRoutes');
-
-// FOR REACH ROUTES, WE NEED A 
-// 1. Routes
-// 2. MODEL AND A 
-// 3. CONTROLLER AS WELL in a new file, check the routes, model and controller folder to understand
-
-
-
-// Using the routes:
 app.use('/api/tasks', taskRoutes);
 app.use('/api/offers', offerRoutes);
 app.use('/api/users', userRoutes);

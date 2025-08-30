@@ -31,16 +31,16 @@ const userSchema = new mongoose.Schema({
         phone: { type: String, default: '' },
         publicEmail: { type: String, default: '' }
     },
-    skills: { type: [String], default: [] }, // Changed to simple array like following
+    skills: { type: [String], default: [] }, 
 
-    following: { type: [String], default: [] }, // Changed to simple array like interests
+    following: { type: [String], default: [] },
 
-    interests: { type: [String], default: [] }, // Kept from your original file
-    availability: { type: String, default: 'Flexible' }, // Changed default to be more descriptive
+    interests: { type: [String], default: [] },
+    availability: { type: String, default: 'Flexible' },
     
     volunteerHistory: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Task' // Assumes you have or will have a 'Task' model
+        ref: 'Task'
     }],
     credits: {
         earned: { type: Number, default: 10 },
@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema({
         average: { type: Number, default: 0 },
         count: { type: Number, default: 0 }
     },
-    socialLinks: { // Kept from your original file
+    socialLinks: { 
         github: { type: String, default: '' },
         linkedin: { type: String, default: '' },
         twitter: { type: String, default: '' },
@@ -60,35 +60,28 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, ref: 'Task'
     }],
     
-    // --- Metadata (from your original file) ---
-    flag: { type: Boolean, default: false }, // Kept from your original file
+    flag: { type: Boolean, default: false },
     createdAt: { 
         type: Date, 
         default: Date.now 
     }
 }, {
-    // Adding timestamps is a good practice to automatically get createdAt and updatedAt
     timestamps: true 
 });
 
 
 // --- VIRTUALS for calculated properties (highly recommended) ---
 
-// Creates a "virtual" field for the user's full name
 userSchema.virtual('fullName').get(function() {
   const first = this.firstName || '';
   const last = this.lastName || '';
   return `${first} ${last}`.trim();
 });
-// Creates a "virtual" field for the user's current credit balance
 userSchema.virtual('credits.balance').get(function() {
-  // Use `|| 0` to handle cases where a field might be missing on an old document
   const earned = this.credits.earned || 0;
   const spent = this.credits.spent || 0;
   return earned - spent;
 });
-
-// To include virtuals when you convert a document to JSON (e.g., in an API response)
 userSchema.set('toJSON', { virtuals: true });
 userSchema.set('toObject', { virtuals: true });
 
