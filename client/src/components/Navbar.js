@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import toast, { Toaster } from 'react-hot-toast';
 
 const Navbar = () => {
   const { pathname } = useLocation();
@@ -13,10 +14,11 @@ const Navbar = () => {
 
   const handleLogout = async () => {
   try {
-    await logout();    
+    await logout();
+    toast.success("Successfully logged out.")
     navigate("/login");      
   } catch (err) {
-    console.error("Logout error:", err);
+    toast.error("Logout error:", err);
   }
 };
 
