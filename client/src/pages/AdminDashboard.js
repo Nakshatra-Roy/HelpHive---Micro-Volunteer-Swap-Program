@@ -12,14 +12,15 @@ const AdminDashboard = () => {
     const [activity, setActivity] = useState([]);
     const [admins, setAdmins] = useState([]);
     const [loading, setLoading] = useState(true);
+    const API = process.env.REACT_APP_BACKEND_URL;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [statsRes, activityRes, adminsRes] = await Promise.all([
-                    axios.get('/api/admin/stats'),
-                    axios.get('/api/admin/my-activity'),
-                    axios.get('/api/admin/all-admins')
+                    axios.get(`${API}/api/admin/stats`),
+                    axios.get(`${API}/api/admin/my-activity`),
+                    axios.get(`${API}/api/admin/all-admins`)
                 ]);
                 setStats(statsRes.data); 
                 setActivity(activityRes.data); 

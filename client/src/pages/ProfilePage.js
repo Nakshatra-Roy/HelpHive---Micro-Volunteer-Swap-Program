@@ -23,7 +23,7 @@ function ProfilePage() {
   const [viewingReview, setViewingReview] = useState(null);
   const { register, handleSubmit, reset } = useForm();
   const [refetchTrigger, setRefetchTrigger] = useState(0);
-
+  const API = process.env.REACT_APP_BACKEND_URL;
   
   useEffect(() => {
   if (loading || !user) return;
@@ -67,7 +67,7 @@ function ProfilePage() {
   try {
     const token = localStorage.getItem('token');
     const response = await axios.get(
-      `/api/reviews/task/${task._id}/for/${reviewee._id}`,
+      `${API}/api/reviews/task/${task._id}/for/${reviewee._id}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     setViewingReview(response.data.data);

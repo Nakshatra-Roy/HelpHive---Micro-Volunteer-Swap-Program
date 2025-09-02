@@ -17,13 +17,13 @@ function PublicProfilePage() {
   const { id: profileUserId } = useParams();
   const { user: currentUser } = useAuth();
   const [profileUser, setProfileUser] = useState(null);
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [activeChatTaskId, setActiveChatTaskId] = useState(null);
   const [reviewTask, setReviewTask] = useState(null);
   const [viewingReview, setViewingReview] = useState(null);
   const { register, handleSubmit, reset } = useForm();
   const [refetchTrigger, setRefetchTrigger] = useState(0);
-
+  const API = process.env.REACT_APP_BACKEND_URL;
   
   useEffect(() => {
   // If a logged-in user tries to view their own public profile,
@@ -36,7 +36,7 @@ const [loading, setLoading] = useState(true);
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/users/${profileUserId}`);
+      const response = await axios.get(`${API}/api/users/${profileUserId}`);
       setProfileUser(response.data);
     } catch (error) {
       console.error("Error fetching user profile:", error);

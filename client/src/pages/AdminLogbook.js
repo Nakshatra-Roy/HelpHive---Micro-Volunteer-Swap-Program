@@ -11,13 +11,14 @@ const AdminLogbook = () => {
     () => Array.from({ length: 8 }, (_, i) => ({ _id: `placeholder-${i}` })),
     []
   );
-
+  const API = process.env.REACT_APP_BACKEND_URL;
+  
   useEffect(() => {
     let alive = true;
 
     const fetchCompletedTasks = async () => {
       try {
-        const res = await axios.get("/api/tasks/completed");
+        const res = await axios.get(`${API}/api/tasks/completed`);
         if (alive) {
           setTasks(res.data);
           setLoading(false);

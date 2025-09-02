@@ -5,6 +5,7 @@ const ShowAdmins = ({ admins, loading }) => {
   const [flagPending, setFlagPending] = useState(new Set());
   const [statusPending, setStatusPending] = useState(new Set());
   const [rolePending, setRolePending] = useState(new Set());
+  const API = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
     setList(admins || []);
@@ -17,7 +18,7 @@ const ShowAdmins = ({ admins, loading }) => {
 
     setFlagPending(prev => new Set(prev).add(id));
     try {
-      const res = await fetch(`/api/users/${id}`, {
+      const res = await fetch(`${API}/api/users/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ flag: nextFlag }),

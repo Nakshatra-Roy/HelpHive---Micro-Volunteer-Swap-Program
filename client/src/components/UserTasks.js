@@ -9,6 +9,7 @@ const UserTasks = ({ userId, onStartChat, onLeaveReview, onSeeReview, refetchTri
   const [loading, setLoading] = useState(true);
   const [userMap, setUserMap] = useState({}); // Cache of userId → fullName
   const { user } = useAuth();
+  const API = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
     if (!userId) return;
@@ -16,7 +17,7 @@ const UserTasks = ({ userId, onStartChat, onLeaveReview, onSeeReview, refetchTri
     const fetchUserTasks = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`/api/users/${userId}/tasks`);
+        const response = await axios.get(`${API}/api/users/${userId}/tasks`);
         console.log("RAW DATA RECEIVED ON FRONTEND:", response.data);
         setTasksCreated(response.data.created);
         setTasksHelping(response.data.helping);

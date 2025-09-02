@@ -11,7 +11,7 @@ export const useTaskStore = create((set) => ({
   fetchTask: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get(`${API}api/tasks`);
+      const response = await axios.get(`${API}/api/tasks`);
       set({ tasks: response.data.data, loading: false });
       return { success: true, message: 'Tasks fetched successfully' };
     } catch (error) {
@@ -27,7 +27,7 @@ export const useTaskStore = create((set) => ({
   createTask: async (taskData) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.post('/api/tasks', taskData);
+      const response = await axios.post(`${API}/api/tasks`, taskData);
       set((state) => ({
     tasks: [...state.tasks, response.data.data],
     loading: false
@@ -54,7 +54,7 @@ export const useTaskStore = create((set) => ({
 
   set({ loading: true, error: null });
   try {
-    const response = await axios.put(`/api/tasks/${task._id}/accept`, { userId });
+    const response = await axios.put(`${API}/api/tasks/${task._id}/accept`, { userId });
     set((state) => ({
   tasks: state.tasks.map(t => t._id === task._id ? response.data.data : t),
   loading: false
@@ -73,7 +73,7 @@ export const useTaskStore = create((set) => ({
 completeTask: async (taskId) => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.patch(`/api/tasks/${taskId}/complete`);
+      const response = await axios.patch(`${API}/api/tasks/${taskId}/complete`);
       set((state) => ({
         tasks: state.tasks.map(t =>
           t._id === taskId ? { ...t, status: 'completed' } : t
@@ -94,7 +94,7 @@ fetchSwapRequests: async () => {
     set({ loading: true });
     try {
         // Note the URL is now /api/tasks/swaps
-        const response = await axios.get('/api/tasks/swaps');
+        const response = await axios.get(`${API}/api/tasks/swaps`);
         set({ swapRequests: response.data.data, loading: false });
     } catch (error) {
         // handle error
@@ -116,7 +116,7 @@ requestTaskSwap: async (taskToGiveId, taskToReceiveId) => {
 respondToSwapRequest: async (swapRequestId, accepted) => {
     try {
         // Note the URL is now /api/tasks/swaps/:id/respond
-        const response = await axios.put(`/api/tasks/swaps/${swapRequestId}/respond`, { accepted });
+        const response = await axios.put(`${API}/api/tasks/swaps/${swapRequestId}/respond`, { accepted });
         set(state => ({
             swapRequests: state.swapRequests.filter(req => req._id !== swapRequestId)
         }));
@@ -129,7 +129,7 @@ respondToSwapRequest: async (swapRequestId, accepted) => {
 initiateHelperSwap: async (myCommittedTaskId, theirOpenTaskId) => {
   set({ loading: true });
   try {
-    const response = await axios.put(`/api/tasks/${myCommittedTaskId}/${theirOpenTaskId}/helper-swap`);
+    const response = await axios.put(`${API}/api/tasks/${myCommittedTaskId}/${theirOpenTaskId}/helper-swap`);
     
     // Update the two modified tasks in our local state
     const { updatedMyCommittedTask, updatedTheirOpenTask } = response.data.data;

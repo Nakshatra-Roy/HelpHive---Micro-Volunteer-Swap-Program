@@ -34,7 +34,8 @@ function useFetch(url, initial = []) {
 }
 
 function AdminUsers() {
-  const { data: users, loading } = useFetch(`/api/users/`, []);
+  const API = process.env.REACT_APP_BACKEND_URL;
+  const { data: users, loading } = useFetch(`${API}/api/users/`, []);
   const [list, setList] = useState([]);
   const [filters, setFilters] = useState({ search: "", role: "", accountStatus: "" });
 

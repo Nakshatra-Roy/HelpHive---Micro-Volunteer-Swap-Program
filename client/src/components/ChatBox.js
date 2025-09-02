@@ -10,6 +10,7 @@ const ChatBox = ({ taskId, onClose }) => {
   const [newMessage, setNewMessage] = useState('');
   const [taskCreatorId, setTaskCreatorId] = useState(null);
   const messagesEndRef = useRef(null);
+  const API = process.env.REACT_APP_BACKEND_URL;
 
   const getMessageClass = (sender) => {
     if (!sender?._id || !user?._id) return 'other-message';
@@ -48,7 +49,7 @@ const ChatBox = ({ taskId, onClose }) => {
           return;
         }
 
-        const response = await axios.get(`/api/chat/history/${taskId}`, {
+        const response = await axios.get(`${API}/api/chat/history/${taskId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

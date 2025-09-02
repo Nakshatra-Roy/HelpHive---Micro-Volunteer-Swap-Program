@@ -22,6 +22,7 @@ ChartJS.register(
 const TrustDashboard = ({ userId }) => {
   const [trustData, setTrustData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const API = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
     if (!userId) return;
@@ -29,7 +30,7 @@ const TrustDashboard = ({ userId }) => {
     const fetchTrustData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`/api/users/${userId}/trust-score`, {
+        const response = await axios.get(`${API}/api/users/${userId}/trust-score`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
