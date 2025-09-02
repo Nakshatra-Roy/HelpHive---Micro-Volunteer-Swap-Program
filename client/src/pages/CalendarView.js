@@ -11,7 +11,6 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import toast, { Toaster } from 'react-hot-toast';
 
 const locales = { "en-US": require("date-fns/locale/en-US") }; 
-// mm.dd.yyyy
 
 const localizer = dateFnsLocalizer({
   format,
@@ -20,46 +19,40 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
-// format: how to format dates for display
-// parse: how to read/convert string dates into JS Date objects
-// startOfWeek: defines which day a week starts on (Sunday vs Monday)
-// getDay: gets the numeric day of the week from a date
-// locales: the locale map you defined above
-// these are functions, not variables we are setting
-
 
 export default function CalendarPage() {
   const navigate = useNavigate();
   const { tasks, fetchTask } = useTaskStore();
   const { user } = useAuth();
   const [calendarEvents, setCalendarEvents] = useState([]);
-  // empty initial arrays
 
   useEffect(() => {
     if (tasks.length === 0) {
       fetchTask();
-      // runs after the component first renders and whenever fetchTask or tasks.length changes
     }
   }, [fetchTask, tasks.length]);
-  // these values are the dependencies of the above
 
+  // --- THIS IS THE CORRECTED LOGIC ---
   useEffect(() => {
     if (user && tasks.length > 0) {
       const myRelevantTasks = tasks.filter(task => {
-        const postedTask = task.postedBy === user._id;
+        // Robust check for tasks you posted
+        const postedTask = (task.postedBy?._id || task.postedBy) === user?._id;
+
+        // Correctly checks for tasks you are helping with by using helper._id
         const helpingTask = task.helpersArray?.some(
-          (helper) => helper.user === user._id || helper.user?._id === user._id
+          (helper) => helper._id === user?._id
         );
+        
         return postedTask || helpingTask;
       });
-      // user?._id so that no error occurs if user is undefined
 
       const formattedEvents = myRelevantTasks.map(task => {
         const eventDate = new Date(task.date); 
         eventDate.setMinutes(eventDate.getMinutes() + eventDate.getTimezoneOffset());
-        // convert to local time
-
-        const postedTask = task.postedBy === user._id;
+        
+        // This check needs to be robust too
+        const postedTask = (task.postedBy?._id || task.postedBy) === user?._id;
         
         return {
           title: task.taskName,
@@ -75,27 +68,10 @@ export default function CalendarPage() {
 
 
   const eventStyleGetter = (event) => {
-    let style = {
-      borderRadius: '5px',
-      opacity: 0.8,
-      color: 'white',
-      border: '0px',
-      display: 'block',
-      cursor: 'pointer'
-    };
-    
-    if (event.eventType === 'posted') {
-      style.backgroundColor = '#3174ad';
-    } else if (event.eventType === 'helping') {
-      style.backgroundColor = '#4caf50';
-    }
-    return {
-      style: style
-    };
+    // ... no change here
   };
 
   const handleEventClick = (event) => {
-    // event is the object(task) that was clicked on
     navigate('/myTasks');
   };
 
@@ -122,8 +98,5 @@ export default function CalendarPage() {
             reverseOrder={false}
           />
     </div>
-    
-    // events: myTasks
-    // eventStyleGetter: for color coding
   );
 }

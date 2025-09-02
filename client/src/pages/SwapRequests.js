@@ -46,7 +46,7 @@ const SwapRequests = () => {
           <div className="row tasks" key={request._id}>
             <div>{request.taskToGive.taskName}</div>
             <div>{request.taskToReceive.taskName}</div>
-            <div>{request.requester.fullName}</div>
+            <div>{request.requester.firstName + ' ' + request.requester.lastName}</div>
             <div style={{ display: "flex", gap: "8px" }}>
               <button
                 className="btn glossy primary"

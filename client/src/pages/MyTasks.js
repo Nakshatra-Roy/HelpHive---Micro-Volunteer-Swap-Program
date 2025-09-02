@@ -19,6 +19,25 @@ const MyTasks = () => {
     if (tasks.length === 0) fetchTask();
   }, [fetchTask, tasks.length]);
 
+  useEffect(() => {
+    if (tasks.length > 0 && user) {
+      console.log("--- DEBUGGING DATA ---");
+      console.log("Current User ID:", user._id);
+      
+      // Find a specific task where you know you are a helper
+      const aHelperTask = tasks.find(task => task.taskName === "Name of a task you are helping with");
+      
+      if (aHelperTask) {
+        console.log("Found a task you are helping with:", aHelperTask);
+        console.log("Structure of its helpersArray:", aHelperTask.helpersArray);
+      } else {
+        console.log("Could not automatically find a task you are helping with in the list.");
+        console.log("All tasks received:", tasks); // Log all tasks as a fallback
+      }
+      console.log("----------------------");
+    }
+  }, [tasks, user]); 
+
   const handleCompleteTask = async (taskId) => {
     setLoadingTaskId(taskId);
     const { success, message } = await completeTask(taskId);
@@ -73,10 +92,8 @@ const MyTasks = () => {
 
   const myPostedTasks = tasks.filter((task) => task.postedBy?._id === user?._id);
   const myHelperTasks = tasks.filter((task) =>
-    task.helpersArray?.some(
-      (helper) => helper.user === user?._id || helper.user?._id === user?._id
-    )
-  );
+  task.helpersArray?.some((helper) => helper._id === user?._id)
+);
 
   return (
     
@@ -250,7 +267,7 @@ const HelperTaskRow = ({ task, getPostedByName, handleOpenModal }) => {
         )}
       </div>
       <div className="task-hover-info">
-        <p><strong>Posted by:</strong> {task.postedBy.fullName}</p>
+        <p><strong>Posted by:</strong> {task.postedBy?.fullName || 'Unknown'}</p>
         <p><strong>Description:</strong> {task.taskDescription}</p>
         <p><strong>Category:</strong> {task.category}</p>
         <p><strong>Location:</strong> {task.location}</p>

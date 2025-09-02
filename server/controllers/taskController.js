@@ -397,7 +397,7 @@ export const createSwapRequest = async (req, res) => {
 export const getSwapRequests = async (req, res) => {
   try {
     const requests = await SwapRequest.find({ recipient: req.user._id })
-      .populate('requester', 'fullName')
+      .populate('requester', 'firstName lastName fullName')
       .populate('taskToGive', 'taskName')
       .populate('taskToReceive', 'taskName');
       
