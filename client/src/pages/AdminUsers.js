@@ -67,10 +67,9 @@ function AdminUsers() {
     if (!user?._id) return;
     const id = user._id;
     const nextFlag = !Boolean(user.flag);
-
     setFlagPending(prev => new Set(prev).add(id));
     try {
-      const res = await fetch(`/api/users/${id}`, {
+      const res = await fetch(`${API}/api/users/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ flag: nextFlag }),
@@ -97,7 +96,7 @@ function AdminUsers() {
 
     setStatusPending(prev => new Set(prev).add(id));
     try {
-      const res = await fetch(`/api/users/${id}`, {
+      const res = await fetch(`${API}/api/users/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accountStatus: nextStatus }),
@@ -128,7 +127,7 @@ function AdminUsers() {
     setList(prev => prev.map(u => (u._id === id ? { ...u, role: newRole } : u)));
 
     try {
-      const res = await fetch(`/api/users/${id}`, {
+      const res = await fetch(`${API}/api/users/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: newRole }),
