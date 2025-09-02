@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import axios from 'axios';
+const API = process.env.REACT_APP_BACKEND_URL;
 
 export const useTaskStore = create((set) => ({
   tasks: [],
@@ -10,7 +11,7 @@ export const useTaskStore = create((set) => ({
   fetchTask: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await axios.get('http://localhost:5001/api/tasks');
+      const response = await axios.get(`${API}api/tasks`);
       set({ tasks: response.data.data, loading: false });
       return { success: true, message: 'Tasks fetched successfully' };
     } catch (error) {

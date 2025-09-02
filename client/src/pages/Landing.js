@@ -5,8 +5,6 @@ import { useTaskStore } from "../store/taskStore";
 import TaskTableLanding from "../components/TaskTableLanding";
 import "./style.css";
 
-const API_BASE =
-  process.env.REACT_APP_API_BASE?.replace(/\/+$/, "") || "";
 
 function useFetch(url, initial = []) {
   const [data, setData] = useState(initial);
@@ -42,11 +40,12 @@ const Landing = () => {
   const { tasks, loading, fetchTask, acceptTask } = useTaskStore();
   const { user } = useAuth();
   const [acceptPending, setAcceptPending] = useState(new Set());
+  const API = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
     fetchTask();
   }, [fetchTask]);
-  const { data: helpers, loading: loadingHelpers } = useFetch(`/api/users`, []);
+  const { data: helpers, loading: loadingHelpers } = useFetch(`${API}/api/users`, []);
 
   const topHelpers = useMemo(() => {
     if (!Array.isArray(helpers)) return [];
