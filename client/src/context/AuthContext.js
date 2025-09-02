@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+const API = process.env.REACT_APP_BACKEND_URL;
 
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
@@ -20,7 +21,7 @@ export const AuthProvider = ({ children }) => {
 
   const loadUser = async (token = localStorage.getItem('token')) => {
     if (!token) throw new Error('No authentication token found');
-    
+
     try {
       setLoading(true);
       if (!token) {
@@ -29,7 +30,7 @@ export const AuthProvider = ({ children }) => {
       
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
-      const res = await axios.get('http://localhost:5001/api/profile');
+      const res = await axios.get(`${API}/api/profile`);
       setUser(res.data);
       setError(null);
     } catch (err) {
@@ -63,7 +64,7 @@ export const AuthProvider = ({ children }) => {
       
       setLoading(true);
       setError(null); 
-      const res = await axios.post('http://localhost:5001/api/users/login', { email, password });
+      const res = await axios.post(`${API}/api/users/login`, { email, password });
       
       if (!res.data.token) {
         throw new Error('No authentication token received');
@@ -123,7 +124,7 @@ export const AuthProvider = ({ children }) => {
       headers = { 'Content-Type': 'application/json' };
     }
 
-    const res = await axios.put('http://localhost:5001/api/profile', data, { headers });
+    const res = await axios.put(`${API}/api/profile`, data, { headers });
 
     setUser(res.data);
     setError(null);

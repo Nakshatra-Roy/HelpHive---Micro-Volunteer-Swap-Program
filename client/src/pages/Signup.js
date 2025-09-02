@@ -22,13 +22,14 @@ function Signup() {
   });
 
   const navigate = useNavigate();
+  const API = process.env.REACT_APP_BACKEND_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       await axios.post(
-        "http://localhost:5001/api/users",
+        `${API}/api/users`,
         {
           firstName,
           lastName,
