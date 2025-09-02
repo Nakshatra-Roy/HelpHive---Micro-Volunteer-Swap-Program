@@ -109,6 +109,11 @@ const ViewTasks = () => {
 
   return (
     <section className="section">
+      <div className="backdrop">
+        <div className="blob b1" />
+        <div className="blob b2" />
+        <div className="grid-overlay" />
+      </div>
       <div className="container">
         <TaskFilters
           onFilterChange={setFilters}

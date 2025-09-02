@@ -1,6 +1,5 @@
-import React, { useMemo, useState } from "react";
-import axios from "axios";
-import { Link } from 'react-router-dom';
+import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
 
 const TaskTable = ({
   tasks = [],
@@ -10,9 +9,13 @@ const TaskTable = ({
   onAccept,
   sortOrder = "desc",
 }) => {
-  const placeholders = useMemo(() => Array.from({ length: 8 }, (_, i) => ({ _id: `placeholder-${i}` })),[]);
-  const [userMap, setUserMap] = useState({});
-  const [hoveredTaskId, setHoveredTaskId] = useState(null);
+  const placeholders = useMemo(
+    () =>
+      Array.from({ length: 5 }, (_, i) => ({
+        _id: `placeholder-${i}`,
+      })),
+    []
+  );
 
   const sortedTasks = useMemo(() => {
     if (loading) return placeholders;
@@ -25,185 +28,182 @@ const TaskTable = ({
 
   const rows = loading ? placeholders : sortedTasks;
 
-  const getPostedByName = async (userId) => {
-    if (userMap[userId]) return userMap[userId];
-    try {
-      const res = await axios.get(`/api/users/${userId}`);
-      const fullName = res.data.fullName || "Unknown";
-      setUserMap((prev) => ({ ...prev, [userId]: fullName }));
-      return fullName;
-    } catch (err) {
-      console.error(`Error fetching user ${userId}:`, err);
-      return "Unknown";
-    }
-  };
-
   return (
-    <>
-      <div className="card glass">
-        <div className="table">
-          <div className="row header">
-            <div>#</div>
-            <div>Task Name</div>
-            <div>Category</div>
-            <div>Location</div>
-            <div>Helpers Required</div>
-            <div>Current Helpers</div>
-            <div>Due Date</div>
-            <div>Priority</div>
-            <div>Credits</div>
-            <div>Actions</div>
-          </div>
+    <div className="feed-container">
+      {rows.map((t, i) => {
+        const id = loading ? i : t?._id || i;
+        const cur = loading ? 0 : t?.curHelpers || 0;
+        const req = loading ? 0 : t?.helpersReq || 0;
+        const isFull = !loading && cur >= req;
+        const isBusy = !loading && t?._id ? busyIds.has(t._id) : false;
 
-          {rows.map((t, i) => {
-            const id = loading ? i : t?._id || i;
-            const cur = loading ? 0 : t?.curHelpers || 0;
-            const req = loading ? 0 : t?.helpersReq || 0;
-            const isFull = !loading && cur >= req;
-            const isBusy = !loading && t?._id ? busyIds.has(t._id) : false;
-
-
-            return (
-              <div
-                className="row"
-                key={id}
-                style={{ position: "relative" }}
-                onMouseEnter={() => setHoveredTaskId(t._id)}
-                onMouseLeave={() => setHoveredTaskId(null)}
-              >
-                <div>{i + 1}</div>
-                 <div>
-                  {loading ? (
-                    <span>—</span>
-                  ) : (
-                    // We wrap the task name in a Link to the user's public profile
-                    <Link to={`/users/${t.postedBy?._id}`} className="user-link">
-                      {t?.taskName || "—"}
-                    </Link>
-                  )}
-                </div>
-                <div>{t?.category || "—"}</div>
-                <div>{t?.location || "—"}</div>
-                <div>{t?.helpersReq ?? "—"}</div>
-                <div>{t?.curHelpers ?? "—"}</div>
-                <div>
-                  {t?.date
-                    ? new Date(t.date).toLocaleDateString("en-GB", {
+        return (
+          <div key={id} className="card feed-card">
+            <div className="feed-header">
+              <div className="feed-poster">
+                {loading ? (
+                  <div className="skeleton skeleton-text short" />
+                ) : (
+                  <Link to={`/users/${t?.postedBy?._id}`} className="btn glossy tiny poster-link">
+                    by 👤 {t?.postedBy?.fullName || "Unknown"}
+                  </Link>
+                )}
+                <span className="feed-date">
+                  ✍️{t?.createdAt
+                    ? new Date(t.createdAt).toLocaleDateString("en-GB", {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
                       })
                     : "—"}
-                </div>
-                <div>{t?.priority || "—"}</div>
-                <div className="credits-cell">{t?.credits || "—"}</div>
-
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
-                >
-                  {!loading ? (
-                    <button
-                      onClick={() => t && onAccept?.(t)}
-                      className="btn glossy primary"
-                      style={{
-                        padding: "6px 12px",
-                        fontSize: "0.8rem",
-                        background: !isFull ? "#10b981" : undefined,
-                      }}
-                      disabled={isBusy || isFull || !userId}
-                      aria-busy={isBusy}
-                      title={
-                        !userId
-                          ? "Login required"
-                          : isFull
-                          ? "Task is full"
-                          : "Accept this task"
-                      }
-                    >
-                      {isBusy ? "..." : isFull ? "Full" : "Accept"}
-                    </button>
-                  ) : (
-                    <div className="pill">—</div>
-                  )}
-                </div>
-
-                {hoveredTaskId === t._id && (
-                  <div className="task-hover-info">
-                    <p>
-                      <strong>Posted by:</strong> {t.postedBy?.fullName || "Unknown"}
-                    </p>
-                    <p>
-                      <strong>Description:</strong>{" "}
-                      {t?.taskDescription || "—"}
-                    </p>
-                  </div>
-                )}
+                </span>
               </div>
-            );
-          })}
+              <span className={`priority-badge ${t?.priority?.toLowerCase() || ""}`}>
+                {t?.priority || "—"}
+              </span>
+            </div>
 
-          {!loading && tasks.length === 0 && (
-            <div className="row">
-              <div style={{ gridColumn: "1 / -1", opacity: 0.8 }}>
-                Search returned no results.
+            <div className="feed-body">
+              <h3 className="feed-title">
+                {loading ? (
+                  <div className="skeleton skeleton-text" />
+                ) : (
+                  t?.taskName || "Undefined"
+                )}
+              </h3>
+              <span className="feed-description">
+                {loading ? (
+                  <div className="skeleton skeleton-text long" />
+                ) : (
+                  t?.taskDescription || "No description provided."
+                )}
+              </span>
+                <br/>
+              <div className="feed-meta">
+                <span className="skill-pill">📍 {t?.location || "—"}</span>
+                <span className="skill-pill">
+                  👥 {cur}/{req} helpers
+                </span>
+                <span className="skill-pill">💰 {t?.credits || 0} credits</span>
+                <span className="skill-pill">🎯 {t?.date
+                    ? new Date(t.date).toLocaleDateString("en-GB", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "—"}</span>
+                    {!loading ? (
+                      <button
+                        onClick={() => t && onAccept?.(t)}
+                        className="btn glossy primary"
+                        disabled={isBusy || isFull || !userId}
+                        aria-busy={isBusy}
+                      >
+                        {isBusy ? "..." : isFull ? "Full" : "Accept"}
+                      </button>
+                    ) : (
+                      <div className="skeleton skeleton-btn" />
+                    )}
               </div>
             </div>
-          )}
-        </div>
-      </div>
+
+              
+          </div>
+        );
+      })}
+
+      {!loading && tasks.length === 0 && (
+        <p className="empty-feed">No tasks found 😢</p>
+      )}
 
       <style>{`
-        .table {
+        .feed-container {
           display: flex;
           flex-direction: column;
-          width: 100%;
+          gap: 1rem;
         }
-        .row {
-          display: grid;
-          grid-template-columns: 40px 1.5fr 1fr 1fr 1fr 1fr 1.2fr 1fr 1fr 120px;
+        .feed-card {
+          display: flex;
+          flex-direction: column;
+          gap: 0rem;
+        }
+        .feed-header {
+          display: flex;
+          justify-content: space-between;
           align-items: center;
-          gap: 8px;
-          padding: 8px 12px;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
         }
-        .row.head {
-          font-weight: bold;
-          background: #d9f99d;
+        .feed-poster {
+          display: flex;
+          flex-direction: column;
+          font-size: 0.9rem;
+          color: #374151;
         }
-        .pill {
+        .poster-link {
+          font-weight: 1000;
+          color: #2563eb;
+        }
+        .feed-date {
+          font-size: 0.8rem;
+          color: #6b7280;
+        }
+        .priority-badge {
           padding: 4px 8px;
-          border-radius: 999px;
-          background: rgba(255,255,255,0.1);
+          border-radius: 6px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
         }
-        .task-hover-info {
-          display: block;
-          position: absolute;
-          background: white;
-          color: black;
-          padding: 10px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-          border-radius: 8px;
-          top: 100%;
-          left: 0;
-          z-index: 10;
-          width: max-content;
-          max-width: 320px;
+        .priority-badge.low { background: #d1fae5; color: #065f46; }
+        .priority-badge.medium { background: #fef3c7; color: #92400e; }
+        .priority-badge.high { background: #fee2e2; color: #991b1b; }
+
+        .feed-body {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
         }
-        .btn[disabled] {
-          opacity: .6;
-          cursor: not-allowed;
+        .feed-title {
+          font-size: 1.1rem;
+          font-weight: 600;
         }
-        .credits-cell {
-          text-align: right;
-          font-weight: 500;
+        .feed-description {
+          font-size: 0.95rem;
+          color: #374151;
+        }
+        .feed-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          font-size: 0.9rem;
+          color: #4b5563;
+        }
+        .feed-actions {
+          display: flex;
+          justify-content: flex-end;
+        }
+        .empty-feed {
+          text-align: center;
+          color: #6b7280;
+          margin-top: 2rem;
+        }
+
+        /* Skeleton loaders */
+        .skeleton {
+          background: rgba(0,0,0,0.08);
+          border-radius: 4px;
+          animation: pulse 1.5s infinite;
+        }
+        .skeleton-text { height: 12px; width: 100px; }
+        .skeleton-text.long { width: 80%; height: 14px; }
+        .skeleton-text.short { width: 60px; }
+        .skeleton-btn { width: 80px; height: 30px; border-radius: 6px; }
+        @keyframes pulse {
+          0% { opacity: 0.6; }
+          50% { opacity: 1; }
+          100% { opacity: 0.6; }
         }
       `}</style>
-    </>
+    </div>
   );
 };
 

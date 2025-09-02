@@ -27,6 +27,11 @@ const SwapRequests = () => {
   }
 
   return (
+    <><div className="backdrop">
+        <div className="blob b1" />
+        <div className="blob b2" />
+        <div className="grid-overlay" />
+      </div>
     <div className="card glass">
       <h2 style={{ marginBottom: 16 }}>Incoming Swap Requests</h2>
       <div className="table">
@@ -67,6 +72,7 @@ const SwapRequests = () => {
             reverseOrder={false}
           />
     </div>
+    </>
   );
 };
 

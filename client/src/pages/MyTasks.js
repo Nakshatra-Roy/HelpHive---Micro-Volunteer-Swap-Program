@@ -79,7 +79,13 @@ const MyTasks = () => {
   );
 
   return (
+    
     <>
+    <div className="backdrop">
+        <div className="blob b1" />
+        <div className="blob b2" />
+        <div className="grid-overlay" />
+      </div>
       {/* --- POSTED TASKS --- */}
       <div className="card glass">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
