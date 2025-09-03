@@ -334,11 +334,13 @@ export const acceptSwap = async (req, res) => {
     if (!task1.helpersArray.includes(user2_Id)) {
       task1.helpersArray.push(user2_Id);
       task1.curHelpers += 1;
+      task1.status = 'in-progress';
     }
 
     if (!task2.helpersArray.includes(user1_Id)) {
       task2.helpersArray.push(user1_Id);
       task2.curHelpers += 1;
+      task1.status = 'in-progress';
     }
 
     await task1.save({ session });
@@ -377,6 +379,7 @@ export const createSwapRequest = async (req, res) => {
       taskToGive: taskToGiveId,
       taskToReceive: taskToReceiveId,
     });
+
     
     await swapRequest.save();
     res.status(201).json({ success: true, message: 'Swap request sent successfully.' });
