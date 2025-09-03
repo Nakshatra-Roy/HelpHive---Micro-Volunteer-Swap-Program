@@ -36,8 +36,8 @@ const SwapRequests = () => {
       <h2 style={{ marginBottom: 16 }}>Incoming Swap Requests</h2>
       <div className="table">
         <div className="row headed">
-          <div>Task You'll Give</div>
           <div>Task You'll Get</div>
+          <div>Task You'll Give</div>
           <div>Requested By</div>
           <div>Actions</div>
         </div>
