@@ -25,9 +25,9 @@ const ShowAdmins = ({ admins, loading }) => {
       });
       if (!res.ok) throw new Error(`Failed (${res.status})`);
       setList(prev => prev.map(u => (u._id === id ? { ...u, flag: nextFlag } : u)));
-      alert(nextFlag ? "User flagged successfully" : "User unflagged successfully");
+      toast.success(nextFlag ? "User flagged successfully" : "User unflagged successfully");
     } catch {
-      alert("Error toggling flag");
+      toast.error("Error toggling flag");
     } finally {
       setFlagPending(prev => {
         const s = new Set(prev);
@@ -52,9 +52,9 @@ const ShowAdmins = ({ admins, loading }) => {
       });
       if (!res.ok) throw new Error(`Failed (${res.status})`);
       setList(prev => prev.map(u => (u._id === id ? { ...u, accountStatus: nextStatus } : u)));
-      alert(nextStatus === "inactive" ? "User deactivated successfully" : "User activated successfully");
+      toast.success(nextStatus === "inactive" ? "User deactivated successfully" : "User activated successfully");
     } catch {
-      alert("Error updating account status");
+      toast.error("Error updating account status");
     } finally {
       setStatusPending(prev => {
         const s = new Set(prev);
@@ -82,11 +82,11 @@ const ShowAdmins = ({ admins, loading }) => {
         body: JSON.stringify({ role: newRole }),
       });
       if (!res.ok) throw new Error(`Failed (${res.status})`);
-      alert(`Role updated to ${newRole}`);
+      toast.success(`Role updated to ${newRole}`);
     } catch {
       // revert on failure
       setList(prev => prev.map(u => (u._id === id ? { ...u, role: prevRole } : u)));
-      alert("Error updating role");
+      toast.error("Error updating role");
     } finally {
       setRolePending(prev => {
         const s = new Set(prev);
