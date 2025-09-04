@@ -340,7 +340,7 @@ export const acceptSwap = async (req, res) => {
     if (!task2.helpersArray.includes(user1_Id)) {
       task2.helpersArray.push(user1_Id);
       task2.curHelpers += 1;
-      task1.status = 'in-progress';
+      task2.status = 'in-progress';
     }
 
     await task1.save({ session });
@@ -432,9 +432,11 @@ export const respondToSwapRequest = async (req, res) => {
 
       taskToReceive.helpersArray.push(request.requester);
       taskToReceive.curHelpers += 1;
+      taskToReceive.status = 'in-progress';
 
       taskToGive.helpersArray.push(request.recipient);
       taskToGive.curHelpers += 1;
+      taskToGive.status = 'in-progress';
       
       await taskToGive.save({ session });
       await taskToReceive.save({ session });
