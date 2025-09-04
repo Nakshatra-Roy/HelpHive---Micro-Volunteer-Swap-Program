@@ -4,7 +4,7 @@ import AdminSummary from '../components/AdminSummary';
 import AdminGlobalActivity from '../components/AdminGlobalActivity';
 import ShowAdmins from '../components/ShowAdmins';
 import AdminRecentActivity from '../components/AdminRecentActivity';
-  import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 const AdminDashboard = () => {
